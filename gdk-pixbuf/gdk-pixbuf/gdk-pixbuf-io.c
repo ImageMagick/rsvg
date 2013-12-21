@@ -451,6 +451,9 @@ gdk_pixbuf_io_init (void)
 #ifdef INCLUDE_xbm
         load_one_builtin_module (xbm);
 #endif
+#ifdef INCLUDE_svg
+        load_one_builtin_module (svg);
+#endif
 #ifdef INCLUDE_tga
         load_one_builtin_module (tga);
 #endif
@@ -660,6 +663,7 @@ module (pnm);
 module (bmp);
 module (wbmp);
 module (xbm);
+module (svg);
 module (tga);
 module (pcx);
 module (icns);
@@ -733,6 +737,9 @@ gdk_pixbuf_load_module_unlocked (GdkPixbufModule *image_module,
 #endif
 #ifdef INCLUDE_xbm
         try_module (xbm,xbm);
+#endif
+#ifdef INCLUDE_svg
+        try_module (svg,svg);
 #endif
 #ifdef INCLUDE_tga
         try_module (tga,tga);

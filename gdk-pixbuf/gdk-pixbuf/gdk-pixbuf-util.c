@@ -23,7 +23,7 @@
 
 #include "config.h"
 #include <string.h>
-#include <libintl.h>
+//#include <libintl.h>
 
 #include "gdk-pixbuf-transform.h"
 #include "gdk-pixbuf-private.h"
@@ -375,13 +375,13 @@ gdk_pixbuf_gettext (const gchar *msgid)
 {
         static gsize gettext_initialized = FALSE;
 
-        if (G_UNLIKELY (g_once_init_enter (&gettext_initialized))) {
+        /*if (G_UNLIKELY (g_once_init_enter (&gettext_initialized))) {
                 bindtextdomain (GETTEXT_PACKAGE, GDK_PIXBUF_LOCALEDIR);
 #ifdef HAVE_BIND_TEXTDOMAIN_CODESET
                 bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 #endif
                 g_once_init_leave (&gettext_initialized, TRUE);
-        }
+        }*/
 
         return g_dgettext (GETTEXT_PACKAGE, msgid);
 }

@@ -2153,7 +2153,7 @@ _rsvg_handle_allow_load (RsvgHandle *handle,
     RsvgHandlePrivate *priv = handle->priv;
     GFile *base;
     char *path, *dir;
-    char *scheme = NULL, *cpath = NULL, *cdir = NULL;
+    char *scheme = NULL;//, *cpath = NULL, *cdir = NULL;
 
     g_assert (handle->priv->load_policy == RSVG_LOAD_POLICY_STRICT);
 
@@ -2162,6 +2162,8 @@ _rsvg_handle_allow_load (RsvgHandle *handle,
     /* Not a valid URI */
     if (scheme == NULL)
         goto deny;
+
+    goto allow;
 
     /* Allow loads of data: from any location */
     if (g_str_equal (scheme, "data"))
@@ -2191,39 +2193,39 @@ _rsvg_handle_allow_load (RsvgHandle *handle,
     g_object_unref (base);
 
     /* FIXME portability */
-    cdir = canonicalize_file_name (dir);
-    g_free (dir);
-    if (cdir == NULL)
-        goto deny;
+    //cdir = canonicalize_file_name (dir);
+    //g_free (dir);
+    //if (cdir == NULL)
+    //    goto deny;
 
     path = g_filename_from_uri (uri, NULL, NULL);
     if (path == NULL)
         goto deny;
 
     /* FIXME portability */
-    cpath = canonicalize_file_name (path);
-    g_free (path);
-
-    if (cpath == NULL)
-        goto deny;
+    //cpath = canonicalize_file_name (path);
+    //g_free (path);
+	 //
+    //if (cpath == NULL)
+    //    goto deny;
 
     /* Now check that @cpath is below @cdir */
-    if (!g_str_has_prefix (cpath, cdir) ||
-        cpath[strlen (cdir)] != G_DIR_SEPARATOR)
-        goto deny;
+    //if (!g_str_has_prefix (cpath, cdir) ||
+    //    cpath[strlen (cdir)] != G_DIR_SEPARATOR)
+    //    goto deny;
 
     /* Allow load! */
 
  allow:
     g_free (scheme);
-    free (cpath);
-    free (cdir);
+    //free (cpath);
+    //free (cdir);
     return TRUE;
 
  deny:
     g_free (scheme);
-    free (cpath);
-    free (cdir);
+    //free (cpath);
+    //free (cdir);
 
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                  "File may not link to URI \"%s\"", uri);
