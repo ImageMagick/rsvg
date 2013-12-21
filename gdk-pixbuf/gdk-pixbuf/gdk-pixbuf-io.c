@@ -209,9 +209,9 @@ get_file_formats (void)
 
 /* DllMain function needed to tuck away the gdk-pixbuf DLL handle */
 
-static HMODULE gdk_pixbuf_dll;
+static HMODULE gdk_pixbuf_dll = NULL;
 
-BOOL WINAPI
+/*BOOL WINAPI
 DllMain (HINSTANCE hinstDLL,
          DWORD     fdwReason,
          LPVOID    lpvReserved)
@@ -223,7 +223,7 @@ DllMain (HINSTANCE hinstDLL,
         }
 
   return TRUE;
-}
+}*/
 
 char *
 _gdk_pixbuf_win32_get_toplevel (void)
@@ -830,19 +830,19 @@ _gdk_pixbuf_load_module (GdkPixbufModule *image_module,
                          GError         **error)
 {
         gboolean ret;
-        gboolean locked = FALSE;
+        //gboolean locked = FALSE;
 
         /* be extra careful, maybe the module initializes
          * the thread system
          */
-        if (g_threads_got_initialized) {
+        //if (g_threads_got_initialized) {
                 G_LOCK (init_lock);
-                locked = TRUE;
-        }
+        //        locked = TRUE;
+        //}
 
         ret = gdk_pixbuf_load_module_unlocked (image_module, error);
 
-        if (locked)
+        //if (locked)
                 G_UNLOCK (init_lock);
 
         return ret;
