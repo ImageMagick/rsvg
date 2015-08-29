@@ -1332,11 +1332,11 @@ box_blur_line (gint box_width, gint even_offset,
                gint len, gint bpp)
 {
     gint  i;
-    gint  lead;    /* This marks the leading edge of the kernel              */
-    gint  output;  /* This marks the center of the kernel                    */
-    gint  trail;   /* This marks the pixel BEHIND the last 1 in the
-                      kernel; it's the pixel to remove from the accumulator. */
-    gint  ac[bpp]; /* Accumulator for each channel                           */
+    gint  lead;   /* This marks the leading edge of the kernel              */
+    gint  output; /* This marks the center of the kernel                    */
+    gint  trail;  /* This marks the pixel BEHIND the last 1 in the
+                     kernel; it's the pixel to remove from the accumulator. */
+    gint  *ac;    /* Accumulator for each channel                           */
 
 
     /* The algorithm differs for even and odd-sized kernels.
@@ -1349,6 +1349,7 @@ box_blur_line (gint box_width, gint even_offset,
      * of these arrays.
      */
     lead = 0;
+    ac = g_new (gint, bpp);
 
     if (box_width % 2 != 0) {
         /* Odd-width kernel */
@@ -1452,6 +1453,7 @@ box_blur_line (gint box_width, gint even_offset,
         output++;
         trail++;
     }
+    g_free (ac);
 }
 
 static gint
