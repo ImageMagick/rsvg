@@ -86,8 +86,11 @@ subdir = tools
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
-	$(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/m4/gtk-doc.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/vapigen.m4 \
+	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -234,6 +237,7 @@ GTK3_BINARY_VERSION = @GTK3_BINARY_VERSION@
 GTK3_CFLAGS = @GTK3_CFLAGS@
 GTK3_LIBS = @GTK3_LIBS@
 GTKDOC_CHECK = @GTKDOC_CHECK@
+GTKDOC_CHECK_PATH = @GTKDOC_CHECK_PATH@
 GTKDOC_DEPS_CFLAGS = @GTKDOC_DEPS_CFLAGS@
 GTKDOC_DEPS_LIBS = @GTKDOC_DEPS_LIBS@
 GTKDOC_MKPDF = @GTKDOC_MKPDF@
@@ -293,6 +297,8 @@ RSVG_API_MAJOR_VERSION = @RSVG_API_MAJOR_VERSION@
 RSVG_API_MINOR_VERSION = @RSVG_API_MINOR_VERSION@
 RSVG_API_VERSION = @RSVG_API_VERSION@
 RSVG_API_VERSION_U = @RSVG_API_VERSION_U@
+RSVG_CONVERT_CFLAGS = @RSVG_CONVERT_CFLAGS@
+RSVG_CONVERT_LIBS = @RSVG_CONVERT_LIBS@
 RSVG_LT_VERSION_INFO = @RSVG_LT_VERSION_INFO@
 SED = @SED@
 SET_MAKE = @SET_MAKE@

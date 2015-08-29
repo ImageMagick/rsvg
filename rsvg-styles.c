@@ -37,7 +37,7 @@
 #include "rsvg-mask.h"
 #include "rsvg-marker.h"
 
-#include <libcroco.h>
+#include <libcroco/libcroco.h>
 
 #define RSVG_DEFAULT_FONT "Times New Roman"
 
@@ -311,7 +311,7 @@ rsvg_state_inherit_run (RsvgState * dst, const RsvgState * src,
     if (function (dst->has_text_anchor, src->has_text_anchor))
         dst->text_anchor = src->text_anchor;
     if (function (dst->has_letter_spacing, src->has_letter_spacing))
-	dst->letter_spacing = src->letter_spacing;
+        dst->letter_spacing = src->letter_spacing;
     if (function (dst->has_startMarker, src->has_startMarker))
         dst->startMarker = src->startMarker;
     if (function (dst->has_middleMarker, src->has_middleMarker))
@@ -329,10 +329,10 @@ rsvg_state_inherit_run (RsvgState * dst, const RsvgState * src,
     }
 
     if (function (dst->has_space_preserve, src->has_space_preserve))
-	dst->space_preserve = src->space_preserve;
+        dst->space_preserve = src->space_preserve;
 
     if (function (dst->has_visible, src->has_visible))
-	dst->visible = src->visible;
+        dst->visible = src->visible;
 
     if (function (dst->has_lang, src->has_lang)) {
         if (dst->has_lang)
@@ -807,6 +807,7 @@ rsvg_parse_style_pair (RsvgHandle * ctx,
             if (state->dash.n_dash != 0) {
                 /* free any cloned dash data */
                 g_free (state->dash.dash);
+                state->dash.dash = NULL;
                 state->dash.n_dash = 0;
             }
         } else {
@@ -840,6 +841,7 @@ rsvg_parse_style_pair (RsvgHandle * ctx,
                    be ignored */
                 if (total == 0) {
                     g_free (state->dash.dash);
+                    state->dash.dash = NULL;
                     state->dash.n_dash = 0;
                 }
             }
@@ -968,12 +970,28 @@ rsvg_parse_style (RsvgHandle * ctx, RsvgState * state, const char *str)
         if (g_strv_length (values) == 2) {
             gboolean important;
             gchar *style_value = NULL;
-            if (parse_style_value (values[1], &style_value, &important))
+            gchar *first_value = values[0];
+            gchar *second_value = values[1];
+            gchar **split_list;
+
+            /* Just remove single quotes in a trivial way.  No handling for any
+             * special character inside the quotes is done.  This relates
+             * especially to font-family names but cases with special characters
+             * are rare.
+             *
+             * We need a real CSS parser, sigh.
+             */
+            split_list = g_strsplit (second_value, "'", -1);
+            second_value = g_strjoinv(NULL, split_list);
+            g_strfreev(split_list);
+
+            if (parse_style_value (second_value, &style_value, &important))
                 rsvg_parse_style_pair (ctx, state,
-                                       g_strstrip (values[0]),
+                                       g_strstrip (first_value),
                                        style_value,
                                        important);
             g_free (style_value);
+            g_free (second_value);
         }
         g_strfreev (values);
     }
@@ -1164,7 +1182,7 @@ ccss_import_style (CRDocHandler * a_this,
                    CRString * a_uri, CRString * a_uri_default_ns, CRParsingLocation * a_location)
 {
     CSSUserData *user_data = (CSSUserData *) a_this->app_data;
-    guint8 *stylesheet_data;
+    char *stylesheet_data;
     gsize stylesheet_data_len;
     char *mime_type = NULL;
 
@@ -1172,7 +1190,7 @@ ccss_import_style (CRDocHandler * a_this,
         return;
 
     stylesheet_data = _rsvg_handle_acquire_data (user_data->ctx,
-                                                 (gchar *) cr_string_peek_raw_str (a_uri),
+                                                 cr_string_peek_raw_str (a_uri),
                                                  &mime_type,
                                                  &stylesheet_data_len,
                                                  NULL);
@@ -1184,8 +1202,7 @@ ccss_import_style (CRDocHandler * a_this,
         return;
     }
 
-    rsvg_parse_cssbuffer (user_data->ctx, (const char *) stylesheet_data,
-                          stylesheet_data_len);
+    rsvg_parse_cssbuffer (user_data->ctx, stylesheet_data, stylesheet_data_len);
     g_free (stylesheet_data);
     g_free (mime_type);
 }
@@ -1372,8 +1389,8 @@ rsvg_lookup_apply_css_style (RsvgHandle * ctx, const char *target, RsvgState * s
  * rsvg_parse_style_attrs:
  * @ctx: Rsvg context.
  * @state: Rsvg state
- * @tag: The SVG tag we're processing (eg: circle, ellipse), optionally %NULL
- * @klazz: The space delimited class list, optionally %NULL
+ * @tag: (nullable): The SVG tag we're processing (eg: circle, ellipse), optionally %NULL
+ * @klazz: (nullable): The space delimited class list, optionally %NULL
  * @atts: Attributes in SAX style.
  *
  * Parses style and transform attributes and modifies state at top of
@@ -1501,7 +1518,8 @@ rsvg_state_free_all (RsvgState * state)
 
 /**
  * rsvg_property_bag_new:
- * @atts:
+ * @atts: (array zero-terminated=1): list of alternating attributes
+ *   and values
  * 
  * The property bag will NOT copy the attributes and values. If you need
  * to store them for later, use rsvg_property_bag_dup().
@@ -1526,7 +1544,7 @@ rsvg_property_bag_new (const char **atts)
 
 /**
  * rsvg_property_bag_dup:
- * @bag:
+ * @bag: property bag to duplicate
  * 
  * Returns a copy of @bag that owns the attributes and values.
  * 

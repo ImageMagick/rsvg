@@ -18,7 +18,6 @@
  */
 
 #include "config.h"
-#include "rsvg.h"
 #include "rsvg-private.h"
 #include "rsvg-size-callback.h"
 
@@ -30,12 +29,11 @@
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 
+#include "rsvg-compat.h"
+
 #if 0 // defined (G_OS_UNIX)
 #include <gio/gunixinputstream.h>
 #endif
-
-#define DEFAULT_WIDTH  640
-#define DEFAULT_HEIGHT 480
 
 /* RsvgImage */
 
@@ -348,8 +346,8 @@ save_file (const char *title, const char *suggested_filename, GtkWidget * parent
     dialog = gtk_file_chooser_dialog_new (title,
                                           GTK_WINDOW (parent),
                                           GTK_FILE_CHOOSER_ACTION_SAVE,
-                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                          GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
+                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                          _("_Save"), GTK_RESPONSE_ACCEPT, NULL);
 
     if (suggested_filename && *suggested_filename) {
         gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (dialog), suggested_filename);
@@ -430,16 +428,12 @@ create_popup_menu (ViewerCbInfo * info)
 {
     GtkWidget *popup_menu;
     GtkWidget *menu_item;
-    GtkWidget *stock;
 
     popup_menu = gtk_menu_new ();
     gtk_menu_set_accel_group (GTK_MENU (popup_menu), info->accel_group);
 
     if (info->base_uri) {
-        menu_item = gtk_image_menu_item_new_with_label (_("Copy SVG location"));
-        stock = gtk_image_new_from_stock (GTK_STOCK_COPY, GTK_ICON_SIZE_MENU);
-        gtk_widget_show (stock);
-        gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), stock);
+        menu_item = gtk_menu_item_new_with_label (_("Copy SVG location"));
         g_signal_connect (menu_item, "activate", G_CALLBACK (copy_svg_location), info);
         gtk_widget_show (menu_item);
         gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), menu_item);
@@ -447,31 +441,28 @@ create_popup_menu (ViewerCbInfo * info)
                                     GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
     }
 
-    menu_item = gtk_image_menu_item_new_with_label (_("Save as PNG"));
-    stock = gtk_image_new_from_stock (GTK_STOCK_SAVE_AS, GTK_ICON_SIZE_MENU);
-    gtk_widget_show (stock);
-    gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), stock);
+    menu_item = gtk_menu_item_new_with_label (_("Save as PNG"));
     g_signal_connect (menu_item, "activate", G_CALLBACK (save_pixbuf), info);
     gtk_widget_show (menu_item);
     gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), menu_item);
     gtk_widget_add_accelerator (menu_item, "activate", info->accel_group, GDK_KEY_S,
                                 GDK_CONTROL_MASK | GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE);
 
-    menu_item = gtk_image_menu_item_new_from_stock (GTK_STOCK_PRINT, NULL);
+    menu_item = gtk_menu_item_new_with_label (_("Print"));
     g_signal_connect (menu_item, "activate", G_CALLBACK (print_pixbuf), info);
     gtk_widget_show (menu_item);
     gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), menu_item);
     gtk_widget_add_accelerator (menu_item, "activate", info->accel_group, GDK_KEY_P, GDK_CONTROL_MASK,
                                 GTK_ACCEL_VISIBLE);
 
-    menu_item = gtk_image_menu_item_new_from_stock (GTK_STOCK_ZOOM_IN, NULL);
+    menu_item = gtk_menu_item_new_with_label (_("Zoom In"));
     g_signal_connect (menu_item, "activate", G_CALLBACK (zoom_in), info);
     gtk_widget_show (menu_item);
     gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), menu_item);
     gtk_widget_add_accelerator (menu_item, "activate", info->accel_group, GDK_KEY_plus,
                                 GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-
-    menu_item = gtk_image_menu_item_new_from_stock (GTK_STOCK_ZOOM_OUT, NULL);
+                                              
+    menu_item = gtk_menu_item_new_with_label (_("Zoom Out"));
     g_signal_connect (menu_item, "activate", G_CALLBACK (zoom_out), info);
     gtk_widget_show (menu_item);
     gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), menu_item);
@@ -502,26 +493,28 @@ quit_cb (GtkWidget * win, gpointer unused)
     gtk_main_quit ();
 }
 
+static GtkToolItem *
+tool_button_new (const char *icon_name)
+{
+    GtkToolItem *toolitem;
+
+    toolitem = gtk_tool_button_new (NULL, NULL);
+    gtk_tool_button_set_icon_name (GTK_TOOL_BUTTON (toolitem), icon_name);
+    return toolitem;
+}
+
 static void
 populate_window (GtkWidget * win, 
                  ViewerCbInfo * info, 
-                 cairo_surface_t *surface /* adopted */,
-                 gint win_width, 
-                 gint win_height)
+                 cairo_surface_t *surface /* adopted */)
 {
     GtkWidget *vbox;
     GtkWidget *scroll;
     GtkWidget *toolbar;
     GtkToolItem *toolitem;
-    GtkRequisition requisition;
-    gint img_width, img_height;
 
     vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add (GTK_CONTAINER (win), vbox);
-
-    /* pack the window with the image */
-    img_width = cairo_image_surface_get_width (surface);
-    img_height = cairo_image_surface_get_height (surface);
 
     /* create a new image */
     info->image = rsvg_image_new_take_surface (surface);
@@ -529,59 +522,47 @@ populate_window (GtkWidget * win,
     toolbar = gtk_toolbar_new ();
     gtk_box_pack_start (GTK_BOX (vbox), toolbar, FALSE, FALSE, 0);
 
-    toolitem = gtk_tool_button_new_from_stock (GTK_STOCK_ZOOM_IN);
+    toolitem = tool_button_new ("zoom-in");
     gtk_toolbar_insert (GTK_TOOLBAR (toolbar), toolitem, 0);
     g_signal_connect (toolitem, "clicked", G_CALLBACK (zoom_in), info);
 
-    toolitem = gtk_tool_button_new_from_stock (GTK_STOCK_ZOOM_OUT);
+    toolitem = tool_button_new ("zoom-out");
     gtk_toolbar_insert (GTK_TOOLBAR (toolbar), toolitem, 1);
     g_signal_connect (toolitem, "clicked", G_CALLBACK (zoom_out), info);
-
-    gtk_widget_size_request(toolbar, &requisition);
-
-    /* HACK: adjust for frame width & height + packing borders */
-    img_height += requisition.height + 30;
-    win_height += requisition.height + 30;
-    img_width  += 20;
-    win_width  += 20;
 
     scroll = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
                                     GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (scroll), 
-                                           GTK_WIDGET (info->image));
+    gtk_container_add (GTK_CONTAINER (scroll), GTK_WIDGET (info->image));
     gtk_box_pack_start (GTK_BOX (vbox), scroll, TRUE, TRUE, 0);
 }
 
 static void
 view_surface (ViewerCbInfo * info, 
               cairo_surface_t *surface /* adopted */,
-              const char *color)
+              const char *bg_color)
 {
     GtkWidget *win;
-    GdkColor bg_color;
-    gint win_width, win_height;
 
     /* create toplevel window and set its title */
 
     win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
-    win_width = DEFAULT_WIDTH;
-    win_height = DEFAULT_HEIGHT;
-
-    populate_window (win, info, surface, win_width, win_height);
+    populate_window (win, info, surface);
 
     /* exit when 'X' is clicked */
     g_signal_connect (win, "destroy", G_CALLBACK (quit_cb), NULL);
     g_signal_connect (win, "delete_event", G_CALLBACK (quit_cb), NULL);
 
-    if (color && strcmp (color, "none") != 0) {
-        if (gdk_color_parse (color, &bg_color)) {
+    if (bg_color && strcmp (bg_color, "none") != 0) {
+        GdkRGBA rgba;
+
+        if (gdk_rgba_parse (&rgba, bg_color)) {
             GtkWidget *parent_widget = gtk_widget_get_parent (GTK_WIDGET (info->image));
 
-            gtk_widget_modify_bg (parent_widget, GTK_STATE_NORMAL, &bg_color);
+            gtk_widget_override_background_color (parent_widget, GTK_STATE_FLAG_NORMAL, &rgba);
         } else
-            g_warning (_("Couldn't parse color '%s'"), color);
+            g_warning (_("Couldn't parse color '%s'"), bg_color);
     }
 
     create_popup_menu (info);
@@ -612,6 +593,7 @@ main (int argc, char **argv)
     char *bg_color = NULL;
     char *base_uri = NULL;
     gboolean keep_aspect_ratio = FALSE;
+    gboolean unlimited = FALSE;
     char *id = NULL;
     GInputStream *input;
     GFileInfo *file_info;
@@ -621,6 +603,8 @@ main (int argc, char **argv)
 
     int from_stdin = 0;
     ViewerCbInfo info;
+
+    RsvgHandleFlags flags = RSVG_HANDLE_FLAGS_NONE;
 
     char **args = NULL;
     gint n_args = 0;
@@ -646,6 +630,8 @@ main (int argc, char **argv)
          N_("<string>")},
         {"keep-aspect", 'k', 0, G_OPTION_ARG_NONE, &keep_aspect_ratio,
          N_("Preserve the image's aspect ratio"), NULL},
+        {"unlimited", 'u', 0, G_OPTION_ARG_NONE, &unlimited,
+         N_("Allow huge SVG files"), NULL},
         {"version", 'v', 0, G_OPTION_ARG_NONE, &bVersion, N_("Show version information"), NULL},
         {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &args, NULL, N_("[FILE...]")},
         {NULL}
@@ -654,7 +640,7 @@ main (int argc, char **argv)
 	/* Set the locale so that UTF-8 filenames work */
     setlocale(LC_ALL, "");
 
-    g_type_init ();
+    RSVG_G_TYPE_INIT;
 
     info.window = NULL;
     info.popup_menu = NULL;
@@ -687,6 +673,9 @@ main (int argc, char **argv)
     rsvg_set_default_dpi_x_y (dpi_x, dpi_y);
 
     compressed = FALSE;
+
+    if (unlimited)
+        flags |= RSVG_HANDLE_FLAG_UNLIMITED;
 
     if (from_stdin) {
 #if 0 // defined (G_OS_UNIX)
@@ -749,10 +738,11 @@ main (int argc, char **argv)
 
     info.handle = rsvg_handle_new_from_stream_sync (input, 
                                                     base_file, 
-                                                    RSVG_HANDLE_FLAGS_NONE,
+                                                    flags,
                                                     NULL /* cancellable */,
                                                     &err);
-    g_object_unref (base_file);
+    if (base_file != NULL)
+        g_object_unref (base_file);
     g_object_unref (input);
 
     if (info.handle == NULL) {

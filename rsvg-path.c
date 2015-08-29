@@ -177,7 +177,7 @@ rsvg_path_builder_finish (RsvgPathBuilder *builder)
 }
 
 static void
-rsvg_path_arc_segment (RSVGParsePathCtx * ctx,
+rsvg_path_arc_segment (RsvgPathBuilder *builder,
                        double xc, double yc,
                        double th0, double th1, double rx, double ry,
                        double x_axis_rotation)
@@ -200,39 +200,43 @@ rsvg_path_arc_segment (RSVGParsePathCtx * ctx,
     x2 = x3 + rx*(t * sin (th1));
     y2 = y3 + ry*(-t * cos (th1));
 
-    rsvg_path_builder_curve_to (&ctx->builder,
-                            xc + cosf*x1 - sinf*y1,
-                            yc + sinf*x1 + cosf*y1,
-                            xc + cosf*x2 - sinf*y2,
-                            yc + sinf*x2 + cosf*y2,
-                            xc + cosf*x3 - sinf*y3,
-                            yc + sinf*x3 + cosf*y3);
+    rsvg_path_builder_curve_to (builder,
+                                xc + cosf*x1 - sinf*y1,
+                                yc + sinf*x1 + cosf*y1,
+                                xc + cosf*x2 - sinf*y2,
+                                yc + sinf*x2 + cosf*y2,
+                                xc + cosf*x3 - sinf*y3,
+                                yc + sinf*x3 + cosf*y3);
 }
 
 /**
- * rsvg_path_arc:
- * @ctx: Path context.
+ * rsvg_path_builder_arc:
+ * @builder: Path builder.
+ * @x1: Starting x coordinate
+ * @y1: Starting y coordinate
  * @rx: Radius in x direction (before rotation).
  * @ry: Radius in y direction (before rotation).
  * @x_axis_rotation: Rotation angle for axes.
  * @large_arc_flag: 0 for arc length <= 180, 1 for arc >= 180.
- * @sweep: 0 for "negative angle", 1 for "positive angle".
- * @x: New x coordinate.
- * @y: New y coordinate.
+ * @sweep_flag: 0 for "negative angle", 1 for "positive angle".
+ * @x2: Ending x coordinate
+ * @y2: Ending y coordinate
  *
  * Add an RSVG arc to the path context.
  **/
-static void
-rsvg_path_arc (RSVGParsePathCtx * ctx,
-               double rx, double ry, double x_axis_rotation,
-               int large_arc_flag, int sweep_flag, double x, double y)
+void
+rsvg_path_builder_arc (RsvgPathBuilder *builder,
+                       double x1, double y1,
+                       double rx, double ry,
+                       double x_axis_rotation,
+                       gboolean large_arc_flag, gboolean sweep_flag,
+                       double x2, double y2)
 {
 
     /* See Appendix F.6 Elliptical arc implementation notes
        http://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes */
 
     double f, sinf, cosf;
-    double x1, y1, x2, y2;
     double x1_, y1_;
     double cx_, cy_, cx, cy;
     double gamma;
@@ -241,103 +245,95 @@ rsvg_path_arc (RSVGParsePathCtx * ctx,
 
     int i, n_segs;
 
-    /* Start and end of path segment */
-    x1 = ctx->cp.point.x;
-    y1 = ctx->cp.point.y;
-
-    x2 = x;
-    y2 = y;
-
-    if(x1 == x2 && y1 == y2)
+    if (x1 == x2 && y1 == y2)
         return;
 
     /* X-axis */
     f = x_axis_rotation * M_PI / 180.0;
-    sinf = sin(f);
-    cosf = cos(f);
+    sinf = sin (f);
+    cosf = cos (f);
+
+    rx = fabs (rx);
+    ry = fabs (ry);
 
     /* Check the radius against floading point underflow.
        See http://bugs.debian.org/508443 */
-    if ((fabs(rx) < DBL_EPSILON) || (fabs(ry) < DBL_EPSILON)) {
-        rsvg_path_builder_line_to (&ctx->builder, x, y);
+    if ((rx < DBL_EPSILON) || (ry < DBL_EPSILON)) {
+        rsvg_path_builder_line_to (builder, x2, y2);
         return;
     }
 
-    if(rx < 0)rx = -rx;
-    if(ry < 0)ry = -ry;
-
-    k1 = (x1 - x2)/2;
-    k2 = (y1 - y2)/2;
+    k1 = (x1 - x2) / 2;
+    k2 = (y1 - y2) / 2;
 
     x1_ = cosf * k1 + sinf * k2;
     y1_ = -sinf * k1 + cosf * k2;
 
-    gamma = (x1_*x1_)/(rx*rx) + (y1_*y1_)/(ry*ry);
+    gamma = (x1_ * x1_) / (rx * rx) + (y1_ * y1_) / (ry * ry);
     if (gamma > 1) {
-        rx *= sqrt(gamma);
-        ry *= sqrt(gamma);
+        rx *= sqrt (gamma);
+        ry *= sqrt (gamma);
     }
 
     /* Compute the center */
 
-    k1 = rx*rx*y1_*y1_ + ry*ry*x1_*x1_;
-    if(k1 == 0)    
+    k1 = rx * rx * y1_ * y1_ + ry * ry * x1_ * x1_;
+    if (k1 == 0)
         return;
 
-    k1 = sqrt(fabs((rx*rx*ry*ry)/k1 - 1));
-    if(sweep_flag == large_arc_flag)
+    k1 = sqrt (fabs ((rx * rx * ry * ry) / k1 - 1));
+    if (sweep_flag == large_arc_flag)
         k1 = -k1;
 
-    cx_ = k1*rx*y1_/ry;
-    cy_ = -k1*ry*x1_/rx;
+    cx_ = k1 * rx * y1_ / ry;
+    cy_ = -k1 * ry * x1_ / rx;
     
-    cx = cosf*cx_ - sinf*cy_ + (x1+x2)/2;
-    cy = sinf*cx_ + cosf*cy_ + (y1+y2)/2;
+    cx = cosf * cx_ - sinf * cy_ + (x1 + x2) / 2;
+    cy = sinf * cx_ + cosf * cy_ + (y1 + y2) / 2;
 
     /* Compute start angle */
 
-    k1 = (x1_ - cx_)/rx;
-    k2 = (y1_ - cy_)/ry;
-    k3 = (-x1_ - cx_)/rx;
-    k4 = (-y1_ - cy_)/ry;
+    k1 = (x1_ - cx_) / rx;
+    k2 = (y1_ - cy_) / ry;
+    k3 = (-x1_ - cx_) / rx;
+    k4 = (-y1_ - cy_) / ry;
 
-    k5 = sqrt(fabs(k1*k1 + k2*k2));
-    if(k5 == 0)return;
+    k5 = sqrt (fabs (k1 * k1 + k2 * k2));
+    if (k5 == 0)
+        return;
 
-    k5 = k1/k5;
-    if(k5 < -1)k5 = -1;
-    else if(k5 > 1)k5 = 1;
-    theta1 = acos(k5);
-    if(k2 < 0)theta1 = -theta1;
+    k5 = k1 / k5;
+    k5 = CLAMP (k5, -1, 1);
+    theta1 = acos (k5);
+    if (k2 < 0)
+        theta1 = -theta1;
 
     /* Compute delta_theta */
 
-    k5 = sqrt(fabs((k1*k1 + k2*k2)*(k3*k3 + k4*k4)));
-    if(k5 == 0)return;
+    k5 = sqrt (fabs ((k1 * k1 + k2 * k2) * (k3 * k3 + k4 * k4)));
+    if (k5 == 0)
+        return;
 
-    k5 = (k1*k3 + k2*k4)/k5;
-    if(k5 < -1)k5 = -1;
-    else if(k5 > 1)k5 = 1;
-    delta_theta = acos(k5);
-    if(k1*k4 - k3*k2 < 0)delta_theta = -delta_theta;
+    k5 = (k1 * k3 + k2 * k4) / k5;
+    k5 = CLAMP (k5, -1, 1);
+    delta_theta = acos (k5);
+    if (k1 * k4 - k3 * k2 < 0)
+        delta_theta = -delta_theta;
 
-    if(sweep_flag && delta_theta < 0)
-        delta_theta += M_PI*2;
-    else if(!sweep_flag && delta_theta > 0)
-        delta_theta -= M_PI*2;
+    if (sweep_flag && delta_theta < 0)
+        delta_theta += M_PI * 2;
+    else if (!sweep_flag && delta_theta > 0)
+        delta_theta -= M_PI * 2;
    
     /* Now draw the arc */
 
     n_segs = ceil (fabs (delta_theta / (M_PI * 0.5 + 0.001)));
 
     for (i = 0; i < n_segs; i++)
-        rsvg_path_arc_segment (ctx, cx, cy,
+        rsvg_path_arc_segment (builder, cx, cy,
 			                   theta1 + i * delta_theta / n_segs,
                                theta1 + (i + 1) * delta_theta / n_segs,
                                rx, ry, x_axis_rotation);
-
-    ctx->cp.point.x = x;
-    ctx->cp.point.y = y;
 }
 
 
@@ -433,6 +429,7 @@ rsvg_parse_path_do_cmd (RSVGParsePathCtx * ctx, gboolean final)
         if (ctx->param == 1) {
             rsvg_path_builder_line_to (&ctx->builder, ctx->params[0], ctx->cp.point.y);
             ctx->cp.point.x = ctx->rp.point.x = ctx->params[0];
+            ctx->rp.point.y = ctx->cp.point.y;
             ctx->param = 0;
         }
         break;
@@ -440,6 +437,7 @@ rsvg_parse_path_do_cmd (RSVGParsePathCtx * ctx, gboolean final)
         /* vertical lineto */
         if (ctx->param == 1) {
             rsvg_path_builder_line_to (&ctx->builder, ctx->cp.point.x, ctx->params[0]);
+            ctx->rp.point.x = ctx->cp.point.x;
             ctx->cp.point.y = ctx->rp.point.y = ctx->params[0];
             ctx->param = 0;
         }
@@ -513,9 +511,38 @@ rsvg_parse_path_do_cmd (RSVGParsePathCtx * ctx, gboolean final)
         break;
     case 'a':
         if (ctx->param == 7 || final) {
-            rsvg_path_arc (ctx,
-                           ctx->params[0], ctx->params[1], ctx->params[2],
-                           ctx->params[3], ctx->params[4], ctx->params[5], ctx->params[6]);
+            double x1, y1;
+            double rx, ry;
+            double x_axis_rotation;
+            gboolean large_arc_flag;
+            gboolean sweep_flag;
+            double x2, y2;
+
+            x1 = ctx->cp.point.x;
+            y1 = ctx->cp.point.y;
+
+            rx = ctx->params[0];
+            ry = ctx->params[1];
+
+            x_axis_rotation = ctx->params[2];
+
+            large_arc_flag = (ctx->params[3] == 0 ? FALSE : TRUE);
+            sweep_flag = (ctx->params[4] == 0 ? FALSE : TRUE);
+
+            x2 = ctx->params[5];
+            y2 = ctx->params[6];
+
+            rsvg_path_builder_arc (&ctx->builder,
+                                   x1, y1,
+                                   rx, ry,
+                                   x_axis_rotation,
+                                   large_arc_flag,
+                                   sweep_flag,
+                                   x2, y2);
+
+            ctx->cp.point.x = x2;
+            ctx->cp.point.y = y2;
+
             ctx->param = 0;
         }
         break;
@@ -568,100 +595,135 @@ rsvg_path_end_of_number (RSVGParsePathCtx * ctx, double val, int sign, int exp_s
     rsvg_parse_path_do_cmd (ctx, FALSE);    
 }
 
+#define RSVGN_IN_PREINTEGER  0
+#define RSVGN_IN_INTEGER     1
+#define RSVGN_IN_FRACTION    2
+#define RSVGN_IN_PREEXPONENT 3
+#define RSVGN_IN_EXPONENT    4
+
+#define RSVGN_GOT_SIGN          0x1
+#define RSVGN_GOT_EXPONENT_SIGN 0x2
+
+/* Returns the length of the number parsed, so it can be skipped
+ * in rsvg_parse_path_data. Calls rsvg_path_end_number to have the number
+ * processed in its command.
+ */
+static int
+rsvg_parse_number (RSVGParsePathCtx * ctx, const char *data)
+{
+    int length = 0;
+    int in = RSVGN_IN_PREINTEGER; /* Current location within the number */
+    int got = 0x0; /* [bitfield] Having 2 of each of these is an error */
+    gboolean end = FALSE; /* Set to true if the number should end after a char */
+    gboolean error = FALSE; /* Set to true if the number ended due to an error */
+
+    double value = 0.0;
+    double fraction = 1.0;
+    int sign = +1; /* Presume the INTEGER is positive if it has no sign */
+    int exponent = 0;
+    int exponent_sign = +1; /* Presume the EXPONENT is positive if it has no sign */
+
+    while (data[length] != '\0' && !end && !error) {
+        char c = data[length];
+        switch (in) {
+            case RSVGN_IN_PREINTEGER: /* No numbers yet, we're just starting out */
+                /* LEGAL: + - .->FRACTION DIGIT->INTEGER */
+                if (c == '+' || c == '-') {
+                    if (got & RSVGN_GOT_SIGN) {
+                        error = TRUE; /* Two signs: not allowed */
+                    } else {
+                        sign = c == '+' ? +1 : -1;
+                        got |= RSVGN_GOT_SIGN;
+                    }
+                } else if (c == '.') {
+                    in = RSVGN_IN_FRACTION;
+                } else if (c >= '0' && c <= '9') {
+                    value = c - '0';
+                    in = RSVGN_IN_INTEGER;
+                }
+                break;
+            case RSVGN_IN_INTEGER: /* Previous character(s) was/were digit(s) */
+                /* LEGAL: DIGIT .->FRACTION E->PREEXPONENT */
+                if (c >= '0' && c <= '9') {
+                    value = value * 10 + (c - '0');
+                }
+                else if (c == '.') {
+                    in = RSVGN_IN_FRACTION;
+                }
+                else if (c == 'e' || c == 'E') {
+                    in = RSVGN_IN_PREEXPONENT;
+                }
+                else {
+                    end = TRUE;
+                }
+                break;
+            case RSVGN_IN_FRACTION: /* Previously, digit(s) in the fractional part */
+                /* LEGAL: DIGIT E->PREEXPONENT */
+                if (c >= '0' && c <= '9') {
+                    fraction *= 0.1;
+                    value += fraction * (c - '0');
+                }
+                else if (c == 'e' || c == 'E') {
+                    in = RSVGN_IN_PREEXPONENT;
+                }
+                else {
+                    end = TRUE;
+                }
+                break;
+            case RSVGN_IN_PREEXPONENT: /* Right after E */
+                /* LEGAL: + - DIGIT->EXPONENT */
+                if (c == '+' || c == '-') {
+                    if (got & RSVGN_GOT_EXPONENT_SIGN) {
+                        error = TRUE; /* Two signs: not allowed */
+                    } else {
+                        exponent_sign = c == '+' ? +1 : -1;
+                        got |= RSVGN_GOT_EXPONENT_SIGN;
+                    }
+                } else if (c >= '0' && c <= '9') {
+                    exponent = c - '0';
+                    in = RSVGN_IN_EXPONENT;
+                }
+                break;
+            case RSVGN_IN_EXPONENT: /* After E and the sign, if applicable */
+                /* LEGAL: DIGIT */
+                if (c >= '0' && c <= '9') {
+                    exponent = exponent * 10 + (c - '0');
+                } else {
+                    end = TRUE;
+                }
+                break;
+        }
+        length++;
+    }
+
+    /* TODO? if (error) report_the_error_somehow(); */
+    rsvg_path_end_of_number(ctx, value, sign, exponent_sign, exponent);
+    return end /* && !error */ ? length - 1 : length;
+}
+
 static void
 rsvg_parse_path_data (RSVGParsePathCtx * ctx, const char *data)
 {
     int i = 0;
-    double val = 0;
     char c = 0;
-    gboolean in_num = FALSE;
-    gboolean in_frac = FALSE;
-    gboolean in_exp = FALSE;
-    gboolean exp_wait_sign = FALSE;
-    int sign = 0;
-    int exp = 0;
-    int exp_sign = 0;
-    double frac = 0.0;
 
-    in_num = FALSE;
-    for (i = 0;; i++) {
+    for (i = 0; data[i] != '\0'; i++) {
         c = data[i];
-        if (c >= '0' && c <= '9') {
+        if ((c >= '0' && c <= '9') || c == '+' || c == '-' || c == '.') {
             /* digit */
-            if (in_num) {
-                if (in_exp) {
-                    exp = (exp * 10) + c - '0';
-                    exp_wait_sign = FALSE;
-                } else if (in_frac)
-                    val += (frac *= 0.1) * (c - '0');
-                else
-                    val = (val * 10) + c - '0';
-            } else {
-                in_num = TRUE;
-                in_frac = FALSE;
-                in_exp = FALSE;
-                exp = 0;
-                exp_sign = 1;
-                exp_wait_sign = FALSE;
-                val = c - '0';
-                sign = 1;
-            }
-        } else if (c == '.') {
-            if (!in_num) {
-                in_frac = TRUE;
-                val = 0;
-            }
-            else if (in_frac) {
-                rsvg_path_end_of_number(ctx, val, sign, exp_sign, exp);
-                in_frac = FALSE;
-                in_exp = FALSE;
-                exp = 0;
-                exp_sign = 1;
-                exp_wait_sign = FALSE;
-                val = 0;
-                sign = 1;
-            }
-            else {
-                in_frac = TRUE;
-            }
-            in_num = TRUE;
-            frac = 1;
-        } else if ((c == 'E' || c == 'e') && in_num) {
-            in_exp = TRUE;
-            exp_wait_sign = TRUE;
-            exp = 0;
-            exp_sign = 1;
-        } else if ((c == '+' || c == '-') && in_exp) {
-            exp_sign = c == '+' ? 1 : -1;
-        } else if (in_num) {
-            /* end of number */
-            rsvg_path_end_of_number(ctx, val, sign, exp_sign, exp);
-            in_num = FALSE;
-        }
-
-        if (c == '\0')
-            break;
-        else if ((c == '+' || c == '-') && !exp_wait_sign) {
-            sign = c == '+' ? 1 : -1;
-            val = 0;
-            in_num = TRUE;
-            in_frac = FALSE;
-            in_exp = FALSE;
-            exp = 0;
-            exp_sign = 1;
-            exp_wait_sign = FALSE;
+            i += rsvg_parse_number(ctx, data + i) - 1;
         } else if (c == 'z' || c == 'Z') {
             if (ctx->param)
                 rsvg_parse_path_do_cmd (ctx, TRUE);
             rsvg_path_builder_close_path (&ctx->builder);
 
             ctx->cp = ctx->rp = g_array_index (ctx->builder.path_data, cairo_path_data_t, ctx->builder.path_data->len - 1);
-        } else if (c >= 'A' && c <= 'Z' && c != 'E') {
+        } else if (c >= 'A' && c < 'Z' && c != 'E') {
             if (ctx->param)
                 rsvg_parse_path_do_cmd (ctx, TRUE);
             ctx->cmd = c + 'a' - 'A';
             ctx->rel = FALSE;
-        } else if (c >= 'a' && c <= 'z' && c != 'e') {
+        } else if (c >= 'a' && c < 'z' && c != 'e') {
             if (ctx->param)
                 rsvg_parse_path_do_cmd (ctx, TRUE);
             ctx->cmd = c;

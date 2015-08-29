@@ -50,24 +50,13 @@ G_BEGIN_DECLS
 #define RSVG_IS_HANDLE_CLASS(klass)       (G_TYPE_CHECK_CLASS_TYPE ((klass), RSVG_TYPE_HANDLE))
 #define RSVG_HANDLE_GET_CLASS(obj)        (G_TYPE_INSTANCE_GET_CLASS ((obj), RSVG_TYPE_HANDLE, RsvgHandleClass))
 
-#ifndef RSVG_EXPORT
-#  if defined(_LIB)
-#    define RSVG_EXPORT extern
-#  else
-#    ifdef RSVG_COMPILATION
-#      define RSVG_EXPORT __declspec(dllexport)
-#    else
-#      define RSVG_EXPORT extern __declspec(dllimport)
-#    endif
-#  endif
-#endif
-
 GType rsvg_handle_get_type (void);
 
 /**
  * RsvgError:
+ * @RSVG_ERROR_FAILED: the request failed
  *
- * An enumeration representing possible error domains
+ * An enumeration representing possible errors
  */
 typedef enum {
     RSVG_ERROR_FAILED
@@ -79,7 +68,7 @@ GQuark rsvg_error_quark (void) G_GNUC_CONST;
 /**
  * RsvgHandle:
  *
- * The RsvgHandle is an object representing the parsed form of a SVG
+ * The #RsvgHandle is an object representing the parsed form of a SVG
  */
 typedef struct _RsvgHandle RsvgHandle;
 typedef struct RsvgHandlePrivate RsvgHandlePrivate;
@@ -87,9 +76,16 @@ typedef struct _RsvgHandleClass RsvgHandleClass;
 typedef struct _RsvgDimensionData RsvgDimensionData;
 typedef struct _RsvgPositionData RsvgPositionData;
 
+/**
+ * RsvgHandleClass:
+ * @parent: parent class
+ *
+ * Class structure for #RsvgHandle
+ */
 struct _RsvgHandleClass {
     GObjectClass parent;
 
+    /*< private >*/
     gpointer _abi_padding[15];
 };
 
@@ -119,6 +115,9 @@ struct _RsvgDimensionData {
 
 /**
  * RsvgPositionData:
+ * @x: position on the x axis
+ * @y: position on the y axis
+ *
  * Position of an SVG fragment.
  */
 struct _RsvgPositionData {
@@ -132,25 +131,18 @@ void rsvg_set_default_dpi	(double dpi);
 void rsvg_set_default_dpi_x_y	(double dpi_x, double dpi_y);
 
 void rsvg_handle_set_dpi	(RsvgHandle * handle, double dpi);
-RSVG_EXPORT
 void rsvg_handle_set_dpi_x_y	(RsvgHandle * handle, double dpi_x, double dpi_y);
 
-RSVG_EXPORT
 RsvgHandle  *rsvg_handle_new		(void);
-RSVG_EXPORT
 gboolean     rsvg_handle_write		(RsvgHandle * handle, const guchar * buf, 
                                      gsize count, GError ** error);
-RSVG_EXPORT
 gboolean     rsvg_handle_close		(RsvgHandle * handle, GError ** error);
 GdkPixbuf   *rsvg_handle_get_pixbuf	(RsvgHandle * handle);
 GdkPixbuf   *rsvg_handle_get_pixbuf_sub (RsvgHandle * handle, const char *id);
 
-RSVG_EXPORT
 const char  *rsvg_handle_get_base_uri (RsvgHandle * handle);
-RSVG_EXPORT
 void         rsvg_handle_set_base_uri (RsvgHandle * handle, const char *base_uri);
 
-RSVG_EXPORT
 void rsvg_handle_get_dimensions (RsvgHandle * handle, RsvgDimensionData * dimension_data);
 
 gboolean rsvg_handle_get_dimensions_sub (RsvgHandle * handle, RsvgDimensionData * dimension_data, const char *id);
@@ -160,9 +152,22 @@ gboolean rsvg_handle_has_sub (RsvgHandle * handle, const char *id);
 
 /* GIO APIs */
 
+/**
+ * RsvgHandleFlags:
+ * @RSVG_HANDLE_FLAGS_NONE: none
+ * @RSVG_HANDLE_FLAG_UNLIMITED: Allow any SVG XML without size limitations.
+ *   For security reasons, this should only be used for trusted input!
+ *   Since: 2.40.3
+ * @RSVG_HANDLE_FLAG_KEEP_IMAGE_DATA: Keeps the image data when loading images,
+ *  for use by cairo when painting to e.g. a PDF surface. This will make the
+ *  resulting PDF file smaller and faster.
+ *  Since: 2.40.3
+ */
 typedef enum /*< flags >*/ 
 {
-    RSVG_HANDLE_FLAGS_NONE        = 0
+    RSVG_HANDLE_FLAGS_NONE           = 0,
+    RSVG_HANDLE_FLAG_UNLIMITED       = 1 << 0,
+    RSVG_HANDLE_FLAG_KEEP_IMAGE_DATA = 1 << 1
 } RsvgHandleFlags;
 
 RsvgHandle *rsvg_handle_new_with_flags (RsvgHandleFlags flags);
@@ -202,15 +207,12 @@ RSVG_DEPRECATED_FOR(g_object_unref)
 void rsvg_handle_free (RsvgHandle * handle);
 
 /**
- * RsvgSizeFunc ():
- * @width: Pointer to where to set/store the width
- * @height: Pointer to where to set/store the height
- * @user_data: User data pointer
+ * RsvgSizeFunc:
+ * @width: (out): the width of the SVG
+ * @height: (out): the height of the SVG
+ * @user_data: user data
  *
  * Function to let a user of the library specify the SVG's dimensions
- * @width: the ouput width the SVG should be
- * @height: the output height the SVG should be
- * @user_data: user data
  *
  * Deprecated: Set up a cairo matrix and use rsvg_handle_render_cairo() instead.
  */

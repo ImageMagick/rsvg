@@ -28,6 +28,7 @@
 #define _GNU_SOURCE 1
 
 #include "rsvg.h"
+#include "rsvg-compat.h"
 #include "rsvg-private.h"
 #include "rsvg-css.h"
 #include "rsvg-styles.h"
@@ -50,10 +51,41 @@
 #include <math.h>
 #include <string.h>
 #include <stdarg.h>
+#include <limits.h>
+#include <stdlib.h>
 
 #include "rsvg-path.h"
 #include "rsvg-paint-server.h"
 #include "rsvg-xml.h"
+
+#ifdef G_OS_WIN32
+static char *
+rsvg_realpath_utf8 (const char *filename, const char *unused)
+{
+    wchar_t *wfilename;
+    wchar_t *wfull;
+    char *full;
+
+    wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+    if (!wfilename)
+        return NULL;
+
+    wfull = _wfullpath (NULL, wfilename, 0);
+    g_free (wfilename);
+    if (!wfull)
+        return NULL;
+
+    full = g_utf16_to_utf8 (wfull, -1, NULL, NULL, NULL);
+    free (wfull);
+
+    if (!full)
+        return NULL;
+
+    return full;
+}
+
+#define realpath(a,b) rsvg_realpath_utf8 (a, b)
+#endif
 
 /*
  * This is configurable at runtime
@@ -521,6 +553,23 @@ rsvg_xinclude_handler_end (RsvgSaxHandler * self, const char *name)
     }
 }
 
+static void
+_rsvg_set_xml_parse_options(xmlParserCtxtPtr xml_parser,
+                            RsvgHandle *ctx)
+{
+    xml_parser->options |= XML_PARSE_NONET;
+
+    if (ctx->priv->flags & RSVG_HANDLE_FLAG_UNLIMITED) {
+#if LIBXML_VERSION > 20632
+        xml_parser->options |= XML_PARSE_HUGE;
+#endif
+    }
+
+#if LIBXML_VERSION > 20800
+    xml_parser->options |= XML_PARSE_BIG_LINES;
+#endif
+}
+
 /* http://www.w3.org/TR/xinclude/ */
 static void
 rsvg_start_xinclude (RsvgHandle * ctx, RsvgPropertyBag * atts)
@@ -535,7 +584,7 @@ rsvg_start_xinclude (RsvgHandle * ctx, RsvgPropertyBag * atts)
 
     parse = rsvg_property_bag_lookup (atts, "parse");
     if (parse && !strcmp (parse, "text")) {
-        guint8 *data;
+        char *data;
         gsize data_len;
         const char *encoding;
 
@@ -556,7 +605,7 @@ rsvg_start_xinclude (RsvgHandle * ctx, RsvgPropertyBag * atts)
             data_len = text_data_len;
         }
 
-        rsvg_characters_impl (ctx, (const xmlChar *) data, data_len);
+        rsvg_characters_impl (ctx, (xmlChar *) data, data_len);
 
         g_free (data);
     } else {
@@ -573,7 +622,7 @@ rsvg_start_xinclude (RsvgHandle * ctx, RsvgPropertyBag * atts)
             goto fallback;
 
         xml_parser = xmlCreatePushParserCtxt (&rsvgSAXHandlerStruct, ctx, NULL, 0, NULL);
-        xml_parser->options |= XML_PARSE_NONET;
+        _rsvg_set_xml_parse_options(xml_parser, ctx);
 
         buffer = _rsvg_xml_input_buffer_new_from_stream (stream, NULL /* cancellable */, XML_CHAR_ENCODING_NONE, &err);
         g_object_unref (stream);
@@ -802,7 +851,7 @@ rsvg_entity_decl (void *data, const xmlChar * name, int type,
         resolvedPublicId = xmlBuildRelativeURI (publicId, (xmlChar*) rsvg_handle_get_base_uri (ctx));
 
     if (type == XML_EXTERNAL_PARAMETER_ENTITY && !content) {
-        guint8 *entity_data;
+        char *entity_data;
         gsize entity_data_len;
 
         if (systemId)
@@ -888,7 +937,7 @@ rsvg_processing_instruction (void *ctx, const xmlChar * target, const xmlChar * 
                 if (value && strcmp (value, "text/css") == 0) {
                     value = rsvg_property_bag_lookup (atts, "href");
                     if (value && value[0]) {
-                        guint8 *style_data;
+                        char *style_data;
                         gsize style_data_len;
                         char *mime_type = NULL;
 
@@ -900,7 +949,7 @@ rsvg_processing_instruction (void *ctx, const xmlChar * target, const xmlChar * 
                         if (style_data && 
                             mime_type &&
                             strcmp (mime_type, "text/css") == 0) {
-                            rsvg_parse_cssbuffer (handle, (char *) style_data, style_data_len);
+                            rsvg_parse_cssbuffer (handle, style_data, style_data_len);
                         }
 
                         g_free (mime_type);
@@ -1113,7 +1162,7 @@ rsvg_handle_write_impl (RsvgHandle * handle, const guchar * buf, gsize count, GE
     if (handle->priv->ctxt == NULL) {
         handle->priv->ctxt = xmlCreatePushParserCtxt (&rsvgSAXHandlerStruct, handle, NULL, 0,
                                                       rsvg_handle_get_base_uri (handle));
-        handle->priv->ctxt->options |= XML_PARSE_NONET;
+        _rsvg_set_xml_parse_options(handle->priv->ctxt, handle);
 
         /* if false, external entities work, but internal ones don't. if true, internal entities
            work, but external ones don't. favor internal entities, in order to not cause a
@@ -1147,21 +1196,21 @@ rsvg_handle_close_impl (RsvgHandle * handle, GError ** error)
     handle->priv->error = &real_error;
 
     if (handle->priv->ctxt != NULL) {
-        xmlDocPtr xmlDoc;
+        xmlDocPtr xml_doc;
         int result;
 
-        xmlDoc = handle->priv->ctxt->myDoc;
+        xml_doc = handle->priv->ctxt->myDoc;
 
         result = xmlParseChunk (handle->priv->ctxt, "", 0, TRUE);
         if (result != 0) {
             rsvg_set_error (error, handle->priv->ctxt);
             xmlFreeParserCtxt (handle->priv->ctxt);
-            xmlFreeDoc (xmlDoc);
+            xmlFreeDoc (xml_doc);
             return FALSE;
         }
 
         xmlFreeParserCtxt (handle->priv->ctxt);
-        xmlFreeDoc (xmlDoc);
+        xmlFreeDoc (xml_doc);
     }
 
     rsvg_defs_resolve_all (handle->priv->defs);
@@ -1202,9 +1251,9 @@ rsvg_drawing_ctx_free (RsvgDrawingCtx * handle)
  * @handle: An #RsvgHandle
  *
  * Returns the SVG's metadata in UTF-8 or %NULL. You must make a copy
- * of this metadata if you wish to use it after #handle has been freed.
+ * of this metadata if you wish to use it after @handle has been freed.
  *
- * Returns: The SVG's title
+ * Returns: (nullable): The SVG's title
  *
  * Since: 2.9
  *
@@ -1226,9 +1275,9 @@ rsvg_handle_get_metadata (RsvgHandle * handle)
  * @handle: An #RsvgHandle
  *
  * Returns the SVG's title in UTF-8 or %NULL. You must make a copy
- * of this title if you wish to use it after #handle has been freed.
+ * of this title if you wish to use it after @handle has been freed.
  *
- * Returns: The SVG's title
+ * Returns: (nullable): The SVG's title
  *
  * Since: 2.4
  *
@@ -1250,9 +1299,9 @@ rsvg_handle_get_title (RsvgHandle * handle)
  * @handle: An #RsvgHandle
  *
  * Returns the SVG's description in UTF-8 or %NULL. You must make a copy
- * of this description if you wish to use it after #handle has been freed.
+ * of this description if you wish to use it after @handle has been freed.
  *
- * Returns: The SVG's description
+ * Returns: (nullable): The SVG's description
  *
  * Since: 2.4
  *
@@ -1299,9 +1348,10 @@ rsvg_handle_get_dimensions (RsvgHandle * handle, RsvgDimensionData * dimension_d
  * rsvg_handle_get_dimensions_sub:
  * @handle: A #RsvgHandle
  * @dimension_data: (out): A place to store the SVG's size
- * @id: An element's id within the SVG, or NULL to get the dimension of the whole SVG. 
- * For example, if you have a layer called "layer1" for that you want to get the dimension, 
- * pass "#layer1" as the id.
+ * @id: (nullable): An element's id within the SVG, or %NULL to get
+ *   the dimension of the whole SVG.  For example, if you have a layer
+ *   called "layer1" for that you want to get the dimension, pass
+ *   "#layer1" as the id.
  *
  * Get the size of a subelement of the SVG file. Do not call from within the size_func callback, because an infinite loop will occur.
  *
@@ -1528,7 +1578,7 @@ rsvg_handle_has_sub (RsvgHandle * handle,
  * @dpi: Dots Per Inch (aka Pixels Per Inch)
  *
  * Sets the DPI for the all future outgoing pixbufs. Common values are
- * 75, 90, and 300 DPI. Passing a number <= 0 to #dpi will 
+ * 75, 90, and 300 DPI. Passing a number <= 0 to @dpi will
  * reset the DPI to whatever the default value happens to be.
  *
  * Since: 2.8
@@ -1545,7 +1595,7 @@ rsvg_set_default_dpi (double dpi)
  * @dpi_y: Dots Per Inch (aka Pixels Per Inch)
  *
  * Sets the DPI for the all future outgoing pixbufs. Common values are
- * 75, 90, and 300 DPI. Passing a number <= 0 to #dpi will 
+ * 75, 90, and 300 DPI. Passing a number <= 0 to @dpi will
  * reset the DPI to whatever the default value happens to be.
  *
  * Since: 2.8
@@ -1570,7 +1620,7 @@ rsvg_set_default_dpi_x_y (double dpi_x, double dpi_y)
  * @dpi: Dots Per Inch (aka Pixels Per Inch)
  *
  * Sets the DPI for the outgoing pixbuf. Common values are
- * 75, 90, and 300 DPI. Passing a number <= 0 to #dpi will 
+ * 75, 90, and 300 DPI. Passing a number <= 0 to @dpi will
  * reset the DPI to whatever the default value happens to be.
  *
  * Since: 2.8
@@ -1588,7 +1638,7 @@ rsvg_handle_set_dpi (RsvgHandle * handle, double dpi)
  * @dpi_y: Dots Per Inch (aka Pixels Per Inch)
  *
  * Sets the DPI for the outgoing pixbuf. Common values are
- * 75, 90, and 300 DPI. Passing a number <= 0 to #dpi_x or #dpi_y will 
+ * 75, 90, and 300 DPI. Passing a number <= 0 to #dpi_x or @dpi_y will
  * reset the DPI to whatever the default value happens to be.
  *
  * Since: 2.8
@@ -1612,7 +1662,7 @@ rsvg_handle_set_dpi_x_y (RsvgHandle * handle, double dpi_x, double dpi_y)
 /**
  * rsvg_handle_set_size_callback:
  * @handle: An #RsvgHandle
- * @size_func: A sizing function, or %NULL
+ * @size_func: (nullable): A sizing function, or %NULL
  * @user_data: User data to pass to @size_func, or %NULL
  * @user_data_destroy: Destroy function for @user_data, or %NULL
  *
@@ -1642,13 +1692,13 @@ rsvg_handle_set_size_callback (RsvgHandle * handle,
 /**
  * rsvg_handle_write:
  * @handle: an #RsvgHandle
- * @buf: (array length=count) (element-type guint8): pointer to svg data
+ * @buf: (array length=count) (element-type guchar): pointer to svg data
  * @count: length of the @buf buffer in bytes
  * @error: (allow-none): a location to store a #GError, or %NULL
  *
- * Loads the next @count bytes of the image.  This will return #TRUE if the data
- * was loaded successful, and #FALSE if an error occurred.  In the latter case,
- * the loader will be closed, and will not accept further writes. If FALSE is
+ * Loads the next @count bytes of the image.  This will return %TRUE if the data
+ * was loaded successful, and %FALSE if an error occurred.  In the latter case,
+ * the loader will be closed, and will not accept further writes. If %FALSE is
  * returned, @error will be set to an error from the #RsvgError domain. Errors
  * from #GIOErrorEnum are also possible.
  *
@@ -1736,7 +1786,7 @@ rsvg_handle_close (RsvgHandle * handle, GError ** error)
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the
- * operation was cancelled, the error G_IO_ERROR_CANCELLED will be
+ * operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
  * returned.
  *
  * Returns: %TRUE if reading @stream succeeded, or %FALSE otherwise
@@ -1770,7 +1820,7 @@ rsvg_handle_read_stream_sync (RsvgHandle   *handle,
     if (priv->ctxt == NULL) {
         priv->ctxt = xmlCreatePushParserCtxt (&rsvgSAXHandlerStruct, handle, NULL, 0,
                                               rsvg_handle_get_base_uri (handle));
-        priv->ctxt->options |= XML_PARSE_NONET;
+        _rsvg_set_xml_parse_options(priv->ctxt, handle);
 
         /* if false, external entities work, but internal ones don't. if true, internal entities
            work, but external ones don't. favor internal entities, in order to not cause a
@@ -1833,7 +1883,7 @@ rsvg_handle_read_stream_sync (RsvgHandle   *handle,
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the
- * operation was cancelled, the error G_IO_ERROR_CANCELLED will be
+ * operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
  * returned.
  *
  * Returns: a new #RsvgHandle on success, or %NULL with @error filled in
@@ -1876,7 +1926,7 @@ rsvg_handle_new_from_gfile_sync (GFile          *file,
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the
- * operation was cancelled, the error G_IO_ERROR_CANCELLED will be
+ * operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
  * returned.
  *
  * Returns: a new #RsvgHandle on success, or %NULL with @error filled in
@@ -1920,7 +1970,7 @@ rsvg_handle_new_from_stream_sync (GInputStream   *input_stream,
 void
 rsvg_init (void)
 {
-    g_type_init ();
+    RSVG_G_TYPE_INIT;
 }
 
 /**
@@ -2153,7 +2203,7 @@ _rsvg_handle_allow_load (RsvgHandle *handle,
     RsvgHandlePrivate *priv = handle->priv;
     GFile *base;
     char *path, *dir;
-    char *scheme = NULL;//, *cpath = NULL, *cdir = NULL;
+    char *scheme = NULL, *cpath = NULL, *cdir = NULL;
 
     g_assert (handle->priv->load_policy == RSVG_LOAD_POLICY_STRICT);
 
@@ -2162,8 +2212,6 @@ _rsvg_handle_allow_load (RsvgHandle *handle,
     /* Not a valid URI */
     if (scheme == NULL)
         goto deny;
-
-    goto allow;
 
     /* Allow loads of data: from any location */
     if (g_str_equal (scheme, "data"))
@@ -2192,40 +2240,38 @@ _rsvg_handle_allow_load (RsvgHandle *handle,
     dir = g_file_get_path (base);
     g_object_unref (base);
 
-    /* FIXME portability */
-    //cdir = canonicalize_file_name (dir);
-    //g_free (dir);
-    //if (cdir == NULL)
-    //    goto deny;
+    cdir = realpath (dir, NULL);
+    g_free (dir);
+    if (cdir == NULL)
+        goto deny;
 
     path = g_filename_from_uri (uri, NULL, NULL);
     if (path == NULL)
         goto deny;
 
-    /* FIXME portability */
-    //cpath = canonicalize_file_name (path);
-    //g_free (path);
-	 //
-    //if (cpath == NULL)
-    //    goto deny;
+    cpath = realpath (path, NULL);
+    g_free (path);
+
+    if (cpath == NULL)
+        goto deny;
 
     /* Now check that @cpath is below @cdir */
-    //if (!g_str_has_prefix (cpath, cdir) ||
-    //    cpath[strlen (cdir)] != G_DIR_SEPARATOR)
-    //    goto deny;
+    if (!g_str_has_prefix (cpath, cdir) ||
+        cpath[strlen (cdir)] != G_DIR_SEPARATOR)
+        goto deny;
 
     /* Allow load! */
 
  allow:
     g_free (scheme);
-    //free (cpath);
-    //free (cdir);
+    free (cpath);
+    free (cdir);
     return TRUE;
 
  deny:
     g_free (scheme);
-    //free (cpath);
-    //free (cdir);
+    free (cpath);
+    free (cdir);
 
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
                  "File may not link to URI \"%s\"", uri);
@@ -2261,7 +2307,7 @@ _rsvg_handle_resolve_uri (RsvgHandle *handle,
     return resolved_uri;
 }
 
-guint8* 
+char * 
 _rsvg_handle_acquire_data (RsvgHandle *handle,
                            const char *url,
                            char **content_type,
@@ -2269,7 +2315,7 @@ _rsvg_handle_acquire_data (RsvgHandle *handle,
                            GError **error)
 {
     char *uri;
-    guint8 *data;
+    char *data;
 
     uri = _rsvg_handle_resolve_uri (handle, url);
 

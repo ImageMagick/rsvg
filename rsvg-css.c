@@ -41,7 +41,7 @@
 
 #include <libxml/parser.h>
 
-#include <libcroco.h>
+#include <libcroco/libcroco.h>
 
 #define POINTS_PER_INCH (72.0)
 #define CM_PER_INCH     (2.54)
@@ -519,7 +519,9 @@ rsvg_css_parse_font_style (const char *str, gboolean * inherit)
             return PANGO_STYLE_OBLIQUE;
         if (!strcmp (str, "italic"))
             return PANGO_STYLE_ITALIC;
-        else if (!strcmp (str, "inherit")) {
+        if (!strcmp (str, "normal"))
+            return PANGO_STYLE_NORMAL;
+        if (!strcmp (str, "inherit")) {
             UNSETINHERIT ();
             return PANGO_STYLE_NORMAL;
         }
@@ -848,7 +850,7 @@ rsvg_css_parse_xml_attribute_string (const char *attribute_string)
 
     if ((doc = parser->myDoc) == NULL ||
         (node = doc->children) == NULL ||
-        strcmp (node->name, "rsvg-hack") != 0 ||
+        strcmp ((const char *) node->name, "rsvg-hack") != 0 ||
         node->next != NULL ||
         node->properties == NULL)
           goto done;

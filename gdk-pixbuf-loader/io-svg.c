@@ -28,8 +28,6 @@
 #include <rsvg.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
-#include "librsvg-features.h"
-
 #define N_(string) (string)
 #define _(string) (string)
 
@@ -175,22 +173,24 @@ gdk_pixbuf__svg_image_stop_load (gpointer data, GError **error)
         return result;
 }
 
-void _gdk_pixbuf__svg_fill_vtable(GdkPixbufModule *module)
+void
+fill_vtable (GdkPixbufModule *module)
 {
         module->begin_load     = gdk_pixbuf__svg_image_begin_load;
         module->stop_load      = gdk_pixbuf__svg_image_stop_load;
         module->load_increment = gdk_pixbuf__svg_image_load_increment;
 }
 
-void _gdk_pixbuf__svg_fill_info(GdkPixbufFormat *info)
+void
+fill_info (GdkPixbufFormat *info)
 {
-        static GdkPixbufModulePattern signature[] = {
+        static const GdkPixbufModulePattern signature[] = {
                 {  " <svg",  "*    ", 100 },
                 {  " <!DOCTYPE svg",  "*             ", 100 },
                 { NULL, NULL, 0 }
         };
 
-        static gchar *mime_types[] = { /* yes folks, i actually have run into all of these in the wild... */
+        static const gchar *mime_types[] = { /* yes folks, i actually have run into all of these in the wild... */
                 "image/svg+xml",
                 "image/svg",
                 "image/svg-xml",
@@ -199,7 +199,7 @@ void _gdk_pixbuf__svg_fill_info(GdkPixbufFormat *info)
                 "image/svg+xml-compressed",
                 NULL
         };
-        static gchar *extensions[] = {
+        static const gchar *extensions[] = {
                 "svg",
                 "svgz",
                 "svg.gz",
@@ -207,10 +207,10 @@ void _gdk_pixbuf__svg_fill_info(GdkPixbufFormat *info)
         };
 
         info->name        = "svg";
-        info->signature   = signature;
+        info->signature   = (GdkPixbufModulePattern *) signature;
         info->description = _("Scalable Vector Graphics");
-        info->mime_types  = mime_types;
-        info->extensions  = extensions;
+        info->mime_types  = (gchar **) mime_types;
+        info->extensions  = (gchar **) extensions;
         info->flags       = GDK_PIXBUF_FORMAT_SCALABLE | GDK_PIXBUF_FORMAT_THREADSAFE;
         info->license     = "LGPL";
 }

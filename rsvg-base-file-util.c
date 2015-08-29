@@ -31,28 +31,27 @@
 
 static gboolean
 rsvg_handle_fill_with_data (RsvgHandle * handle,
-                            const guint8 * data, gsize data_len, GError ** error)
+                            const char * data, gsize data_len, GError ** error)
 {
+    gboolean rv;
+
     rsvg_return_val_if_fail (data != NULL, FALSE, error);
     rsvg_return_val_if_fail (data_len != 0, FALSE, error);
 
-    if (!rsvg_handle_write (handle, data, data_len, error))
-        return FALSE;
-    if (!rsvg_handle_close (handle, error))
-        return FALSE;
+    rv = rsvg_handle_write (handle, (guchar *) data, data_len, error);
 
-    return TRUE;
+    return rsvg_handle_close (handle, rv ? error : NULL) && rv;
 }
 
 /**
  * rsvg_handle_new_from_data:
  * @data: (array length=data_len): The SVG data
- * @data_len: The length of #data, in bytes
+ * @data_len: The length of @data, in bytes
  * @error: return location for errors
  *
- * Loads the SVG specified by #data.
+ * Loads the SVG specified by @data.
  *
- * Returns: A RsvgHandle or %NULL if an error occurs.
+ * Returns: A #RsvgHandle or %NULL if an error occurs.
  * Since: 2.14
  */
 RsvgHandle *
@@ -63,7 +62,7 @@ rsvg_handle_new_from_data (const guint8 * data, gsize data_len, GError ** error)
     handle = rsvg_handle_new ();
 
     if (handle) {
-        if (!rsvg_handle_fill_with_data (handle, data, data_len, error)) {
+        if (!rsvg_handle_fill_with_data (handle, (char *) data, data_len, error)) {
             g_object_unref (handle);
             handle = NULL;
         }
@@ -77,16 +76,16 @@ rsvg_handle_new_from_data (const guint8 * data, gsize data_len, GError ** error)
  * @file_name: The file name to load. If built with gnome-vfs, can be a URI.
  * @error: return location for errors
  *
- * Loads the SVG specified by #file_name.
+ * Loads the SVG specified by @file_name.
  *
- * Returns: A RsvgHandle or %NULL if an error occurs.
+ * Returns: A #RsvgHandle or %NULL if an error occurs.
  * Since: 2.14
  */
 RsvgHandle *
 rsvg_handle_new_from_file (const gchar * file_name, GError ** error)
 {
     gchar *base_uri;
-    guint8 *data;
+    char *data;
     gsize data_len;
     RsvgHandle *handle = NULL;
 

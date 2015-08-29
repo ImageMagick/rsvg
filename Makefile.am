@@ -3,8 +3,6 @@ SUBDIRS = . gdk-pixbuf-loader tests tools doc
 NULL =
 BUILT_SOURCES =
 
-ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I m4
-
 lib_LTLIBRARIES = librsvg-@RSVG_API_MAJOR_VERSION@.la
 
 bin_PROGRAMS = rsvg-convert
@@ -25,6 +23,7 @@ librsvg_@RSVG_API_MAJOR_VERSION@_la_SOURCES = \
 	librsvg-features.c 	\
 	rsvg-css.c 		\
 	rsvg-css.h 		\
+	rsvg-compat.h		\
 	rsvg-defs.c 		\
 	rsvg-defs.h 		\
 	rsvg-image.c		\
@@ -119,15 +118,14 @@ rsvg_convert_CPPFLAGS = \
 	$(AM_CPPFLAGS)
 
 rsvg_convert_CFLAGS =\
-	$(LIBRSVG_CFLAGS) 	\
+	$(RSVG_CONVERT_CFLAGS) \
 	$(AM_CFLAGS)
 
 rsvg_convert_LDFLAGS = $(AM_LDFLAGS)
 
 rsvg_convert_LDADD = \
 	$(top_builddir)/librsvg-@RSVG_API_MAJOR_VERSION@.la	\
-	$(LIBRSVG_LIBS)		\
-	$(GTHREAD_LIBS)		\
+	$(RSVG_CONVERT_LIBS) \
 	$(LIBM)
 
 rsvg_view_3_SOURCES = \

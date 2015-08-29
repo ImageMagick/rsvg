@@ -34,10 +34,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#include <glib/gi18n.h>
+#include <gio/gio.h>
+
+#ifdef G_OS_UNIX
+#include <gio/gunixinputstream.h>
+#endif
+
+#ifdef G_OS_WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#include <gio/gwin32inputstream.h>
+#endif
 
 #include "rsvg-css.h"
 #include "rsvg.h"
-#include "rsvg-private.h"
+#include "rsvg-compat.h"
 #include "rsvg-size-callback.h"
 
 #ifdef CAIRO_HAS_PS_SURFACE
@@ -63,44 +76,6 @@ display_error (GError * err)
         g_printerr ("%s\n", err->message);
         g_error_free (err);
     }
-}
-
-static RsvgHandle *
-rsvg_handle_new_from_stdio_file (FILE * f, GError ** error)
-{
-    RsvgHandle *handle;
-    gchar *current_dir;
-    gchar *base_uri;
-
-    handle = rsvg_handle_new ();
-
-    while (!feof (f)) {
-        guchar buffer[4096];
-        gsize length = fread (buffer, 1, sizeof (buffer), f);
-
-        if (length > 0) {
-            if (!rsvg_handle_write (handle, buffer, length, error)) {
-                g_object_unref (handle);
-                return NULL;
-            }
-        } else if (ferror (f)) {
-            g_object_unref (handle);
-            return NULL;
-        }
-    }
-
-    if (!rsvg_handle_close (handle, error)) {
-        g_object_unref (handle);
-        return NULL;
-    }
-
-    current_dir = g_get_current_dir ();
-    base_uri = g_build_filename (current_dir, "file.svg", NULL);
-    rsvg_handle_set_base_uri (handle, base_uri);
-    g_free (base_uri);
-    g_free (current_dir);
-
-    return handle;
 }
 
 static void
@@ -136,18 +111,25 @@ main (int argc, char **argv)
     int keep_aspect_ratio = FALSE;
     guint32 background_color = 0;
     char *background_color_str = NULL;
-    char *base_uri = NULL;
     gboolean using_stdin = FALSE;
+    gboolean unlimited = FALSE;
+    gboolean keep_image_data = FALSE;
+    gboolean no_keep_image_data = FALSE;
     GError *error = NULL;
 
     int i;
     char **args = NULL;
     gint n_args = 0;
-    RsvgHandle *rsvg;
+    RsvgHandle *rsvg = NULL;
     cairo_surface_t *surface = NULL;
     cairo_t *cr = NULL;
+    RsvgHandleFlags flags = RSVG_HANDLE_FLAGS_NONE;
     RsvgDimensionData dimensions;
     FILE *output_file = stdout;
+
+#ifdef G_OS_WIN32
+    HANDLE handle;
+#endif
 
     GOptionEntry options_table[] = {
         {"dpi-x", 'd', 0, G_OPTION_ARG_DOUBLE, &dpi_x,
@@ -172,8 +154,10 @@ main (int argc, char **argv)
          N_("whether to preserve the aspect ratio [optional; defaults to FALSE]"), NULL},
         {"background-color", 'b', 0, G_OPTION_ARG_STRING, &background_color_str,
          N_("set the background color [optional; defaults to None]"), N_("[black, white, #abccee, #aaa...]")},
+        {"unlimited", 'u', 0, G_OPTION_ARG_NONE, &unlimited, N_("Allow huge SVG files"), NULL},
+        {"keep-image-data", 0, 0, G_OPTION_ARG_NONE, &keep_image_data, N_("Keep image data"), NULL},
+        {"no-keep-image-data", 0, 0, G_OPTION_ARG_NONE, &no_keep_image_data, N_("Don't keep image data"), NULL},
         {"version", 'v', 0, G_OPTION_ARG_NONE, &bVersion, N_("show version information"), NULL},
-        {"base-uri", 'b', 0, G_OPTION_ARG_STRING, &base_uri, N_("base uri"), NULL},
         {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &args, NULL, N_("[FILE...]")},
         {NULL}
     };
@@ -181,7 +165,7 @@ main (int argc, char **argv)
     /* Set the locale so that UTF-8 filenames work */
     setlocale(LC_ALL, "");
 
-    g_type_init ();
+    RSVG_G_TYPE_INIT;
 
     g_option_context = g_option_context_new (_("- SVG Converter"));
     g_option_context_add_main_entries (g_option_context, options_table, NULL);
@@ -222,27 +206,89 @@ main (int argc, char **argv)
         exit (1);
     }
 
+    if (format != NULL &&
+        (g_str_equal (format, "ps") || g_str_equal (format, "eps") || g_str_equal (format, "pdf")) &&
+        !no_keep_image_data)
+        keep_image_data = TRUE;
+
     if (zoom != 1.0)
         x_zoom = y_zoom = zoom;
 
     rsvg_set_default_dpi_x_y (dpi_x, dpi_y);
 
+    if (unlimited)
+        flags |= RSVG_HANDLE_FLAG_UNLIMITED;
+
+    if (keep_image_data)
+        flags |= RSVG_HANDLE_FLAG_KEEP_IMAGE_DATA;
+
     for (i = 0; i < n_args; i++) {
+        GFile *file;
+        GInputStream *stream;
 
-        if (using_stdin)
-            rsvg = rsvg_handle_new_from_stdio_file (stdin, &error);
-        else
-            rsvg = rsvg_handle_new_from_file (args[i], &error);
+        if (using_stdin) {
+            file = NULL;
+#ifdef _WIN32
+            handle = GetStdHandle (STD_INPUT_HANDLE);
 
-        if (!rsvg) {
+            if (handle == INVALID_HANDLE_VALUE) {
+              gchar *emsg = g_win32_error_message (GetLastError());
+              g_printerr ( _("Unable to acquire HANDLE for STDIN: %s\n"), emsg);
+              g_free (emsg);
+              exit (1);
+            }
+            stream = g_win32_input_stream_new (handle, FALSE);
+#else
+            stream = g_unix_input_stream_new (STDIN_FILENO, FALSE);
+#endif
+        } else {
+            GFileInfo *file_info;
+            gboolean compressed = FALSE;
+
+            file = g_file_new_for_commandline_arg (args[i]);
+            stream = (GInputStream *) g_file_read (file, NULL, &error);
+
+            if ((file_info = g_file_query_info (file,
+                                                G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
+                                                G_FILE_QUERY_INFO_NONE,
+                                                NULL,
+                                                NULL))) {
+                const char *content_type;
+                char *gz_content_type;
+
+                content_type = g_file_info_get_content_type (file_info);
+                gz_content_type = g_content_type_from_mime_type ("application/x-gzip");
+                compressed = (content_type != NULL && g_content_type_is_a (content_type, gz_content_type));
+                g_free (gz_content_type);
+                g_object_unref (file_info);
+            }
+
+            if (compressed) {
+                GZlibDecompressor *decompressor;
+                GInputStream *converter_stream;
+
+                decompressor = g_zlib_decompressor_new (G_ZLIB_COMPRESSOR_FORMAT_GZIP);
+                converter_stream = g_converter_input_stream_new (stream, G_CONVERTER (decompressor));
+                g_object_unref (stream);
+                stream = converter_stream;
+            }
+
+            if (stream == NULL)
+                goto done;
+        }
+
+        rsvg = rsvg_handle_new_from_stream_sync (stream, file, flags, NULL, &error);
+
+    done:
+        g_clear_object (&stream);
+        g_clear_object (&file);
+
+        if (error != NULL) {
             fprintf (stderr, _("Error reading SVG:"));
             display_error (error);
             fprintf (stderr, "\n");
             exit (1);
         }
-
-        if (base_uri)
-            rsvg_handle_set_base_uri (rsvg, base_uri);
 
         /* in the case of multi-page output, all subsequent SVGs are scaled to the first's size */
         rsvg_handle_set_size_callback (rsvg, rsvg_cairo_size_callback, &dimensions, NULL);

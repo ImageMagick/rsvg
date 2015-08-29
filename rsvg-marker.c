@@ -100,15 +100,15 @@ rsvg_new_marker (void)
 }
 
 void
-rsvg_marker_render (RsvgMarker * self, gdouble x, gdouble y, gdouble orient, gdouble linewidth,
-		    RsvgDrawingCtx * ctx)
+rsvg_marker_render (RsvgMarker * self, gdouble xpos, gdouble ypos, gdouble orient, gdouble linewidth,
+                    RsvgDrawingCtx * ctx)
 {
     cairo_matrix_t affine, taffine;
     unsigned int i;
     gdouble rotation;
     RsvgState *state = rsvg_current_state (ctx);
 
-    cairo_matrix_init_translate (&taffine, x, y);
+    cairo_matrix_init_translate (&taffine, xpos, ypos);
     cairo_matrix_multiply (&affine, &taffine, &state->affine);
 
     if (self->orientAuto)
@@ -276,10 +276,18 @@ rsvg_render_markers (RsvgDrawingCtx * ctx,
             code == CAIRO_PATH_CLOSE_PATH) {
             if (endmarker) {
                 if (code == CAIRO_PATH_CURVE_TO) {
-                    rsvg_marker_render (endmarker, x, y,
-                                        atan2 (y - data[2].point.y,
-                                               x - data[2].point.x),
-                                        linewidth, ctx);
+                    if (data[2].point.x == x && data[2].point.y == y) {
+                        /* Can't calculate angle as points are coincident; use the previous point */
+                        rsvg_marker_render (endmarker, x, y,
+                                            atan2 (y - data[1].point.y,
+                                                   x - data[1].point.x),
+                                            linewidth, ctx);
+                    } else {
+                        rsvg_marker_render (endmarker, x, y,
+                                            atan2 (y - data[2].point.y,
+                                                   x - data[2].point.x),
+                                            linewidth, ctx);
+                    }
                 } else {
                     rsvg_marker_render (endmarker, x, y,
                                         atan2 (y - lasty, x - lastx),
@@ -290,11 +298,20 @@ rsvg_render_markers (RsvgDrawingCtx * ctx,
                    code == CAIRO_PATH_CLOSE_PATH) {
             if (startmarker) {
                 if (nextcode == CAIRO_PATH_CURVE_TO) {
-                    rsvg_marker_render (startmarker, x, y,
-                                        atan2 (nextdata[1].point.y - y,
-                                               nextdata[1].point.x - x),
-                                        linewidth,
-                                        ctx);
+                    if (nextdata[1].point.x == x && nextdata[1].point.y == y) {
+                        /* Can't calculate angle as points are coincident; use the next point */
+                        rsvg_marker_render (startmarker, x, y,
+                                            atan2 (nextdata[2].point.y - y,
+                                                   nextdata[2].point.x - x),
+                                            linewidth,
+                                            ctx);
+                    } else {
+                        rsvg_marker_render (startmarker, x, y,
+                                            atan2 (nextdata[1].point.y - y,
+                                                   nextdata[1].point.x - x),
+                                            linewidth,
+                                            ctx);
+                    }
                 } else {
                     rsvg_marker_render (startmarker, x, y,
                                         atan2 (nextp.point.y - y, nextp.point.x - x),
