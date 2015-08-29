@@ -17,9 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "config.h"
@@ -143,7 +141,7 @@ gdk_pixbuf_animation_new_from_file (const char *filename,
 	GdkPixbufAnimation *animation;
 	int size;
 	FILE *f;
-	guchar buffer [1024];
+	guchar buffer [SNIFF_BUFFER_SIZE];
 	GdkPixbufModule *image_module;
         gchar *display_name;
 
@@ -724,6 +722,10 @@ gdk_pixbuf_animation_iter_init (GdkPixbufAnimationIter *iter)
  * or -1 if the current pixbuf should be displayed forever. g_timeout_add()
  * conveniently takes a timeout in milliseconds, so you can use a timeout
  * to schedule the next update.
+ *
+ * Note that some formats, like GIF, might clamp the timeout values in the
+ * image file to avoid updates that are just too quick. The minimum timeout
+ * for GIF images is currently 20 milliseconds.
  *
  * Return value: delay time in milliseconds (thousandths of a second)
  **/

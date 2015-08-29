@@ -20,9 +20,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 /* This loader is very hairy code.
@@ -1458,7 +1456,8 @@ new_context (void)
 	context->update_func = NULL;
 	context->user_data = NULL;
 	context->buf = NULL;
-	context->amount_needed = 0;
+	context->amount_needed = 13;
+	context->buf = g_new (guchar, context->amount_needed);
 	context->gif89.transparent = -1;
 	context->gif89.delay_time = -1;
 	context->gif89.input_flag = -1;
@@ -1702,24 +1701,24 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 {
-        static GdkPixbufModulePattern signature[] = {
+        static const GdkPixbufModulePattern signature[] = {
                 { "GIF8", NULL, 100 },
                 { NULL, NULL, 0 }
         };
-	static gchar * mime_types[] = {
+	static const gchar *mime_types[] = {
 		"image/gif",
 		NULL
 	};
-	static gchar * extensions[] = {
+	static const gchar *extensions[] = {
 		"gif",
 		NULL
 	};
 
 	info->name = "gif";
-        info->signature = signature;
-	info->description = N_("The GIF image format");
-	info->mime_types = mime_types;
-	info->extensions = extensions;
+        info->signature = (GdkPixbufModulePattern *) signature;
+	info->description = NC_("image format", "GIF");
+	info->mime_types = (gchar **) mime_types;
+	info->extensions = (gchar **) extensions;
 	info->flags = GDK_PIXBUF_FORMAT_THREADSAFE;
 	info->license = "LGPL";
 }

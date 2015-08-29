@@ -14,9 +14,9 @@ AC_PREREQ([2.63])
 #   gdk_pixbuf_binary_age = 0;
 
 m4_define([gdk_pixbuf_major_version], [2])
-m4_define([gdk_pixbuf_minor_version], [30])
-m4_define([gdk_pixbuf_micro_version], [1])
-m4_define([gdk_pixbuf_interface_age], [1])
+m4_define([gdk_pixbuf_minor_version], [31])
+m4_define([gdk_pixbuf_micro_version], [6])
+m4_define([gdk_pixbuf_interface_age], [6])
 m4_define([gdk_pixbuf_binary_age],
           [m4_eval(100 * gdk_pixbuf_minor_version + gdk_pixbuf_micro_version)])
 m4_define([gdk_pixbuf_version],
@@ -26,7 +26,7 @@ m4_define([gdk_pixbuf_binary_version], [2.10.0])
 
 
 # required versions of other packages
-m4_define([glib_required_version], [2.37.2])
+m4_define([glib_required_version], [2.37.6])
 
 AC_INIT([gdk-pixbuf], [gdk_pixbuf_version],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gdk-pixbuf],
@@ -91,6 +91,7 @@ AC_PROG_CC_C_O
 AC_PROG_CC_STDC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+AC_PROG_AWK
 PKG_PROG_PKG_CONFIG
 
 AC_CANONICAL_HOST
@@ -128,6 +129,10 @@ AC_SUBST(EXE_MANIFEST_ARCHITECTURE)
 case $host in
   *-*-linux*)
     os_linux=yes
+    AC_DEFINE(OS_LINUX, 1, [Define to 1 if it's a Linux platform])
+    ;;
+  *-*-darwin*)
+    AC_DEFINE(OS_DARWIN, 1, [Define to 1 if it's a darwin platform])
     ;;
 esac
 
@@ -334,7 +339,7 @@ if test "$gtk_ok" = "yes"; then
 fi
 
 # i18n stuff
-AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT_VERSION([0.19])
 AM_GNU_GETTEXT([external])
 
 GETTEXT_PACKAGE="$PACKAGE"
@@ -899,22 +904,7 @@ fi
 
 AM_CONDITIONAL(USE_MMX, test x$use_mmx_asm = xyes)
 
-REBUILD_PNGS=
-if test -z "$LIBPNG" && test x"$os_win32" = xno -o x$with_gdiplus = xno; then
-  REBUILD_PNGS=#
-fi
-
-dnl Look for a host system's gdk-pixbuf-csource if we are cross-compiling
-
 AM_CONDITIONAL(CROSS_COMPILING, test $cross_compiling = yes)
-
-if test $cross_compiling = yes; then
-  AC_PATH_PROG(GDK_PIXBUF_CSOURCE, gdk-pixbuf-csource, no)
-  AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache, no)
-  if test x$GTK_UPDATE_ICON_CACHE = xno; then
-    REBUILD_PNGS=#
-  fi
-fi
 
 GDK_PIXBUF_PACKAGES="gmodule-no-export-2.0 gobject-2.0 gio-2.0"
 GDK_PIXBUF_EXTRA_LIBS="$STATIC_LIB_DEPS $MATH_LIB $MEDIA_LIB"
@@ -977,7 +967,7 @@ GOBJECT_INTROSPECTION_CHECK([0.9.3])
 # Checks for gtk-doc and docbook-tools
 ##################################################
 
-GTK_DOC_CHECK([1.11], [--flavour=no-tmpl])
+GTK_DOC_CHECK([1.20], [--flavour=no-tmpl])
 
 AC_CHECK_PROG(DB2HTML, db2html, true, false)
 AM_CONDITIONAL(HAVE_DOCBOOK, $DB2HTML)
@@ -1026,6 +1016,66 @@ AC_SUBST(GDK_PIXBUF_LINK_FLAGS)
 
 GLIB_TESTS
 
+AC_MSG_CHECKING([whether to build with gcov testing])
+AC_ARG_ENABLE([coverage],
+		AS_HELP_STRING([--enable-coverage],
+			[Whether to enable coverage testing ]),
+		[],
+		[enable_coverage=no])
+
+AC_MSG_RESULT([$enable_coverage])
+
+if test "$enable_coverage" = "yes"; then
+	if test "$GCC" != "yes"; then
+		AC_MSG_ERROR(Coverage testing requires GCC)
+	fi
+
+	AC_PATH_PROG(GCOV, gcov, no)
+	if test "$GCOV" = "no" ; then
+		AC_MSG_ERROR(gcov tool is not available)
+	fi
+
+	AC_PATH_PROG(LCOV, lcov, no)
+	if test "$LCOV" = "no" ; then
+		AC_MSG_ERROR(lcov tool is not installed)
+	fi
+
+	AC_PATH_PROG(GENHTML, genhtml, no)
+	if test "$GENHTML" = "no" ; then
+		AC_MSG_ERROR(lcov's genhtml tool is not installed)
+	fi
+
+	CFLAGS="$CFLAGS -O0 -g -fprofile-arcs -ftest-coverage"
+	LDFLAGS="$LDFLAGS -lgcov"
+fi
+
+AM_CONDITIONAL([WITH_COVERAGE], [test "$enable_coverage" = "yes"])
+AC_SUBST(LCOV)
+AC_SUBST(GCOV)
+AC_SUBST(GENHTML)
+
+#######################################################
+# Enable replacing the build-time prefix in the loaders
+# cache with the installation prefix on this machine
+# for relocatable packages such as Windows and OS X
+# applicationsapplications and linux bundles
+#######################################################
+
+enable_relocations=no
+case $host in
+  *-*-mingw*)
+    enable_relocations=yes
+    ;;
+  *-*-darwin*)
+    enable_relocations=yes
+    ;;
+esac
+
+if test "x$enable_relocations" = "xyes"; then
+  AC_DEFINE(GDK_PIXBUF_RELOCATABLE, 1,
+                  [Define to 1 to replace the build-time prefix in modules])
+fi
+
 ##################################################
 # Output commands
 ##################################################
@@ -1042,6 +1092,8 @@ build/Makefile
 build/win32/Makefile
 build/win32/vs9/Makefile
 build/win32/vs10/Makefile
+build/win32/vs11/Makefile
+build/win32/vs12/Makefile
 docs/Makefile
 docs/reference/Makefile
 docs/reference/gdk-pixbuf/Makefile

@@ -8,6 +8,8 @@
  *          Federico Mena-Quintero <federico@gimp.org>
  *          Jonathan Blandford <jrb@redhat.com>
  *          S�ren Sandmann <sandmann@daimi.au.dk>
+ *          Christian Dywan <christian@lanedo.com>
+ *          Mukund Sivaraman <muks@banu.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,9 +22,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 /* Following code (almost) blatantly ripped from Imlib */
@@ -87,12 +87,15 @@ tiff_image_parse (TIFF *tiff, TiffContext *context, GError **error)
 	guchar *pixels = NULL;
 	gint width, height, rowstride, bytes;
 	GdkPixbuf *pixbuf;
+	guint16 bits_per_sample = 0;
 	uint16 orientation = 0;
 	uint16 transform = 0;
         uint16 codec;
         gchar *icc_profile_base64;
         const gchar *icc_profile;
         guint icc_profile_size;
+        uint16 resolution_unit;
+        gchar *density_str;
         gint retval;
 
         /* We're called with the lock held. */
@@ -175,6 +178,15 @@ tiff_image_parse (TIFF *tiff, TiffContext *context, GError **error)
                 return NULL;
         }
 
+        /* Save the bits per sample as an option since pixbufs are
+           expected to be always 8 bits per sample. */
+        TIFFGetField (tiff, TIFFTAG_BITSPERSAMPLE, &bits_per_sample);
+        if (bits_per_sample > 0) {
+                gchar str[5];
+                g_snprintf (str, sizeof (str), "%d", bits_per_sample);
+                gdk_pixbuf_set_option (pixbuf, "bits-per-sample", str);
+        }
+
 	/* Set the "orientation" key associated with this image. libtiff 
 	   orientation handling is odd, so further processing is required
 	   by higher-level functions based on this tag. If the embedded
@@ -226,6 +238,33 @@ tiff_image_parse (TIFF *tiff, TiffContext *context, GError **error)
                 g_free (icc_profile_base64);
         }
 
+        retval = TIFFGetField (tiff, TIFFTAG_RESOLUTIONUNIT, &resolution_unit);
+        if (retval == 1) {
+                float x_resolution = 0, y_resolution = 0;
+
+                TIFFGetField (tiff, TIFFTAG_XRESOLUTION, &x_resolution);
+                TIFFGetField (tiff, TIFFTAG_YRESOLUTION, &y_resolution);
+
+                switch (resolution_unit) {
+                case RESUNIT_INCH:
+                        density_str = g_strdup_printf ("%d", (int) round (x_resolution));
+                        gdk_pixbuf_set_option (pixbuf, "x-dpi", density_str);
+                        g_free (density_str);
+                        density_str = g_strdup_printf ("%d", (int) round (y_resolution));
+                        gdk_pixbuf_set_option (pixbuf, "y-dpi", density_str);
+                        g_free (density_str);
+                        break;
+                case RESUNIT_CENTIMETER:
+                        density_str = g_strdup_printf ("%d", DPCM_TO_DPI (x_resolution));
+                        gdk_pixbuf_set_option (pixbuf, "x-dpi", density_str);
+                        g_free (density_str);
+                        density_str = g_strdup_printf ("%d", DPCM_TO_DPI (y_resolution));
+                        gdk_pixbuf_set_option (pixbuf, "y-dpi", density_str);
+                        g_free (density_str);
+                        break;
+                }
+        }
+
 	if (context && context->prepare_func)
 		(* context->prepare_func) (pixbuf, NULL, context->user_data);
 
@@ -237,6 +276,11 @@ tiff_image_parse (TIFF *tiff, TiffContext *context, GError **error)
 		g_object_unref (pixbuf);
 		return NULL;
 	}
+
+	/* Flag multi-page documents, because this loader only handles the
+	   first page. The client app may wish to warn the user. */
+        if (TIFFReadDirectory (tiff))
+                gdk_pixbuf_set_option (pixbuf, "multipage", "yes");
 
 #if G_BYTE_ORDER == G_BIG_ENDIAN
 	/* Turns out that the packing used by TIFFRGBAImage depends on 
@@ -588,6 +632,44 @@ free_save_context (TiffSaveContext *context)
         g_free (context);
 }
 
+static void
+copy_gray_row (gint     *dest,
+               guchar   *src,
+               gint      width,
+               gboolean  has_alpha)
+{
+        gint i;
+        guchar *p;
+
+        p = src;
+        for (i = 0; i < width; i++) {
+                int pr, pg, pb, pv;
+
+                pr = *p++;
+                pg = *p++;
+                pb = *p++;
+
+                if (has_alpha) {
+                        int pa = *p++;
+
+                        /* Premul alpha to simulate it */
+                        if (pa > 0) {
+                                pr = pr * pa / 255;
+                                pg = pg * pa / 255;
+                                pb = pb * pa / 255;
+                        } else {
+                                pr = pg = pb = 0;
+                        }
+                }
+
+                /* Calculate value MAX(MAX(r,g),b) */
+                pv = pr > pg ? pr : pg;
+                pv = pv > pb ? pv : pb;
+
+                *dest++ = pv;
+        }
+}
+
 static gboolean
 gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
                                          gpointer            user_data,
@@ -598,14 +680,19 @@ gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
 {
         TIFF *tiff;
         gint width, height, rowstride;
+        const gchar *bits_per_sample = NULL;
+        long bps;
+        const gchar *compression = NULL;
         guchar *pixels;
         gboolean has_alpha;
         gushort alpha_samples[1] = { EXTRASAMPLE_UNASSALPHA };
         int y;
         TiffSaveContext *context;
         gboolean retval;
-        guchar *icc_profile = NULL;
-        gsize icc_profile_size = 0;
+        const gchar *icc_profile = NULL;
+        const gchar *x_dpi = NULL;
+        const gchar *y_dpi = NULL;
+        guint16 codec;
 
         tiff_set_handlers ();
 
@@ -635,9 +722,6 @@ gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
 
         TIFFSetField (tiff, TIFFTAG_IMAGEWIDTH, width);
         TIFFSetField (tiff, TIFFTAG_IMAGELENGTH, height);
-        TIFFSetField (tiff, TIFFTAG_BITSPERSAMPLE, 8);
-        TIFFSetField (tiff, TIFFTAG_SAMPLESPERPIXEL, has_alpha ? 4 : 3);
-        TIFFSetField (tiff, TIFFTAG_ROWSPERSTRIP, height);
 
         /* libtiff supports a number of 'codecs' such as:
            1 None, 2 Huffman, 5 LZW, 7 JPEG, 8 Deflate, see tiff.h */
@@ -645,48 +729,160 @@ gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
             guint i = 0;
 
             while (keys[i]) {
-                if (g_str_equal (keys[i], "compression")) {
-                    guint16 codec = strtol (values[i], NULL, 0);
-                    if (TIFFIsCODECConfigured (codec))
-                        TIFFSetField (tiff, TIFFTAG_COMPRESSION, codec);
-                    else {
-                        g_set_error_literal (error,
-                                             GDK_PIXBUF_ERROR,
-                                             GDK_PIXBUF_ERROR_FAILED,
-                                             _("TIFF compression doesn't refer to a valid codec."));
-                        retval = FALSE;
-                        goto cleanup;
-                    }
-                } else if (g_str_equal (keys[i], "icc-profile")) {
-                        /* decode from base64 */
-                        icc_profile = g_base64_decode (values[i], &icc_profile_size);
-                        if (icc_profile_size < 127) {
-                            g_set_error (error,
-                                         GDK_PIXBUF_ERROR,
-                                         GDK_PIXBUF_ERROR_BAD_OPTION,
-                                         _("Color profile has invalid length %d."),
-                                         (gint)icc_profile_size);
-                            retval = FALSE;
-                            goto cleanup;
-                        }
-                }
-                i++;
+                    if (g_str_equal (keys[i], "bits-per-sample"))
+                            bits_per_sample = values[i];
+                    else if (g_str_equal (keys[i], "compression"))
+                            compression = values[i];
+                    else if (g_str_equal (keys[i], "icc-profile"))
+                            icc_profile = values[i];
+                    else if (g_str_equal (keys[i], "x-dpi"))
+                            x_dpi = values[i];
+                    else if (g_str_equal (keys[i], "y-dpi"))
+                            y_dpi = values[i];
+                   i++;
             }
         }
 
-        if (has_alpha)
-                TIFFSetField (tiff, TIFFTAG_EXTRASAMPLES, 1, alpha_samples);
+        /* Use 8 bits per sample by default, if none was recorded or
+           specified. */
+        if (!bits_per_sample)
+                bits_per_sample = "8";
 
-        TIFFSetField (tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
-        TIFFSetField (tiff, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);        
+        /* Use DEFLATE compression (8) by default, if none was recorded
+           or specified. */
+        if (!compression)
+                compression = "8";
+
+        /* libtiff supports a number of 'codecs' such as:
+           1 None, 2 Huffman, 5 LZW, 7 JPEG, 8 Deflate, see tiff.h */
+        codec = strtol (compression, NULL, 0);
+
+        if (TIFFIsCODECConfigured (codec))
+                TIFFSetField (tiff, TIFFTAG_COMPRESSION, codec);
+        else {
+                g_set_error_literal (error,
+                                     GDK_PIXBUF_ERROR,
+                                     GDK_PIXBUF_ERROR_FAILED,
+                                     _("TIFF compression doesn't refer to a valid codec."));
+                retval = FALSE;
+                goto cleanup;
+        }
+
+        /* We support 1-bit or 8-bit saving */
+        bps = atol (bits_per_sample);
+        if (bps == 1) {
+                TIFFSetField (tiff, TIFFTAG_BITSPERSAMPLE, 1);
+                TIFFSetField (tiff, TIFFTAG_SAMPLESPERPIXEL, 1);
+                TIFFSetField (tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+                TIFFSetField (tiff, TIFFTAG_COMPRESSION, COMPRESSION_CCITTFAX4);
+        } else if (bps == 8) {
+                TIFFSetField (tiff, TIFFTAG_BITSPERSAMPLE, 8);
+                TIFFSetField (tiff, TIFFTAG_SAMPLESPERPIXEL, has_alpha ? 4 : 3);
+                TIFFSetField (tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+
+                if (has_alpha)
+                        TIFFSetField (tiff, TIFFTAG_EXTRASAMPLES, 1, alpha_samples);
+
+                if (icc_profile != NULL) {
+                        guchar *icc_profile_buf;
+                        gsize icc_profile_size;
+
+                        /* decode from base64 */
+                        icc_profile_buf = g_base64_decode (icc_profile, &icc_profile_size);
+                        if (icc_profile_size < 127) {
+                                g_set_error (error,
+                                             GDK_PIXBUF_ERROR,
+                                             GDK_PIXBUF_ERROR_BAD_OPTION,
+                                             _("Color profile has invalid length %d."),
+                                             (gint) icc_profile_size);
+                                retval = FALSE;
+                                g_free (icc_profile_buf);
+                                goto cleanup;
+                        }
+
+                        TIFFSetField (tiff, TIFFTAG_ICCPROFILE, icc_profile_size, icc_profile_buf);
+                        g_free (icc_profile_buf);
+                }
+        } else {
+                /* The passed bits-per-sample is not supported. */
+                g_set_error_literal (error,
+                                     GDK_PIXBUF_ERROR,
+                                     GDK_PIXBUF_ERROR_FAILED,
+                                     _("TIFF bits-per-sample doesn't contain a supported value."));
+                retval = FALSE;
+                goto cleanup;
+         }
+
+        TIFFSetField (tiff, TIFFTAG_ROWSPERSTRIP, height);
+        TIFFSetField (tiff, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
         TIFFSetField (tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
 
-        if (icc_profile != NULL)
-                TIFFSetField (tiff, TIFFTAG_ICCPROFILE, icc_profile_size, icc_profile);
+        if (bps == 1) {
+                guchar *mono_row;
+                gint *dith_row_1, *dith_row_2, *dith_row_tmp;
 
-        for (y = 0; y < height; y++) {
-                if (TIFFWriteScanline (tiff, pixels + y * rowstride, y, 0) == -1)
-                        break;
+                dith_row_1 = g_new (gint, width);
+                dith_row_2 = g_new (gint, width);
+                mono_row = g_malloc ((width + 7) / 8);
+
+                copy_gray_row (dith_row_1, pixels, width, has_alpha);
+
+                for (y = 0; y < height; y++) {
+                        guint x;
+                        gint *p;
+
+                        memset (mono_row, 0, (width + 7) / 8);
+
+                        if (y > 0) {
+                                dith_row_tmp = dith_row_1;
+                                dith_row_1 = dith_row_2;
+                                dith_row_2 = dith_row_tmp;
+                        }
+
+                        if (y < (height - 1))
+                                copy_gray_row (dith_row_2, pixels + ((y + 1) * rowstride), width, has_alpha);
+
+                        p = dith_row_1;
+                        for (x = 0; x < width; x++) {
+                                gint p_old, p_new, quant_error;
+
+                                /* Apply Floyd-Steinberg dithering */
+
+                                p_old = *p++;
+
+                                if (p_old > 127)
+                                        p_new = 255;
+                                else
+                                        p_new = 0;
+
+                                quant_error = p_old - p_new;
+                                if (x < (width - 1))
+                                        dith_row_1[x + 1] += 7 * quant_error / 16;
+                                if (y < (height - 1)) {
+                                        if (x > 0)
+                                                dith_row_2[x - 1] += 3 * quant_error / 16;
+
+                                        dith_row_2[x] += 5 * quant_error / 16;
+
+                                        if (x < (width - 1))
+                                                dith_row_2[x + 1] += quant_error / 16;
+                                }
+
+                                if (p_new > 127)
+                                        mono_row[x / 8] |= (0x1 << (7 - (x % 8)));
+                        }
+
+                        if (TIFFWriteScanline (tiff, mono_row, y, 0) == -1)
+                                break;
+                }
+                g_free (mono_row);
+                g_free (dith_row_1);
+                g_free (dith_row_2);
+        } else {
+                for (y = 0; y < height; y++) {
+                        if (TIFFWriteScanline (tiff, pixels + y * rowstride, y, 0) == -1)
+                                break;
+                }
         }
 
         if (y < height) {
@@ -699,13 +895,47 @@ gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
                 goto cleanup;
         }
 
+        if (x_dpi != NULL && y_dpi != NULL) {
+                char *endptr = NULL;
+                uint16 resolution_unit = RESUNIT_INCH;
+                float x_dpi_value, y_dpi_value;
+
+                x_dpi_value = strtol (x_dpi, &endptr, 10);
+                if (x_dpi[0] != '\0' && *endptr != '\0')
+                        x_dpi_value = -1;
+                if (x_dpi_value <= 0) {
+                    g_set_error (error,
+                                 GDK_PIXBUF_ERROR,
+                                 GDK_PIXBUF_ERROR_BAD_OPTION,
+                                 _("TIFF x-dpi must be greater than zero; value '%s' is not allowed."),
+                                 x_dpi);
+                    retval = FALSE;
+                    goto cleanup;
+                }
+                y_dpi_value = strtol (y_dpi, &endptr, 10);
+                if (y_dpi[0] != '\0' && *endptr != '\0')
+                        y_dpi_value = -1;
+                if (y_dpi_value <= 0) {
+                    g_set_error (error,
+                                 GDK_PIXBUF_ERROR,
+                                 GDK_PIXBUF_ERROR_BAD_OPTION,
+                                 _("TIFF y-dpi must be greater than zero; value '%s' is not allowed."),
+                                 y_dpi);
+                    retval = FALSE;
+                    goto cleanup;
+                }
+
+                TIFFSetField (tiff, TIFFTAG_RESOLUTIONUNIT, resolution_unit);
+                TIFFSetField (tiff, TIFFTAG_XRESOLUTION, x_dpi_value);
+                TIFFSetField (tiff, TIFFTAG_YRESOLUTION, y_dpi_value);
+        }
+
         TIFFClose (tiff);
 
         /* Now call the callback */
         retval = save_func (context->buffer, context->used, error, user_data);
 
 cleanup:
-        g_free (icc_profile);
         free_save_context (context);
         return retval;
 }
@@ -767,28 +997,27 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 {
-        static GdkPixbufModulePattern signature[] = {
+        static const GdkPixbufModulePattern signature[] = {
                 { "MM \x2a", "  z ", 100 },
                 { "II\x2a ", "   z", 100 },
                 { "II* \020   CR\002 ", "   z zzz   z", 0 },
                 { NULL, NULL, 0 }
         };
-	static gchar * mime_types[] = {
+	static const gchar *mime_types[] = {
 		"image/tiff",
 		NULL
 	};
-	static gchar * extensions[] = {
+	static const gchar *extensions[] = {
 		"tiff",
 		"tif",
 		NULL
 	};
 
 	info->name = "tiff";
-        info->signature = signature;
-	info->description = N_("The TIFF image format");
-	info->mime_types = mime_types;
-	info->extensions = extensions;
-        /* not threadsafe, due to the error handler handling */
+        info->signature = (GdkPixbufModulePattern *) signature;
+	info->description = NC_("image format", "TIFF");
+	info->mime_types = (gchar **) mime_types;
+	info->extensions = (gchar **) extensions;
 	info->flags = GDK_PIXBUF_FORMAT_WRITABLE | GDK_PIXBUF_FORMAT_THREADSAFE;
 	info->license = "LGPL";
 }

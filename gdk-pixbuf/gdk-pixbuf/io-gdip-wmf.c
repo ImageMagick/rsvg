@@ -16,10 +16,11 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "config.h"
+#include <glib/gi18n-lib.h>
 
 #include "io-gdip-utils.h"
 
@@ -36,28 +37,28 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 {
-  static GdkPixbufModulePattern signature[] = {
+  static const GdkPixbufModulePattern signature[] = {
     { "\xd7\xcd\xc6\x9a", NULL, 100 }, /* WMF */
     { "\x01\x00\x09\x00", NULL, 100 }, /* WMF */
     { NULL, NULL, 0 }
   };
 
-  static gchar *mime_types[] = {
+  static const gchar *mime_types[] = {
     "image/x-wmf",
     NULL
   };
 
-  static gchar *extensions[] = {
+  static const gchar *extensions[] = {
     "wmf",
     "apm",
     NULL
   };
 
   info->name        = "wmf";
-  info->signature   = signature;
-  info->description = _("The WMF image format");
-  info->mime_types  = mime_types;
-  info->extensions  = extensions;
+  info->signature   = (GdkPixbufModulePattern *) signature;
+  info->description = NC_("image format", "WMF");
+  info->mime_types  = (gchar **) mime_types;
+  info->extensions  = (gchar **) extensions;
   info->flags       = GDK_PIXBUF_FORMAT_THREADSAFE;
   info->license     = "LGPL";
 }

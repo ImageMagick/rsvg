@@ -16,16 +16,13 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _HAVE_IO_GDIP_UTILS_H
 #define _HAVE_IO_GDIP_UTILS_H
 
 #include "gdk-pixbuf.h"
-#include "gdk-pixbuf-i18n.h"
 
 #include "io-gdip-native.h"
 

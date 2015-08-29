@@ -16,10 +16,11 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "config.h"
+#include <glib/gi18n-lib.h>
 
 #include "io-gdip-utils.h"
 
@@ -36,29 +37,29 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 {
-  static GdkPixbufModulePattern signature[] = {
+  static const GdkPixbufModulePattern signature[] = {
     { "  \x1   ", "zz znz", 100 }, /* ICO */
     { "  \x2   ", "zz znz", 100 }, /* ICO */
     { NULL, NULL, 0 }
   };
 
-  static gchar *mime_types[] = {
+  static const gchar *mime_types[] = {
     "image/x-icon",
     "image/x-ico",
     NULL
   };
 
-  static gchar *extensions[] = {
+  static const gchar *extensions[] = {
     "ico",
     "cur",
     NULL
   };
 
   info->name        = "ico";
-  info->signature   = signature;
-  info->description = _("The ICO image format");
-  info->mime_types  = mime_types;
-  info->extensions  = extensions;
+  info->signature   = (GdkPixbufModulePattern *) signature;
+  info->description = NC_("image format", "Windows icon");
+  info->mime_types  = (gchar **) mime_types;
+  info->extensions  = (gchar **) extensions;
   info->flags       = GDK_PIXBUF_FORMAT_THREADSAFE;
   info->license     = "LGPL";
 }

@@ -1,12 +1,10 @@
-include $(top_srcdir)/Makefile.decl
-
 if PLATFORM_WIN32
 no_undefined = -no-undefined
 endif
 
 lib_LTLIBRARIES=libgdk_pixbuf_xlib-2.0.la
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir) -I$(top_builddir) 	\
 	-I$(top_srcdir)/gdk-pixbuf 		\
 	-I$(top_srcdir)/contrib 		\
@@ -37,6 +35,6 @@ libgdk_pixbuf_xlibinclude_HEADERS =         		\
 pkgconfigdir   = $(libdir)/pkgconfig
 pkgconfig_DATA = gdk-pixbuf-xlib-2.0.pc
 
-EXTRA_DIST += gdk-pixbuf-xlib-2.0.pc.in
+EXTRA_DIST = gdk-pixbuf-xlib-2.0.pc.in
 
 -include $(top_srcdir)/git.mk

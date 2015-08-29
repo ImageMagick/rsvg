@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: gtk+ HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gdk-"
 "pixbuf\n"
-"POT-Creation-Date: 2013-11-11 10:51-0500\n"
+"POT-Creation-Date: 2012-02-04 18:44-0500\n"
 "PO-Revision-Date: 2009-02-13 12:58+0100\n"
 "Last-Translator: Laurent Dhima <laurenti@alblinux.net>\n"
 "Language-Team: albanian <gnome-albanian-perkthyesit@lists.sourceforge.net>\n"
@@ -19,18 +19,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:160 gdk-pixbuf/gdk-pixbuf-io.c:1064
-#: gdk-pixbuf/gdk-pixbuf-io.c:1330
+#: gdk-pixbuf/gdk-pixbuf-animation.c:146 gdk-pixbuf/gdk-pixbuf-io.c:1083
+#: gdk-pixbuf/gdk-pixbuf-io.c:1349
 #, c-format
 msgid "Failed to open file '%s': %s"
 msgstr "E pamundur hapja e file '%s': %s"
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:173 gdk-pixbuf/gdk-pixbuf-io.c:1076
+#: gdk-pixbuf/gdk-pixbuf-animation.c:159 gdk-pixbuf/gdk-pixbuf-io.c:1095
 #, c-format
 msgid "Image file '%s' contains no data"
 msgstr "File '%s' nuk përmban të dhëna"
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:212
+# (pofilter) puncspacing: checks for bad spacing after punctuation
+#: gdk-pixbuf/gdk-pixbuf-animation.c:201 gdk-pixbuf/gdk-pixbuf-io.c:1131
+#: gdk-pixbuf/gdk-pixbuf-io.c:1401
+#, c-format
+msgid ""
+"Failed to load image '%s': reason not known, probably a corrupt image file"
+msgstr ""
+"Hapja e figurës '%s' dështoi: shkaku nuk njihet, ndoshta file është i dëmtuar"
+
+#: gdk-pixbuf/gdk-pixbuf-animation.c:234
 #, c-format
 msgid ""
 "Failed to load animation '%s': reason not known, probably a corrupt "
@@ -39,21 +48,12 @@ msgstr ""
 "Dështova në ngarkimin e animacionit '%s': arsye e panjohur, ka mundësi që "
 "file të jetë i dëmtuar"
 
-# (pofilter) puncspacing: checks for bad spacing after punctuation
-#: gdk-pixbuf/gdk-pixbuf-animation.c:280 gdk-pixbuf/gdk-pixbuf-io.c:1112
-#: gdk-pixbuf/gdk-pixbuf-io.c:1382
-#, c-format
-msgid ""
-"Failed to load image '%s': reason not known, probably a corrupt image file"
-msgstr ""
-"Hapja e figurës '%s' dështoi: shkaku nuk njihet, ndoshta file është i dëmtuar"
-
-#: gdk-pixbuf/gdk-pixbuf-io.c:790
+#: gdk-pixbuf/gdk-pixbuf-io.c:809
 #, c-format
 msgid "Unable to load image-loading module: %s: %s"
 msgstr "I pamundur ngarkimi i modulit ngarkues të figurave: %s: %s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:805
+#: gdk-pixbuf/gdk-pixbuf-io.c:824
 #, fuzzy, c-format
 msgid ""
 "Image-loading module %s does not export the proper interface; perhaps it's "
@@ -62,54 +62,54 @@ msgstr ""
 "Moduli i ngarkimit të figurave %s nuk eksporton interfaqen e duhur; mbase "
 "është për një version tjetër të GTK?"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:814 gdk-pixbuf/gdk-pixbuf-io.c:865
+#: gdk-pixbuf/gdk-pixbuf-io.c:833 gdk-pixbuf/gdk-pixbuf-io.c:884
 #, c-format
 msgid "Image type '%s' is not supported"
 msgstr "Figurat e llojit '%s' nuk suportohen"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:950
+#: gdk-pixbuf/gdk-pixbuf-io.c:964
 #, c-format
 msgid "Couldn't recognize the image file format for file '%s'"
 msgstr "Nuk munda të njoh formatin e figurës për file '%s'"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:958
+#: gdk-pixbuf/gdk-pixbuf-io.c:972
 msgid "Unrecognized image file format"
 msgstr "Format i panjohur figure"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:1121
+#: gdk-pixbuf/gdk-pixbuf-io.c:1140
 #, c-format
 msgid "Failed to load image '%s': %s"
 msgstr "I pamundur ngarkimi i figurës '%s': %s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2015 gdk-pixbuf/io-gdip-utils.c:837
+#: gdk-pixbuf/gdk-pixbuf-io.c:2028 gdk-pixbuf/io-gdip-utils.c:888
 #, c-format
 msgid "Error writing to image file: %s"
 msgstr "Gabim gjatë shkrimit tek file i figurës: %s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2057 gdk-pixbuf/gdk-pixbuf-io.c:2178
+#: gdk-pixbuf/gdk-pixbuf-io.c:2073 gdk-pixbuf/gdk-pixbuf-io.c:2203
 #, c-format
 msgid "This build of gdk-pixbuf does not support saving the image format: %s"
 msgstr ""
 "Ky variant i gdk-pixbuf nuk suporton ruajtjen e figurës në formatin: %s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2088
+#: gdk-pixbuf/gdk-pixbuf-io.c:2107
 msgid "Insufficient memory to save image to callback"
 msgstr "Kujtesë e pamjaftueshme për të ruajtur figurën që duhet rithirrur"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2101
+#: gdk-pixbuf/gdk-pixbuf-io.c:2120
 msgid "Failed to open temporary file"
 msgstr "Dështova në hapjen e file të përkohshëm"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2124
+#: gdk-pixbuf/gdk-pixbuf-io.c:2146
 msgid "Failed to read from temporary file"
 msgstr "I pamundur leximi i file të përkohshëm"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2372
+#: gdk-pixbuf/gdk-pixbuf-io.c:2399
 #, c-format
 msgid "Failed to open '%s' for writing: %s"
 msgstr "E pamundur hapja e '%s' për të shkruar: %s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2398
+#: gdk-pixbuf/gdk-pixbuf-io.c:2425
 #, c-format
 msgid ""
 "Failed to close '%s' while writing image, all data may not have been saved: "
@@ -118,15 +118,15 @@ msgstr ""
 "E pamundur mbyllja e '%s' gjatë shkrimit të figurës, ka mundësi që asnjë nga "
 "të dhënat të jetë ruajtur: %s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2619 gdk-pixbuf/gdk-pixbuf-io.c:2671
+#: gdk-pixbuf/gdk-pixbuf-io.c:2646 gdk-pixbuf/gdk-pixbuf-io.c:2698
 msgid "Insufficient memory to save image into a buffer"
 msgstr "Kujtesë e pamjaftueshme për të ruajtur figurën në një buffer"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2717
+#: gdk-pixbuf/gdk-pixbuf-io.c:2744
 msgid "Error writing to image stream"
 msgstr "Gabim gjatë shkrimit tek stream i figurës"
 
-#: gdk-pixbuf/gdk-pixbuf-loader.c:393
+#: gdk-pixbuf/gdk-pixbuf-loader.c:395
 #, c-format
 msgid ""
 "Internal error: Image loader module '%s' failed to complete an operation, "
@@ -135,7 +135,7 @@ msgstr ""
 "Gabim i brendshëm: Moduli ngarkues i figurave '%s' dështoi në plotësimin e "
 "një operacioni, por nuk dha ndonjë arsye për dështimin"
 
-#: gdk-pixbuf/gdk-pixbuf-loader.c:435
+#: gdk-pixbuf/gdk-pixbuf-loader.c:437
 #, c-format
 msgid "Incremental loading of image type '%s' is not supported"
 msgstr "Ngarkimi inkremental i figurave të llojit '%s' nuk suportohet"
@@ -163,26 +163,25 @@ msgstr[1] "i pamundur sigurimi i buffer të figurës prej %u bytes"
 msgid "Unexpected icon chunk in animation"
 msgstr "Pjesë ikone e paparashikuar në animim"
 
-#: gdk-pixbuf/io-ani.c:342 gdk-pixbuf/io-ani.c:400 gdk-pixbuf/io-ani.c:426
-#: gdk-pixbuf/io-ani.c:449 gdk-pixbuf/io-ani.c:476 gdk-pixbuf/io-ani.c:563
+#: gdk-pixbuf/io-ani.c:337
+msgid "Unsupported animation type"
+msgstr "Lloj i pasuportuar animacioni"
+
+#: gdk-pixbuf/io-ani.c:348 gdk-pixbuf/io-ani.c:406 gdk-pixbuf/io-ani.c:432
+#: gdk-pixbuf/io-ani.c:455 gdk-pixbuf/io-ani.c:482 gdk-pixbuf/io-ani.c:569
 msgid "Invalid header in animation"
 msgstr "Fillim i pavlefshëm në animacion"
 
-#: gdk-pixbuf/io-ani.c:352 gdk-pixbuf/io-ani.c:374 gdk-pixbuf/io-ani.c:458
-#: gdk-pixbuf/io-ani.c:485 gdk-pixbuf/io-ani.c:536 gdk-pixbuf/io-ani.c:608
+#: gdk-pixbuf/io-ani.c:358 gdk-pixbuf/io-ani.c:380 gdk-pixbuf/io-ani.c:464
+#: gdk-pixbuf/io-ani.c:491 gdk-pixbuf/io-ani.c:542 gdk-pixbuf/io-ani.c:614
 msgid "Not enough memory to load animation"
 msgstr "Kujtesë e pamjaftueshme për të ngarkuar animacionin"
 
-#: gdk-pixbuf/io-ani.c:392 gdk-pixbuf/io-ani.c:418 gdk-pixbuf/io-ani.c:437
+#: gdk-pixbuf/io-ani.c:398 gdk-pixbuf/io-ani.c:424 gdk-pixbuf/io-ani.c:443
 msgid "Malformed chunk in animation"
 msgstr "Pjesë e keqformuar në animacion"
 
-#: gdk-pixbuf/io-ani.c:630
-#, fuzzy
-msgid "ANI image was truncated or incomplete."
-msgstr "Figurë GIF e ndëprerë ose jo e plotë."
-
-#: gdk-pixbuf/io-ani.c:671
+#: gdk-pixbuf/io-ani.c:711
 msgid "The ANI image format"
 msgstr "Formati i figurave ANI"
 
@@ -223,7 +222,7 @@ msgstr "Formati i figurës BMP"
 msgid "The EMF image format"
 msgstr "Formati EMF"
 
-#: gdk-pixbuf/io-gdip-gif.c:80 gdk-pixbuf/io-gif.c:1720
+#: gdk-pixbuf/io-gdip-gif.c:80 gdk-pixbuf/io-gif.c:1699
 msgid "The GIF image format"
 msgstr "Formati GIF"
 
@@ -231,7 +230,7 @@ msgstr "Formati GIF"
 msgid "The ICO image format"
 msgstr "Formati i figurës ICO"
 
-#: gdk-pixbuf/io-gdip-jpeg.c:53 gdk-pixbuf/io-jpeg.c:1249
+#: gdk-pixbuf/io-gdip-jpeg.c:53 gdk-pixbuf/io-jpeg.c:1139
 #, c-format
 msgid ""
 "JPEG quality must be a value between 0 and 100; value '%s' could not be "
@@ -240,14 +239,14 @@ msgstr ""
 "Cilësia JPEG duhet të jetë një vlerë midis 0 dhe 100; vlera '%s' nuk mund të "
 "analizohet."
 
-#: gdk-pixbuf/io-gdip-jpeg.c:68 gdk-pixbuf/io-jpeg.c:1265
+#: gdk-pixbuf/io-gdip-jpeg.c:68 gdk-pixbuf/io-jpeg.c:1154
 #, c-format
 msgid ""
 "JPEG quality must be a value between 0 and 100; value '%d' is not allowed."
 msgstr ""
 "Cilësia JPEG duhet të jetë një vlerë midis 0 dhe 100; vlera '%d' nuk lejohet."
 
-#: gdk-pixbuf/io-gdip-jpeg.c:136 gdk-pixbuf/io-jpeg.c:1478
+#: gdk-pixbuf/io-gdip-jpeg.c:136 gdk-pixbuf/io-jpeg.c:1316
 msgid "The JPEG image format"
 msgstr "Formati JPEG"
 
@@ -272,20 +271,20 @@ msgstr "I pamundur kërkimi i fluksit: %s"
 msgid "Could not read from stream: %s"
 msgstr "I pamundur leximi nga fluksi: %s"
 
-#: gdk-pixbuf/io-gdip-utils.c:617
+#: gdk-pixbuf/io-gdip-utils.c:617 gdk-pixbuf/io-gdip-utils.c:752
 msgid "Couldn't load bitmap"
 msgstr "I pamundur ngarkimi i bitmap"
 
-#: gdk-pixbuf/io-gdip-utils.c:773
+#: gdk-pixbuf/io-gdip-utils.c:774
 msgid "Couldn't load metafile"
 msgstr "I pamundur ngarkimi i metafile"
 
 # (pofilter) startcaps: checks that the message starts with the correct capitalisation
-#: gdk-pixbuf/io-gdip-utils.c:878
+#: gdk-pixbuf/io-gdip-utils.c:933
 msgid "Unsupported image format for GDI+"
 msgstr "Format figure i pasuportuar për GDI+"
 
-#: gdk-pixbuf/io-gdip-utils.c:885
+#: gdk-pixbuf/io-gdip-utils.c:940
 msgid "Couldn't save"
 msgstr "E pamundur ruajtja"
 
@@ -293,64 +292,59 @@ msgstr "E pamundur ruajtja"
 msgid "The WMF image format"
 msgstr "Formati WMF"
 
-#: gdk-pixbuf/io-gif.c:222
+#: gdk-pixbuf/io-gif.c:221
 #, c-format
 msgid "Failure reading GIF: %s"
 msgstr "Gabim gjatë leximit të GIF: %s"
 
-#: gdk-pixbuf/io-gif.c:496 gdk-pixbuf/io-gif.c:1502 gdk-pixbuf/io-gif.c:1669
+#: gdk-pixbuf/io-gif.c:495 gdk-pixbuf/io-gif.c:1482 gdk-pixbuf/io-gif.c:1648
 msgid "GIF file was missing some data (perhaps it was truncated somehow?)"
 msgstr "File GIF i mungojnë të dhëna (mbase në një farë mënyre i janë hequr?)"
 
-#: gdk-pixbuf/io-gif.c:505
+#: gdk-pixbuf/io-gif.c:504
 #, c-format
 msgid "Internal error in the GIF loader (%s)"
 msgstr "Gabim i brendshëm në ngarkuesin GIF (%s)"
 
-#: gdk-pixbuf/io-gif.c:579
+#: gdk-pixbuf/io-gif.c:578
 msgid "Stack overflow"
 msgstr "Stack overflow"
 
-#: gdk-pixbuf/io-gif.c:639
+#: gdk-pixbuf/io-gif.c:638
 msgid "GIF image loader cannot understand this image."
 msgstr "Ngarkuesi i imazheve GIF nuk arrin të interpretojë këtë figurë."
 
-#: gdk-pixbuf/io-gif.c:668
+#: gdk-pixbuf/io-gif.c:667
 msgid "Bad code encountered"
 msgstr "Ndesha në kod të gabuar"
 
-#: gdk-pixbuf/io-gif.c:678
+#: gdk-pixbuf/io-gif.c:677
 msgid "Circular table entry in GIF file"
 msgstr "Element i përsëritur tabele në file GIF"
 
-#: gdk-pixbuf/io-gif.c:866 gdk-pixbuf/io-gif.c:1488 gdk-pixbuf/io-gif.c:1541
-#: gdk-pixbuf/io-gif.c:1657
+#: gdk-pixbuf/io-gif.c:865 gdk-pixbuf/io-gif.c:1468 gdk-pixbuf/io-gif.c:1521
+#: gdk-pixbuf/io-gif.c:1636
 msgid "Not enough memory to load GIF file"
 msgstr "Kujtesë e pamjaftueshme për të ngarkuar file GIF"
 
-#: gdk-pixbuf/io-gif.c:960
+#: gdk-pixbuf/io-gif.c:959
 msgid "Not enough memory to composite a frame in GIF file"
 msgstr "Kujtesë e pamjaftueshme për të krijuar një fragment tek file GIF"
 
-#: gdk-pixbuf/io-gif.c:1132
+#: gdk-pixbuf/io-gif.c:1131
 msgid "GIF image is corrupt (incorrect LZW compression)"
 msgstr "Figurë GIF e dëmtuar (gabime në kompresimin LZW)"
 
-#: gdk-pixbuf/io-gif.c:1182
+#: gdk-pixbuf/io-gif.c:1181
 msgid "File does not appear to be a GIF file"
 msgstr "File nuk duket të jetë i formatit GIF"
 
-#: gdk-pixbuf/io-gif.c:1194
+#: gdk-pixbuf/io-gif.c:1193
 #, c-format
 msgid "Version %s of the GIF file format is not supported"
 msgstr "Versioni %s i formatit GIF nuk suportohet"
 
-#: gdk-pixbuf/io-gif.c:1241
-#, fuzzy
-msgid "Resulting GIF image has zero size"
-msgstr "Figura ka gjerësi zero"
-
-#: gdk-pixbuf/io-gif.c:1320
+#: gdk-pixbuf/io-gif.c:1302
 msgid ""
 "GIF image has no global colormap, and a frame inside it has no local "
 "colormap."
@@ -358,7 +352,7 @@ msgstr ""
 "Figura GIF nuk ka një hartë ngjyrash globale dhe, në një fotogramë të "
 "brendshme, mungon harta e ngjyrave lokale."
 
-#: gdk-pixbuf/io-gif.c:1564
+#: gdk-pixbuf/io-gif.c:1543
 msgid "GIF image was truncated or incomplete."
 msgstr "Figurë GIF e ndëprerë ose jo e plotë."
 
@@ -450,12 +444,12 @@ msgstr "I pamundur sigurimi i memorjes për të magazinuar të dhënat e figurë
 msgid "The JPEG 2000 image format"
 msgstr "Formati JPEG 2000 i figurave"
 
-#: gdk-pixbuf/io-jpeg.c:126
+#: gdk-pixbuf/io-jpeg.c:116
 #, c-format
 msgid "Error interpreting JPEG image file (%s)"
 msgstr "Gabim gjatë interpretimit të file JPEG (%s)"
 
-#: gdk-pixbuf/io-jpeg.c:604
+#: gdk-pixbuf/io-jpeg.c:527
 msgid ""
 "Insufficient memory to load image, try exiting some applications to free "
 "memory"
@@ -463,24 +457,19 @@ msgstr ""
 "Kujtesë e pamjaftueshme për të ngarkuar figurën, provoni të mbyllni disa "
 "programe që të lironi pak kujtesë"
 
-#: gdk-pixbuf/io-jpeg.c:651 gdk-pixbuf/io-jpeg.c:865
+#: gdk-pixbuf/io-jpeg.c:568 gdk-pixbuf/io-jpeg.c:781
 #, c-format
 msgid "Unsupported JPEG color space (%s)"
 msgstr "Ngjyrë hapësire JPEG (%s) e pasuportuar"
 
-#: gdk-pixbuf/io-jpeg.c:764 gdk-pixbuf/io-jpeg.c:1044
-#: gdk-pixbuf/io-jpeg.c:1308 gdk-pixbuf/io-jpeg.c:1318
+#: gdk-pixbuf/io-jpeg.c:680 gdk-pixbuf/io-jpeg.c:950 gdk-pixbuf/io-jpeg.c:1183
+#: gdk-pixbuf/io-jpeg.c:1192
 msgid "Couldn't allocate memory for loading JPEG file"
 msgstr "E pamundur përgatitja e kujtesës për të ngarkuar file JPEG"
 
-#: gdk-pixbuf/io-jpeg.c:1018
+#: gdk-pixbuf/io-jpeg.c:925
 msgid "Transformed JPEG has zero width or height."
 msgstr "JPEG e transformuar gjerësi apo lartësi zero."
-
-#: gdk-pixbuf/io-jpeg.c:1279
-#, c-format
-msgid "Color profile has invalid length '%u'."
-msgstr ""
 
 #: gdk-pixbuf/io-pcx.c:186
 msgid "Couldn't allocate memory for header"
@@ -540,73 +529,73 @@ msgstr "Figura e transformuar në PNG ka gjerësi apo lartësi zero."
 msgid "The GdkPixdata format"
 msgstr "Formati GIF"
 
-#: gdk-pixbuf/io-png.c:55
+#: gdk-pixbuf/io-png.c:54
 msgid "Bits per channel of PNG image is invalid."
 msgstr "Numri i bit për kanal i figurës PNG është i pavlefshëm."
 
-#: gdk-pixbuf/io-png.c:136 gdk-pixbuf/io-png.c:642
+#: gdk-pixbuf/io-png.c:135 gdk-pixbuf/io-png.c:641
 msgid "Transformed PNG has zero width or height."
 msgstr "Figura e transformuar në PNG ka gjerësi apo lartësi zero."
 
-#: gdk-pixbuf/io-png.c:144
+#: gdk-pixbuf/io-png.c:143
 msgid "Bits per channel of transformed PNG is not 8."
 msgstr ""
 "Numri i bit-eve për kanal të figurës së transformuar në PNG nuk është 8."
 
-#: gdk-pixbuf/io-png.c:153
+#: gdk-pixbuf/io-png.c:152
 msgid "Transformed PNG not RGB or RGBA."
 msgstr "Figura e transformuar në PNG nuk përdor RGB apo RGBA."
 
-#: gdk-pixbuf/io-png.c:162
+#: gdk-pixbuf/io-png.c:161
 msgid "Transformed PNG has unsupported number of channels, must be 3 or 4."
 msgstr ""
 "Figurë e transformuar në PNG me numër të pasuportuar kanalesh, duhet të jetë "
 "3 ose 4."
 
-#: gdk-pixbuf/io-png.c:183
+#: gdk-pixbuf/io-png.c:182
 #, c-format
 msgid "Fatal error in PNG image file: %s"
 msgstr "Gabim fatal në file PNG: %s"
 
-#: gdk-pixbuf/io-png.c:316
+#: gdk-pixbuf/io-png.c:315
 msgid "Insufficient memory to load PNG file"
 msgstr "Kujtesë e pamjaftueshme për të ngarkuar file PNG"
 
-#: gdk-pixbuf/io-png.c:657
-#, fuzzy, c-format
+#: gdk-pixbuf/io-png.c:656
+#, c-format
 msgid ""
-"Insufficient memory to store a %lu by %lu image; try exiting some "
+"Insufficient memory to store a %ld by %ld image; try exiting some "
 "applications to reduce memory usage"
 msgstr ""
 "Kujtesë e pamjaftueshme për të ruajtur një figurë %ld × %ld; provoni "
 "mbylljen e disa programeve për të zvogëluar përdorimin e kujtesës"
 
-#: gdk-pixbuf/io-png.c:720
+#: gdk-pixbuf/io-png.c:719
 msgid "Fatal error reading PNG image file"
 msgstr "Gabim fatal gjatë leximit të file PNG"
 
-#: gdk-pixbuf/io-png.c:769
+#: gdk-pixbuf/io-png.c:768
 #, c-format
 msgid "Fatal error reading PNG image file: %s"
 msgstr "Gabim fatal gjatë leximit të file PNG: %s"
 
-#: gdk-pixbuf/io-png.c:859
+#: gdk-pixbuf/io-png.c:862
 msgid ""
 "Keys for PNG text chunks must have at least 1 and at most 79 characters."
 msgstr ""
 "Kyçet për segmentet e tekstit PNG duhet të kenë të paktën 1 dhe në maksimum "
 "79 simbole."
 
-#: gdk-pixbuf/io-png.c:868
+#: gdk-pixbuf/io-png.c:871
 msgid "Keys for PNG text chunks must be ASCII characters."
 msgstr "Kyçet për segmentet e tekstit PNG duhet të jenë simbole ASCII."
 
-#: gdk-pixbuf/io-png.c:882 gdk-pixbuf/io-tiff.c:667
+#: gdk-pixbuf/io-png.c:885 gdk-pixbuf/io-tiff.c:737
 #, c-format
 msgid "Color profile has invalid length %d."
 msgstr ""
 
-#: gdk-pixbuf/io-png.c:895
+#: gdk-pixbuf/io-png.c:898
 #, c-format
 msgid ""
 "PNG compression level must be a value between 0 and 9; value '%s' could not "
@@ -615,7 +604,7 @@ msgstr ""
 "Niveli i ngjeshjes PNG duhet të jetë një vlerë midis 0 dhe 9; vlera '%s' nuk "
 "mund të analizohet."
 
-#: gdk-pixbuf/io-png.c:908
+#: gdk-pixbuf/io-png.c:911
 #, c-format
 msgid ""
 "PNG compression level must be a value between 0 and 9; value '%d' is not "
@@ -624,14 +613,14 @@ msgstr ""
 "Niveli i ngjeshjes PNG duhet të jetë një vlerë midis 0 dhe 9; vlera '%d' nuk "
 "lejohet."
 
-#: gdk-pixbuf/io-png.c:956
+#: gdk-pixbuf/io-png.c:959
 #, c-format
 msgid "Value for PNG text chunk %s cannot be converted to ISO-8859-1 encoding."
 msgstr ""
 "Vlera për segmentin %s të tekstit PNG nuk mund të konvertohet në familjen "
 "ISO-8859-1."
 
-#: gdk-pixbuf/io-png.c:1119
+#: gdk-pixbuf/io-png.c:1122
 msgid "The PNG image format"
 msgstr "Formati PNG"
 
@@ -708,7 +697,7 @@ msgstr ""
 msgid "Failed to read QTIF header"
 msgstr "Shkrimi i kreut dështoi\n"
 
-#: gdk-pixbuf/io-qtif.c:152 gdk-pixbuf/io-qtif.c:189 gdk-pixbuf/io-qtif.c:459
+#: gdk-pixbuf/io-qtif.c:152 gdk-pixbuf/io-qtif.c:189 gdk-pixbuf/io-qtif.c:460
 #, c-format
 msgid "QTIF atom size too large (%d byte)"
 msgid_plural "QTIF atom size too large (%d bytes)"
@@ -749,7 +738,7 @@ msgstr "Shkrimi i treguesit të kartelës dështoi\n"
 msgid "Failed to find an image data atom."
 msgstr "E pamundur hapja e figurës TIFF"
 
-#: gdk-pixbuf/io-qtif.c:618
+#: gdk-pixbuf/io-qtif.c:619
 #, fuzzy
 msgid "The QTIF image format"
 msgstr "Formati i figurës TIFF"
@@ -837,55 +826,59 @@ msgstr "Tepri të dhënash në file"
 msgid "The Targa image format"
 msgstr "Formati Targa"
 
-#: gdk-pixbuf/io-tiff.c:104
+#: gdk-pixbuf/io-tiff.c:164
 msgid "Could not get image width (bad TIFF file)"
 msgstr "I pamundur përcaktimi i gjerësisë së figurës (file TIFF i keqformuar)"
 
-#: gdk-pixbuf/io-tiff.c:112
+#: gdk-pixbuf/io-tiff.c:171
 msgid "Could not get image height (bad TIFF file)"
 msgstr "I pamundur përcaktimi i lartësisë së figurës (file TIFF i keqformuar)"
 
-#: gdk-pixbuf/io-tiff.c:120
+#: gdk-pixbuf/io-tiff.c:179
 msgid "Width or height of TIFF image is zero"
 msgstr "Gjerësia ose lartësia e figurës TIFF është zero"
 
-#: gdk-pixbuf/io-tiff.c:129 gdk-pixbuf/io-tiff.c:138
+#: gdk-pixbuf/io-tiff.c:188 gdk-pixbuf/io-tiff.c:197
 msgid "Dimensions of TIFF image too large"
 msgstr "Përmasat e figurës TIFF janë tepër të mëdha"
 
-#: gdk-pixbuf/io-tiff.c:162 gdk-pixbuf/io-tiff.c:174 gdk-pixbuf/io-tiff.c:491
+#: gdk-pixbuf/io-tiff.c:221 gdk-pixbuf/io-tiff.c:233 gdk-pixbuf/io-tiff.c:560
 msgid "Insufficient memory to open TIFF file"
 msgstr "Kujtesë e pamjaftueshme për hapjen e file TIFF"
 
-#: gdk-pixbuf/io-tiff.c:236
+#: gdk-pixbuf/io-tiff.c:294
 msgid "Failed to load RGB data from TIFF file"
 msgstr "Dështova në ngarkimin e të dhënave RGB nga file TIFF"
 
-#: gdk-pixbuf/io-tiff.c:293
+#: gdk-pixbuf/io-tiff.c:350
 msgid "Failed to open TIFF image"
 msgstr "E pamundur hapja e figurës TIFF"
 
-#: gdk-pixbuf/io-tiff.c:427 gdk-pixbuf/io-tiff.c:440
+#: gdk-pixbuf/io-tiff.c:362 gdk-pixbuf/io-tiff.c:777
+msgid "TIFFClose operation failed"
+msgstr "Operacioni TIFFClose dështoi"
+
+#: gdk-pixbuf/io-tiff.c:492 gdk-pixbuf/io-tiff.c:505
 msgid "Failed to load TIFF image"
 msgstr "I pamundur ngarkimi i figurës TIFF"
 
-#: gdk-pixbuf/io-tiff.c:623
+#: gdk-pixbuf/io-tiff.c:691
 msgid "Failed to save TIFF image"
 msgstr "Ruajtja e figurës TIFF dështoi"
 
-#: gdk-pixbuf/io-tiff.c:656
+#: gdk-pixbuf/io-tiff.c:726
 msgid "TIFF compression doesn't refer to a valid codec."
 msgstr ""
 
-#: gdk-pixbuf/io-tiff.c:696
+#: gdk-pixbuf/io-tiff.c:766
 msgid "Failed to write TIFF data"
 msgstr "Shkrimi i të dhënave TIFF dështoi"
 
-#: gdk-pixbuf/io-tiff.c:733
+#: gdk-pixbuf/io-tiff.c:813
 msgid "Couldn't write to TIFF file"
 msgstr "I pamundur shkrimi tek file TIFF"
 
-#: gdk-pixbuf/io-tiff.c:788
+#: gdk-pixbuf/io-tiff.c:868
 msgid "The TIFF image format"
 msgstr "Formati i figurës TIFF"
 
@@ -909,20 +902,20 @@ msgstr "E pamundur ruajtja e pjesës së mbetur"
 msgid "The WBMP image format"
 msgstr "Formati i figurës WBMP"
 
-#: gdk-pixbuf/io-xbm.c:304
+#: gdk-pixbuf/io-xbm.c:296
 msgid "Invalid XBM file"
 msgstr "File XBM i pasaktë"
 
-#: gdk-pixbuf/io-xbm.c:314
+#: gdk-pixbuf/io-xbm.c:306
 msgid "Insufficient memory to load XBM image file"
 msgstr "Kujtesë e pamjaftueshme për ngarkimin e file XBM"
 
-#: gdk-pixbuf/io-xbm.c:462
+#: gdk-pixbuf/io-xbm.c:454
 msgid "Failed to write to temporary file when loading XBM image"
 msgstr ""
 "Dështova në shkrimin e file të përkohshëm gjatë ngarkimit të figurës XBM"
 
-#: gdk-pixbuf/io-xbm.c:501
+#: gdk-pixbuf/io-xbm.c:493
 msgid "The XBM image format"
 msgstr "Formati XBM"
 
@@ -966,12 +959,6 @@ msgstr ""
 #: gdk-pixbuf/io-xpm.c:817
 msgid "The XPM image format"
 msgstr "Formati i figurës XPM"
-
-#~ msgid "Unsupported animation type"
-#~ msgstr "Lloj i pasuportuar animacioni"
-
-#~ msgid "TIFFClose operation failed"
-#~ msgstr "Operacioni TIFFClose dështoi"
 
 #~ msgid "Couldn't allocate memory for paletted data"
 #~ msgstr "S'mund të siguroj kujtesë për të dhënat e palet-uara"

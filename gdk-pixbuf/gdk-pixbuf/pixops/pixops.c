@@ -15,9 +15,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 #include "config.h"
 #include <math.h>
@@ -419,6 +417,86 @@ pixops_composite_nearest (guchar        *dest_buf,
               break;
             }
 	);
+    }
+}
+
+static void
+pixops_composite_nearest_noscale (guchar        *dest_buf,
+				  int            render_x0,
+				  int            render_y0,
+				  int            render_x1,
+				  int            render_y1,
+				  int            dest_rowstride,
+				  int            dest_channels,
+				  gboolean       dest_has_alpha,
+				  const guchar  *src_buf,
+				  int            src_width,
+				  int            src_height,
+				  int            src_rowstride,
+				  int            src_channels,
+				  gboolean       src_has_alpha,
+				  int            overall_alpha)
+{
+  int i, j;
+  int x;
+
+  for (i = 0; i < (render_y1 - render_y0); i++)
+    {
+      const guchar *src  = src_buf + (i + render_y0) * src_rowstride;
+      guchar       *dest = dest_buf + i * dest_rowstride;
+
+      x = render_x0 * src_channels;
+
+      for (j=0; j < (render_x1 - render_x0); j++)
+	{
+	  const guchar *p = src + x;
+	  unsigned int  a0;
+
+	  if (src_has_alpha)
+	    a0 = (p[3] * overall_alpha) / 0xff;
+	  else
+	    a0 = overall_alpha;
+
+	  switch (a0)
+	    {
+	    case 0:
+	      break;
+	    case 255:
+	      dest[0] = p[0];
+	      dest[1] = p[1];
+	      dest[2] = p[2];
+	      if (dest_has_alpha)
+		dest[3] = 0xff;
+	      break;
+	    default:
+	      if (dest_has_alpha)
+	        {
+		  unsigned int w0 = 0xff * a0;
+		  unsigned int w1 = (0xff - a0) * dest[3];
+		  unsigned int w = w0 + w1;
+
+		  dest[0] = (w0 * p[0] + w1 * dest[0]) / w;
+		  dest[1] = (w0 * p[1] + w1 * dest[1]) / w;
+		  dest[2] = (w0 * p[2] + w1 * dest[2]) / w;
+		  dest[3] = w / 0xff;
+	        }
+	      else
+	        {
+		  unsigned int a1 = 0xff - a0;
+		  unsigned int tmp;
+
+		  tmp = a0 * p[0] + a1 * dest[0] + 0x80;
+		  dest[0] = (tmp + (tmp >> 8)) >> 8;
+		  tmp = a0 * p[1] + a1 * dest[1] + 0x80;
+		  dest[1] = (tmp + (tmp >> 8)) >> 8;
+		  tmp = a0 * p[2] + a1 * dest[2] + 0x80;
+		  dest[2] = (tmp + (tmp >> 8)) >> 8;
+	        }
+	      break;
+	    }
+	  dest += dest_channels;
+	  x += src_channels;
+	}
     }
 }
 
@@ -1194,7 +1272,20 @@ make_filter_table (PixopsFilter *filter)
   int i_offset, j_offset;
   int n_x = filter->x.n;
   int n_y = filter->y.n;
-  int *weights = g_new (int, SUBSAMPLE * SUBSAMPLE * n_x * n_y);
+  gsize n_weights;
+  int *weights;
+
+  n_weights = SUBSAMPLE * SUBSAMPLE * n_x;
+  if (n_weights / (SUBSAMPLE * SUBSAMPLE) != n_x)
+    return NULL; /* overflow, bail */
+
+  n_weights *= n_y;
+  if (n_weights / (SUBSAMPLE * SUBSAMPLE * n_x) != n_y)
+    return NULL; /* overflow, bail */
+
+  weights = g_try_new (int, n_weights);
+  if (!weights)
+    return NULL; /* overflow, bail */
 
   for (i_offset=0; i_offset < SUBSAMPLE; i_offset++)
     for (j_offset=0; j_offset < SUBSAMPLE; j_offset++)
@@ -1269,8 +1360,11 @@ pixops_process (guchar         *dest_buf,
   if (x_step == 0 || y_step == 0)
     return; /* overflow, bail out */
 
-  line_bufs = g_new (guchar *, filter->y.n);
   filter_weights = make_filter_table (filter);
+  if (!filter_weights)
+    return; /* overflow, bail out */
+
+  line_bufs = g_new (guchar *, filter->y.n);
 
   check_shift = check_size ? get_check_shift (check_size) : 0;
 
@@ -1390,7 +1484,7 @@ tile_make_weights (PixopsFilterDimension *dim,
 		   double                 scale)
 {
   int n = ceil (1 / scale + 1);
-  double *pixel_weights = g_new (double, SUBSAMPLE * n);
+  double *pixel_weights = g_malloc_n (sizeof (double) * SUBSAMPLE, n);
   int offset;
   int i;
 
@@ -1448,7 +1542,7 @@ bilinear_magnify_make_weights (PixopsFilterDimension *dim,
     }
 
   dim->n = n;
-  dim->weights = g_new (double, SUBSAMPLE * n);
+  dim->weights = g_malloc_n (sizeof (double) * SUBSAMPLE, n);
 
   pixel_weights = dim->weights;
 
@@ -1539,7 +1633,7 @@ bilinear_box_make_weights (PixopsFilterDimension *dim,
 			   double                 scale)
 {
   int n = ceil (1/scale + 3.0);
-  double *pixel_weights = g_new (double, SUBSAMPLE * n);
+  double *pixel_weights = g_malloc_n (sizeof (double) * SUBSAMPLE, n);
   double w;
   int offset, i;
 
@@ -1783,11 +1877,16 @@ _pixops_composite_real (guchar          *dest_buf,
 
   if (interp_type == PIXOPS_INTERP_NEAREST)
     {
-      pixops_composite_nearest (dest_buf, render_x0, render_y0, render_x1,
-				render_y1, dest_rowstride, dest_channels,
-				dest_has_alpha, src_buf, src_width, src_height,
-				src_rowstride, src_channels, src_has_alpha,
-				scale_x, scale_y, overall_alpha);
+      if (scale_x == 1.0 && scale_y == 1.0)
+	pixops_composite_nearest_noscale (dest_buf, render_x0, render_y0, render_x1, render_y1,
+					  dest_rowstride, dest_channels, dest_has_alpha,
+					  src_buf, src_width, src_height, src_rowstride, src_channels,
+					  src_has_alpha, overall_alpha);
+      else
+	pixops_composite_nearest (dest_buf, render_x0, render_y0, render_x1, render_y1,
+				  dest_rowstride, dest_channels, dest_has_alpha,
+				  src_buf, src_width, src_height, src_rowstride, src_channels,
+				  src_has_alpha, scale_x, scale_y, overall_alpha);
       return;
     }
   

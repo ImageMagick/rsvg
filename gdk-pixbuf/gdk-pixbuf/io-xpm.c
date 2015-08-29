@@ -18,9 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "config.h"
@@ -40,7 +38,7 @@
 
 /* I have must have done something to deserve this.
  * XPM is such a crappy format to handle.
- * This code is an ugly hybred from gdkpixmap.c
+ * This code is an ugly hybrid from gdkpixmap.c
  * modified to respect transparent colors.
  * It's still a mess, though.
  */
@@ -688,7 +686,7 @@ struct _XPMContext
 /*
  * FIXME xpm loading progressively is not properly implemented.
  * Instead we will buffer to a file then load that file when done.
- * This is very broken but it should be relayively simple to fix
+ * This is very broken but it should be relatively simple to fix
  * in the future.
  */
 static gpointer
@@ -799,24 +797,24 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 {
-	static GdkPixbufModulePattern signature[] = {
+	static const GdkPixbufModulePattern signature[] = {
 		{ "/* XPM */", NULL, 100 },
 		{ NULL, NULL, 0 }
 	};
-	static gchar * mime_types[] = {
+	static const gchar *mime_types[] = {
 		"image/x-xpixmap",
 		NULL
 	};
-	static gchar * extensions[] = {
+	static const gchar *extensions[] = {
 		"xpm",
 		NULL
 	};
 
 	info->name = "xpm";
-	info->signature = signature;
-	info->description = N_("The XPM image format");
-	info->mime_types = mime_types;
-	info->extensions = extensions;
+	info->signature = (GdkPixbufModulePattern *) signature;
+	info->description = NC_("image format", "XPM");
+	info->mime_types = (gchar **) mime_types;
+	info->extensions = (gchar **) extensions;
 	info->flags = GDK_PIXBUF_FORMAT_THREADSAFE;
 	info->license = "LGPL";
 }

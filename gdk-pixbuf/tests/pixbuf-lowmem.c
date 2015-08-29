@@ -14,8 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "config.h"
@@ -197,9 +196,6 @@ main (int argc, char **argv)
   /* Set a malloc which emulates low mem */
   g_mem_set_vtable (&limited_table);
   
-#if !GLIB_CHECK_VERSION (2, 35, 3)
-  g_type_init ();
-#endif
   g_log_set_always_fatal (G_LOG_LEVEL_WARNING | G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
   
   /* memory tests */

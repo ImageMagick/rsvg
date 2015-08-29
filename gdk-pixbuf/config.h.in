@@ -4,6 +4,9 @@
    language is requested. */
 #undef ENABLE_NLS
 
+/* Define to 1 to replace the build-time prefix in modules */
+#undef GDK_PIXBUF_RELOCATABLE
+
 /* Define if gio can sniff image data */
 #undef GDK_PIXBUF_USE_GIO_MIME
 
@@ -13,11 +16,11 @@
 /* Define to 1 if you have the `bind_textdomain_codeset' function. */
 #undef HAVE_BIND_TEXTDOMAIN_CODESET
 
-/* Define to 1 if you have the MacOS X function CFLocaleCopyCurrent in the
+/* Define to 1 if you have the Mac OS X function CFLocaleCopyCurrent in the
    CoreFoundation framework. */
 #undef HAVE_CFLOCALECOPYCURRENT
 
-/* Define to 1 if you have the MacOS X function CFPreferencesCopyAppValue in
+/* Define to 1 if you have the Mac OS X function CFPreferencesCopyAppValue in
    the CoreFoundation framework. */
 #undef HAVE_CFPREFERENCESCOPYAPPVALUE
 
@@ -79,12 +82,17 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #undef NO_MINUS_C_MINUS_O
+
+/* Define to 1 if it's a darwin platform */
+#undef OS_DARWIN
+
+/* Define to 1 if it's a Linux platform */
+#undef OS_LINUX
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT

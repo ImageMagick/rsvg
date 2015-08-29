@@ -1,8 +1,6 @@
-include $(top_srcdir)/Makefile.decl
-
 noinst_LTLIBRARIES = libpixops.la
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir) -I$(top_builddir) 	\
 	$(GTK_DEBUG_FLAGS)			\
 	$(GDK_PIXBUF_DEP_CFLAGS)
@@ -26,7 +24,7 @@ libpixops_la_SOURCES =  		\
 	pixops-internal.h		\
 	$(mmx_sources)
 
-EXTRA_DIST +=				\
+EXTRA_DIST =				\
 	DETAILS				\
 	pixbuf-transform-math.ltx	\
 	makefile.msc

@@ -14,14 +14,14 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _WIN32
 #define _GNU_SOURCE
 #endif
+#include "config.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -42,6 +42,17 @@ struct IcnsBlockHeader
   guint32 size;			/* caution: bigendian */
 };
 typedef struct IcnsBlockHeader IcnsBlockHeader;
+
+typedef struct
+{
+  GdkPixbufModuleSizeFunc size_func;
+  GdkPixbufModulePreparedFunc prepared_func;
+  GdkPixbufModuleUpdatedFunc updated_func;
+  gpointer user_data;
+
+  GByteArray *byte_array;
+  GdkPixbuf *pixbuf;      /* Our "target" */
+} IcnsProgressiveState;
 
 /*
  * load raw icon data from 'icns' resource
@@ -366,6 +377,106 @@ icns_image_load (FILE *f, GError ** error)
   return pixbuf;
 }
 
+static void
+context_free (IcnsProgressiveState *context)
+{
+  g_byte_array_free (context->byte_array, TRUE);
+  g_clear_object (&context->pixbuf);
+  g_free (context);
+}
+
+static gpointer
+gdk_pixbuf__icns_image_begin_load (GdkPixbufModuleSizeFunc      size_func,
+				   GdkPixbufModulePreparedFunc  prepared_func,
+				   GdkPixbufModuleUpdatedFunc   updated_func,
+				   gpointer                     user_data,
+				   GError                     **error)
+{
+  IcnsProgressiveState *context;
+
+  context = g_new0 (IcnsProgressiveState, 1);
+  context->size_func = size_func;
+  context->prepared_func = prepared_func;
+  context->updated_func = updated_func;
+  context->user_data = user_data;
+  context->byte_array = g_byte_array_new ();
+
+  return context;
+}
+
+static gboolean
+gdk_pixbuf__icns_image_stop_load (gpointer   data,
+                                  GError   **error)
+{
+  IcnsProgressiveState *context = data;
+
+  g_return_val_if_fail (context != NULL, TRUE);
+
+  context_free (context);
+  return TRUE;
+}
+
+static gboolean
+gdk_pixbuf__icns_image_load_increment (gpointer       data,
+                                       const guchar  *buf,
+                                       guint          size,
+                                       GError       **error)
+{
+  IcnsProgressiveState *context = data;
+  int i;
+  int filesize;
+  gint w, h;
+
+  context->byte_array = g_byte_array_append (context->byte_array, buf, size);
+
+  if (context->byte_array->len < 8)
+    return TRUE;
+
+  filesize = (context->byte_array->data[4] << 24) |
+    (context->byte_array->data[5] << 16) |
+    (context->byte_array->data[6] << 8) |
+    (context->byte_array->data[7]);
+
+  if (context->byte_array->len < filesize)
+    return TRUE;
+
+  for (i = 0; i < G_N_ELEMENTS(sizes) && !context->pixbuf; i++)
+    context->pixbuf = load_icon (sizes[i],
+				 context->byte_array->data,
+				 context->byte_array->len);
+
+  if (!context->pixbuf)
+    {
+      g_set_error_literal (error, GDK_PIXBUF_ERROR,
+                           GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+                           _("Could not decode ICNS file"));
+      return FALSE;
+    }
+
+  w = gdk_pixbuf_get_width (context->pixbuf);
+  h = gdk_pixbuf_get_height (context->pixbuf);
+
+  if (context->size_func != NULL)
+    (*context->size_func) (&w,
+			   &h,
+			   context->user_data);
+
+  if (context->prepared_func != NULL)
+    (*context->prepared_func) (context->pixbuf,
+			       NULL,
+			       context->user_data);
+
+  if (context->updated_func != NULL)
+    (*context->updated_func) (context->pixbuf,
+			      0,
+			      0,
+			      gdk_pixbuf_get_width (context->pixbuf),
+			      gdk_pixbuf_get_height (context->pixbuf),
+			      context->user_data);
+
+  return TRUE;
+}
+
 #ifndef INCLUDE_icns
 #define MODULE_ENTRY(function) G_MODULE_EXPORT void function
 #else
@@ -375,28 +486,31 @@ icns_image_load (FILE *f, GError ** error)
 MODULE_ENTRY (fill_vtable) (GdkPixbufModule * module)
 {
   module->load = icns_image_load;
+  module->begin_load = gdk_pixbuf__icns_image_begin_load;
+  module->stop_load = gdk_pixbuf__icns_image_stop_load;
+  module->load_increment = gdk_pixbuf__icns_image_load_increment;
 }
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat * info)
 {
-  static GdkPixbufModulePattern signature[] = {
+  static const GdkPixbufModulePattern signature[] = {
     {"icns", NULL, 100},	/* file begins with 'icns' */
     {NULL, NULL, 0}
   };
-  static gchar *mime_types[] = {
+  static const gchar *mime_types[] = {
     "image/x-icns",
     NULL
   };
-  static gchar *extensions[] = {
+  static const gchar *extensions[] = {
     "icns",
     NULL
   };
 
   info->name = "icns";
-  info->signature = signature;
-  info->description = N_("The ICNS image format");
-  info->mime_types = mime_types;
-  info->extensions = extensions;
+  info->signature = (GdkPixbufModulePattern *) signature;
+  info->description = NC_("image format", "MacOS X icon");
+  info->mime_types = (gchar **) mime_types;
+  info->extensions = (gchar **) extensions;
   info->flags = GDK_PIXBUF_FORMAT_THREADSAFE;
   info->license = "GPL";
   info->disabled = FALSE;

@@ -1,6 +1,3 @@
-## Process this file with automake to produce Makefile.in
-include $(top_srcdir)/Makefile.decl
-
 AUTOMAKE_OPTIONS = 1.6
 
 # The name of the module.
@@ -26,7 +23,6 @@ IGNORE_HFILES=				\
 	pixops				\
 	gdk-pixbuf-alias.h		\
 	gdk-pixbuf-marshal.h		\
-	gdk-pixbuf-i18n.h 		\
 	gdk-pixbuf-private.h		\
 	gdk-pixbuf-xlib-private.h	\
 	io-gif-animation.h		\
@@ -34,7 +30,7 @@ IGNORE_HFILES=				\
 	xpm-color-table.h		\
 	test-images.h
 
-INCLUDES = 				\
+AM_CPPFLAGS = 				\
 	-I$(top_srcdir) 		\
 	-I$(top_builddir) 		\
 	$(GDK_PIXBUF_DEBUG_FLAGS)	\
@@ -48,7 +44,6 @@ GTKDOC_LIBS = \
 # Extra options to supply to gtkdoc-mkdb
 MKDB_OPTIONS= \
 	--main-sgml-file=$(DOC_MAIN_SGML_FILE) 	\
-	--sgml-mode 				\
 	--source-dir=../../../contrib/gdk-pixbuf-xlib \
 	--output-format=xml 			\
 	--name-space=gdk_pixbuf

@@ -16,9 +16,7 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "config.h"
@@ -733,7 +731,7 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 {
-	static GdkPixbufModulePattern signature[] = {
+	static const GdkPixbufModulePattern signature[] = {
 		{ "\x0a \x01", NULL, 100 },
 		{ "\x0a\x02\x01", NULL, 100 },
 		{ "\x0a\x03\x01", NULL, 100 },
@@ -741,20 +739,20 @@ MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 		{ "\x0a\x05\x01", NULL, 100 },
 		{ NULL, NULL, 0 }
 	};
-	static gchar *mime_types[] = {
+	static const gchar *mime_types[] = {
 		"image/x-pcx",
 		NULL,
 	};
-	static gchar *extensions[] = {
+	static const gchar *extensions[] = {
 		"pcx",
 		NULL,
 	};
 
 	info->name = "pcx";
-	info->signature = signature;
-	info->description = N_("The PCX image format");
-	info->mime_types = mime_types;
-	info->extensions = extensions;
+	info->signature = (GdkPixbufModulePattern *) signature;
+	info->description = NC_("image format", "PCX");
+	info->mime_types = (gchar **) mime_types;
+	info->extensions = (gchar **) extensions;
 	info->flags = GDK_PIXBUF_FORMAT_THREADSAFE;
 	info->license = "LGPL";
 }

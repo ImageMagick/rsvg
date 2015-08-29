@@ -18,9 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef GDK_PIXBUF_CORE_H
@@ -41,14 +39,11 @@ G_BEGIN_DECLS
  * @Short_description: Information that describes an image.
  * @Title: The GdkPixbuf Structure
  * 
- * 
  * The #GdkPixbuf structure contains
  * information that describes an image in memory.
  * 
- * 
- * <section id="image-data">
- * <title>Image Data</title>
- * <para>
+ * ## Image Data ## {#image-data}
+ *
  * Image data in a pixbuf is stored in memory in uncompressed,
  * packed format.  Rows in the image are stored top to bottom, and
  * in each row pixels are stored from left to right.  There may be
@@ -56,19 +51,15 @@ G_BEGIN_DECLS
  * as returned by gdk_pixbuf_get_rowstride(), indicates the number
  * of bytes between rows.
  * 
+ * ## put_pixel() Example ## {#put-pixel}
  * 
- * <example id="put-pixel">
- * <title>put_pixel(<!-- -->) example</title>
- * <para>
- * 
- * The following code illustrates a simple put_pixel(<!-- -->)
+ * The following code illustrates a simple put_pixel()
  * function for RGB pixbufs with 8 bits per channel with an alpha
  * channel.  It is not included in the gdk-pixbuf library for
  * performance reasons; rather than making several function calls
  * for each pixel, your own code can take shortcuts.
  * 
- * 
- * <programlisting>
+ * |[<!-- language="C" -->
  * static void
  * put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, guchar blue, guchar alpha)
  * {
@@ -97,26 +88,18 @@ G_BEGIN_DECLS
  *   p[2] = blue;
  *   p[3] = alpha;
  * }
- * </programlisting>
+ * ]|
  * 
  * This function will not work for pixbufs with images that are
  * other than 8 bits per sample or channel, but it will work for
  * most of the pixbufs that GTK+ uses.
- * </para>
- * </example>
  * 
- * <note>
- * If you are doing memcpy() of raw pixbuf data, note that the
- * last row in the pixbuf may not be as wide as the full
- * rowstride, but rather just as wide as the pixel data needs to
- * be.  That is, it is unsafe to do <literal>memcpy (dest,
- * pixels, rowstride * height)</literal> to copy a whole pixbuf.
- * Use gdk_pixbuf_copy() instead, or compute the width in bytes
- * of the last row as <literal>width * ((n_channels *
- * bits_per_sample + 7) / 8)</literal>.
- * </note>
- * </para>
- * </section>
+ * If you are doing memcpy() of raw pixbuf data, note that the last row
+ * in the pixbuf may not be as wide as the full rowstride, but rather
+ * just as wide as the pixel data needs to be. That is, it is unsafe to
+ * do `memcpy (dest, pixels, rowstride * height)` to copy a whole pixbuf.
+ * Use gdk_pixbuf_copy() instead, or compute the width in bytes of the
+ * last row as `width * ((n_channels * bits_per_sample + 7) / 8)`.
  */
 
 
@@ -149,7 +132,7 @@ typedef enum
  * @GDK_COLORSPACE_RGB: Indicates a red/green/blue additive color space.
  * 
  * This enumeration defines the color spaces that are supported by
- * the &gdk-pixbuf; library.  Currently only RGB is supported.
+ * the gdk-pixbuf library.  Currently only RGB is supported.
  */
 /* Note that these values are encoded in inline pixbufs
  * as ints, so don't reorder them
@@ -163,7 +146,7 @@ typedef enum {
 /**
  * GdkPixbuf:
  * 
- * This is the main structure in the &gdk-pixbuf; library.  It is
+ * This is the main structure in the gdk-pixbuf library.  It is
  * used to represent images.  It contains information about the
  * image's pixel data, its color space, bits per sample, width and
  * height, and the rowstride (the number of bytes between the start of
@@ -210,7 +193,7 @@ typedef void (* GdkPixbufDestroyNotify) (guchar *pixels, gpointer data);
  *  given operation on the type of image at hand.
  * @GDK_PIXBUF_ERROR_FAILED: Generic failure code, something went wrong.
  * 
- * An error code in the #GDK_PIXBUF_ERROR domain. Many &gdk-pixbuf;
+ * An error code in the #GDK_PIXBUF_ERROR domain. Many gdk-pixbuf
  * operations can cause errors in this domain, or in the #G_FILE_ERROR
  * domain.
  */
@@ -258,6 +241,8 @@ gsize         gdk_pixbuf_get_byte_length     (const GdkPixbuf *pixbuf);
 guchar       *gdk_pixbuf_get_pixels_with_length (const GdkPixbuf *pixbuf,
                                                  guint           *length);
 
+const guint8* gdk_pixbuf_read_pixels         (const GdkPixbuf  *pixbuf);
+GBytes *      gdk_pixbuf_read_pixel_bytes    (const GdkPixbuf  *pixbuf);
 
 
 
@@ -315,12 +300,23 @@ GdkPixbuf *gdk_pixbuf_new_from_data (const guchar *data,
 				     GdkPixbufDestroyNotify destroy_fn,
 				     gpointer destroy_fn_data);
 
+GdkPixbuf *gdk_pixbuf_new_from_bytes (GBytes *data,
+				      GdkColorspace colorspace,
+				      gboolean has_alpha,
+				      int bits_per_sample,
+				      int width, int height,
+				      int rowstride);
+ 
 GdkPixbuf *gdk_pixbuf_new_from_xpm_data (const char **data);
+
+#ifndef GDK_PIXBUF_DISABLE_DEPRECATED
+G_DEPRECATED
 GdkPixbuf* gdk_pixbuf_new_from_inline	(gint          data_length,
 					 const guint8 *data,
 					 gboolean      copy_pixels,
 					 GError      **error);
-       
+#endif
+
 /* Mutations */
 void       gdk_pixbuf_fill              (GdkPixbuf    *pixbuf,
                                          guint32       pixel);
@@ -473,6 +469,7 @@ GdkPixbuf *gdk_pixbuf_apply_embedded_orientation (GdkPixbuf *src);
 
 const gchar * gdk_pixbuf_get_option (GdkPixbuf   *pixbuf,
                                               const gchar *key);
+GHashTable * gdk_pixbuf_get_options (GdkPixbuf   *pixbuf);
 
 
 G_END_DECLS

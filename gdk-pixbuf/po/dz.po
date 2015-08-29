@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: gtk+.HEAD.dz\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gdk-"
 "pixbuf\n"
-"POT-Creation-Date: 2013-11-11 10:51-0500\n"
+"POT-Creation-Date: 2012-02-04 18:44-0500\n"
 "PO-Revision-Date: 2006-08-09 10:30+0530\n"
 "Last-Translator: Mindu Dorji\n"
 "Language-Team: DZONGKHA <pgeyleg@dit.gov.bt>\n"
@@ -20,18 +20,27 @@ msgstr ""
 "X-Poedit-Country: BHUTAN\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:160 gdk-pixbuf/gdk-pixbuf-io.c:1064
-#: gdk-pixbuf/gdk-pixbuf-io.c:1330
+#: gdk-pixbuf/gdk-pixbuf-animation.c:146 gdk-pixbuf/gdk-pixbuf-io.c:1083
+#: gdk-pixbuf/gdk-pixbuf-io.c:1349
 #, c-format
 msgid "Failed to open file '%s': %s"
 msgstr "ཡིག་སྣོད་ '%s': %s ཁ་ཕྱེ་མ་ཚུགས།"
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:173 gdk-pixbuf/gdk-pixbuf-io.c:1076
+#: gdk-pixbuf/gdk-pixbuf-animation.c:159 gdk-pixbuf/gdk-pixbuf-io.c:1095
 #, c-format
 msgid "Image file '%s' contains no data"
 msgstr "གཟུགས་བརྙན་ཡིག་སྣོད་ ’%s’ ནང་ གནད་སྡུད་མིན་འདུག"
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:212
+#: gdk-pixbuf/gdk-pixbuf-animation.c:201 gdk-pixbuf/gdk-pixbuf-io.c:1131
+#: gdk-pixbuf/gdk-pixbuf-io.c:1401
+#, c-format
+msgid ""
+"Failed to load image '%s': reason not known, probably a corrupt image file"
+msgstr ""
+"གཟུགས་བརྙན་ ’%s’ དེ་ མངོན་གསལ་འབད་མ་ཚུགས།། གནད་དོན་ཧ་མ་གོ ངན་ཅན་གཟུགས་བརྙན་ཡིག་སྣོད་ཅིག་"
+"ཨིནམ་འོང་ནི་མས།"
+
+#: gdk-pixbuf/gdk-pixbuf-animation.c:234
 #, c-format
 msgid ""
 "Failed to load animation '%s': reason not known, probably a corrupt "
@@ -40,21 +49,12 @@ msgstr ""
 "བསྒུལ་བཟོ་ ’%s’ དེ་ མངོན་གསལ་འབད་མ་ཚུགས།། གནད་དོན་ཧ་མ་གོ ངན་ཅན་བསྒུལ་བཟོ་ཡིག་སྣོད་ཅིག་ཨིནམ་"
 "འོང་ནི་མས།"
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:280 gdk-pixbuf/gdk-pixbuf-io.c:1112
-#: gdk-pixbuf/gdk-pixbuf-io.c:1382
-#, c-format
-msgid ""
-"Failed to load image '%s': reason not known, probably a corrupt image file"
-msgstr ""
-"གཟུགས་བརྙན་ ’%s’ དེ་ མངོན་གསལ་འབད་མ་ཚུགས།། གནད་དོན་ཧ་མ་གོ ངན་ཅན་གཟུགས་བརྙན་ཡིག་སྣོད་ཅིག་"
-"ཨིནམ་འོང་ནི་མས།"
-
-#: gdk-pixbuf/gdk-pixbuf-io.c:790
+#: gdk-pixbuf/gdk-pixbuf-io.c:809
 #, c-format
 msgid "Unable to load image-loading module: %s: %s"
 msgstr "གཟུགས་བརྙན་མངོན་གསལ་རྩ་སྒྲིག་ %s:%s དེ་ མངོན་གསལ་འབད་མ་ཚུགས།།"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:805
+#: gdk-pixbuf/gdk-pixbuf-io.c:824
 #, fuzzy, c-format
 msgid ""
 "Image-loading module %s does not export the proper interface; perhaps it's "
@@ -63,53 +63,53 @@ msgstr ""
 "གཟུགས་བརྙན་མངོན་གསལ་ཚད་གཞི་ %s དེ་གིས་ ངོས་འདྲ་བ་ཚུལ་ལྡན་ཅིག་ ཕྱིར་འདྲེན་མི་འབད་བས། ཡང་ཅིན་ ཇི་"
 "ཊི་ཀེ་ཐོན་རིམ་སོ་སོ་ཅིག་ལས་ཨིན་ན"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:814 gdk-pixbuf/gdk-pixbuf-io.c:865
+#: gdk-pixbuf/gdk-pixbuf-io.c:833 gdk-pixbuf/gdk-pixbuf-io.c:884
 #, c-format
 msgid "Image type '%s' is not supported"
 msgstr "གཟུགས་བརྙན་དབྱེ་བ་ ’%s དེ་ལུ་ རྒྱབ་སྐྱོར་མིན་འདུག"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:950
+#: gdk-pixbuf/gdk-pixbuf-io.c:964
 #, c-format
 msgid "Couldn't recognize the image file format for file '%s'"
 msgstr "གཟུགས་བརྙན་ཡིག་སྣོད་ཀྱི་རྩ་སྒྲིག་ ’%s དེ་ ངོས་འཛིན་འབད་མ་ཚུགས།"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:958
+#: gdk-pixbuf/gdk-pixbuf-io.c:972
 msgid "Unrecognized image file format"
 msgstr "ངོས་འཛིན་འབད་མ་ཚུགས་པའི་ གཟུགས་བརྙན་ཡིག་སྣོད་རྩ་སྒྲིག"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:1121
+#: gdk-pixbuf/gdk-pixbuf-io.c:1140
 #, c-format
 msgid "Failed to load image '%s': %s"
 msgstr "གཟུགས་བརྙན་ ’%s’:%s དེ་ མངོན་གསལ་འབད་མ་ཚུགས།།"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2015 gdk-pixbuf/io-gdip-utils.c:837
+#: gdk-pixbuf/gdk-pixbuf-io.c:2028 gdk-pixbuf/io-gdip-utils.c:888
 #, c-format
 msgid "Error writing to image file: %s"
 msgstr "གཟུགས་བརྙན་ཡིག་སྣོད་ %s ལུ་ འབྲི་ནི་ལུ་འཛོལ་བ།"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2057 gdk-pixbuf/gdk-pixbuf-io.c:2178
+#: gdk-pixbuf/gdk-pixbuf-io.c:2073 gdk-pixbuf/gdk-pixbuf-io.c:2203
 #, c-format
 msgid "This build of gdk-pixbuf does not support saving the image format: %s"
 msgstr "ཇི་ཌི་ཀེ་པར་ཁོངས་འདི་གིས་ གཟུགས་བརྙན་རྩ་སྒྲིག་ %s དེ་ བསྲུང་ནི་ལུ་ རྒྱབ་སྐྱོར་མིན་འདུག"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2088
+#: gdk-pixbuf/gdk-pixbuf-io.c:2107
 msgid "Insufficient memory to save image to callback"
 msgstr "ཀཱལ་བེཀ་ལུ་ གཟུགས་བརྙན་བསྲུང་ནི་ལུ་ དྲན་ཚད་ལངམ་མིན་འདུག"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2101
+#: gdk-pixbuf/gdk-pixbuf-io.c:2120
 msgid "Failed to open temporary file"
 msgstr "གནས་སྐབས་ཀྱི་ཡིག་སྣོད་ ཁ་ཕྱེ་མ་ཚུགས།"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2124
+#: gdk-pixbuf/gdk-pixbuf-io.c:2146
 msgid "Failed to read from temporary file"
 msgstr "གནས་སྐབས་ཀྱི་ཡིག་སྣོད་ནང་ལས་ ལྷག་མ་ཚུགས།"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2372
+#: gdk-pixbuf/gdk-pixbuf-io.c:2399
 #, c-format
 msgid "Failed to open '%s' for writing: %s"
 msgstr " '%s' ཁ་ཕྱེ་མ་ཚུགས་ %sའབྲི་ནིའི་དོན་ལུ།"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2398
+#: gdk-pixbuf/gdk-pixbuf-io.c:2425
 #, c-format
 msgid ""
 "Failed to close '%s' while writing image, all data may not have been saved: "
@@ -117,16 +117,16 @@ msgid ""
 msgstr ""
 "གཟུགས་བརྙན་འབྲི་བའི་སྐབས་ ’%s’ དེ་ ཁ་བསྡམས་མ་ཚུགས། གནད་སྡུད་ཆ་མཉམ་ སྲུང་བཞག་མ་འབདཝ་འོང༌། %s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2619 gdk-pixbuf/gdk-pixbuf-io.c:2671
+#: gdk-pixbuf/gdk-pixbuf-io.c:2646 gdk-pixbuf/gdk-pixbuf-io.c:2698
 msgid "Insufficient memory to save image into a buffer"
 msgstr "གནད་ཁོངས་ནང་ལུ་ གཟུགས་བརྙན་བསྲུང་ནིའི་ དྲན་ཚད་ལངམ་མིན་འདུག"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2717
+#: gdk-pixbuf/gdk-pixbuf-io.c:2744
 #, fuzzy
 msgid "Error writing to image stream"
 msgstr "གཟུགས་བརྙན་ཡིག་སྣོད་ %s ལུ་ འབྲི་ནི་ལུ་འཛོལ་བ།"
 
-#: gdk-pixbuf/gdk-pixbuf-loader.c:393
+#: gdk-pixbuf/gdk-pixbuf-loader.c:395
 #, c-format
 msgid ""
 "Internal error: Image loader module '%s' failed to complete an operation, "
@@ -135,7 +135,7 @@ msgstr ""
 "ནང་འཁོད་ཀྱི་འཛོལ་བ: གཟུགས་བརྙན་མངོན་གསལ་འབད་མིའི་ཚད་གཞི་ ’%s དེ་གིས་ བཀོལ་སྤྱོད་ཅིག་མཇུག་བསྡུ་མ་"
 "ཚུགས། དེ་འབདཝ་ད་ མ་ཚུགས་པའིརྒྱུ་མཚན་ ག་ནི་མ་བྱིན་པས།"
 
-#: gdk-pixbuf/gdk-pixbuf-loader.c:435
+#: gdk-pixbuf/gdk-pixbuf-loader.c:437
 #, c-format
 msgid "Incremental loading of image type '%s' is not supported"
 msgstr "གཟུགས་བརྙན་དབྱེ་བ་ '%s' ཡར་འཕར་སྦེ་ མངོན་གསལ་འབད་ནི་ལུ་ རྒྱབ་སྐྱོར་མིན་འདུག"
@@ -163,26 +163,25 @@ msgstr[1] "གཟུགས་བརྙན་གྱི་གནད་ཁོངས
 msgid "Unexpected icon chunk in animation"
 msgstr "བསྒུལ་བཟོ་ནང་ལུ་ རེ་བ་མེད་པའི་ ངོས་དཔར་གྱི་ དུམ་བུ་འདུག"
 
-#: gdk-pixbuf/io-ani.c:342 gdk-pixbuf/io-ani.c:400 gdk-pixbuf/io-ani.c:426
-#: gdk-pixbuf/io-ani.c:449 gdk-pixbuf/io-ani.c:476 gdk-pixbuf/io-ani.c:563
+#: gdk-pixbuf/io-ani.c:337
+msgid "Unsupported animation type"
+msgstr "རྒྱབ་སྐྱོར་མེད་པའི་ བསྒུལ་བཟོའི་དབྱེ་བ།"
+
+#: gdk-pixbuf/io-ani.c:348 gdk-pixbuf/io-ani.c:406 gdk-pixbuf/io-ani.c:432
+#: gdk-pixbuf/io-ani.c:455 gdk-pixbuf/io-ani.c:482 gdk-pixbuf/io-ani.c:569
 msgid "Invalid header in animation"
 msgstr "བསྒུལ་བཟོའི་ནང་ལུ་ ནུས་མེད་མགོ་ཡིག"
 
-#: gdk-pixbuf/io-ani.c:352 gdk-pixbuf/io-ani.c:374 gdk-pixbuf/io-ani.c:458
-#: gdk-pixbuf/io-ani.c:485 gdk-pixbuf/io-ani.c:536 gdk-pixbuf/io-ani.c:608
+#: gdk-pixbuf/io-ani.c:358 gdk-pixbuf/io-ani.c:380 gdk-pixbuf/io-ani.c:464
+#: gdk-pixbuf/io-ani.c:491 gdk-pixbuf/io-ani.c:542 gdk-pixbuf/io-ani.c:614
 msgid "Not enough memory to load animation"
 msgstr "བསྒུལ་བཟོ་མངོན་གསལ་འབད་ནི་ལུ་ དྲན་ཚད་ལངམ་མིན་འདུག"
 
-#: gdk-pixbuf/io-ani.c:392 gdk-pixbuf/io-ani.c:418 gdk-pixbuf/io-ani.c:437
+#: gdk-pixbuf/io-ani.c:398 gdk-pixbuf/io-ani.c:424 gdk-pixbuf/io-ani.c:443
 msgid "Malformed chunk in animation"
 msgstr "བསྒུལ་བཟོའི་ནང་ལུ་ བཟོ་གྱུར་བའི་དུམ་བུ།"
 
-#: gdk-pixbuf/io-ani.c:630
-#, fuzzy
-msgid "ANI image was truncated or incomplete."
-msgstr "ཇི་ཨའི་ཨེཕ་གཟུགས་བརྙན་དེ་ ཆད་སོང་ནུག ཡང་ཅིན་ ཆ་མ་ཚང་པས།"
-
-#: gdk-pixbuf/io-ani.c:671
+#: gdk-pixbuf/io-ani.c:711
 msgid "The ANI image format"
 msgstr "ཨེ་ཨེན་ཨའི་ གཟུགས་བརྙན་གྱི་རྩ་སྒྲིག"
 
@@ -224,7 +223,7 @@ msgstr "བི་ཨེམ་པི་ གཟུགས་བརྙན་རྩ�
 msgid "The EMF image format"
 msgstr "བི་ཨེམ་པི་ གཟུགས་བརྙན་རྩ་སྒྲིག"
 
-#: gdk-pixbuf/io-gdip-gif.c:80 gdk-pixbuf/io-gif.c:1720
+#: gdk-pixbuf/io-gdip-gif.c:80 gdk-pixbuf/io-gif.c:1699
 msgid "The GIF image format"
 msgstr "ཇི་ཨའི་ཨེཕ་གཟུགས་བརྙན་གྱི་རྩ་སྒྲིག"
 
@@ -232,7 +231,7 @@ msgstr "ཇི་ཨའི་ཨེཕ་གཟུགས་བརྙན་གྱ
 msgid "The ICO image format"
 msgstr "ཨའི་སི་ཨོ་ གཟུགས་བརྙན་གྱི་རྩ་སྒྲིག"
 
-#: gdk-pixbuf/io-gdip-jpeg.c:53 gdk-pixbuf/io-jpeg.c:1249
+#: gdk-pixbuf/io-gdip-jpeg.c:53 gdk-pixbuf/io-jpeg.c:1139
 #, c-format
 msgid ""
 "JPEG quality must be a value between 0 and 100; value '%s' could not be "
@@ -241,13 +240,13 @@ msgstr ""
 "ཇེ་པི་ཨི་ཇི་གི་ སྤུས་ཚད་དེ་ བེ་ལུ་ ༠ ལས་ ༡༠༠ གི་བར་ན་འོང་དགོ  བེ་ལུ་ ’%s’ དེ་ མིང་དཔྱད་འབད་མ་"
 "ཚུགས།"
 
-#: gdk-pixbuf/io-gdip-jpeg.c:68 gdk-pixbuf/io-jpeg.c:1265
+#: gdk-pixbuf/io-gdip-jpeg.c:68 gdk-pixbuf/io-jpeg.c:1154
 #, c-format
 msgid ""
 "JPEG quality must be a value between 0 and 100; value '%d' is not allowed."
 msgstr "ཇེ་པི་ཨི་ཇི་གི་ སྤུས་ཚད་དེ་ བེ་ལུ་ ༠ ལས་ ༡༠༠ གི་བར་ན་འོང་དགོ བེ་ལུ་ ’%d’ དེ་མི་ཆོག"
 
-#: gdk-pixbuf/io-gdip-jpeg.c:136 gdk-pixbuf/io-jpeg.c:1478
+#: gdk-pixbuf/io-gdip-jpeg.c:136 gdk-pixbuf/io-jpeg.c:1316
 msgid "The JPEG image format"
 msgstr "ཇེ་པི་ཨི་ཇི་ གཟུགས་བརྙན་གྱི་རྩ་སྒྲིག"
 
@@ -272,22 +271,22 @@ msgstr "རྣམ་གྲངས་སེལ་འཐུ་འབད་མ་ཚ
 msgid "Could not read from stream: %s"
 msgstr "%s ལས་ %s: %s ལུ་ བསྐྱར་མིང་བཏགས་མ་ཚུགས།\n"
 
-#: gdk-pixbuf/io-gdip-utils.c:617
+#: gdk-pixbuf/io-gdip-utils.c:617 gdk-pixbuf/io-gdip-utils.c:752
 #, fuzzy
 msgid "Couldn't load bitmap"
 msgstr "ཡིག་སྣོད་ཀྱི་མིང་ གཞི་བསྒྱུར་འབད་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-gdip-utils.c:773
+#: gdk-pixbuf/io-gdip-utils.c:774
 #, fuzzy
 msgid "Couldn't load metafile"
 msgstr "ཡིག་སྣོད་ཀྱི་མིང་ གཞི་བསྒྱུར་འབད་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-gdip-utils.c:878
+#: gdk-pixbuf/io-gdip-utils.c:933
 #, fuzzy
 msgid "Unsupported image format for GDI+"
 msgstr "རྒྱབ་སྐྱོར་མེད་པའི་ ཨར་ཨེ་ཨེསི་ གཟུགས་བརྙན་གྱི་འགྱུར་བ།"
 
-#: gdk-pixbuf/io-gdip-utils.c:885
+#: gdk-pixbuf/io-gdip-utils.c:940
 #, fuzzy
 msgid "Couldn't save"
 msgstr "གཞན་སྲུང་མ་ཚུགས།"
@@ -297,65 +296,60 @@ msgstr "གཞན་སྲུང་མ་ཚུགས།"
 msgid "The WMF image format"
 msgstr "དྲབ་ལུ་བི་ཨེམ་པི་ གཟུགས་བརྙན་གྱི་རྩ་སྒྲིག་།"
 
-#: gdk-pixbuf/io-gif.c:222
+#: gdk-pixbuf/io-gif.c:221
 #, c-format
 msgid "Failure reading GIF: %s"
 msgstr "ཇི་ཨའི་ཨེཕ་ %s ལྷག་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-gif.c:496 gdk-pixbuf/io-gif.c:1502 gdk-pixbuf/io-gif.c:1669
+#: gdk-pixbuf/io-gif.c:495 gdk-pixbuf/io-gif.c:1482 gdk-pixbuf/io-gif.c:1648
 msgid "GIF file was missing some data (perhaps it was truncated somehow?)"
 msgstr ""
 "ཇི་ཨའི་ཨེཕ་ཡིག་སྣོད་ཀྱི་ གནད་སྡུད་ལ་ལོ་ཅིག་བརླག་སྟོར་ཞུགས་ནུག (ག་དེམ་ཅིག་འབད་ ཆད་སོངཔ་ཨིན་ན?)"
 
-#: gdk-pixbuf/io-gif.c:505
+#: gdk-pixbuf/io-gif.c:504
 #, c-format
 msgid "Internal error in the GIF loader (%s)"
 msgstr "ཇི་ཨའི་ཨེཕ་ མངོན་གསལ་འབད་མི་ (%s) ནང་ལུ་ ནང་འཁོད་ཀྱི་འཛོལ་བ།"
 
-#: gdk-pixbuf/io-gif.c:579
+#: gdk-pixbuf/io-gif.c:578
 msgid "Stack overflow"
 msgstr "ཕྱིར་ལུད་བརྩེགས་ཕུང་འབད།"
 
-#: gdk-pixbuf/io-gif.c:639
+#: gdk-pixbuf/io-gif.c:638
 msgid "GIF image loader cannot understand this image."
 msgstr "ཇི་ཨའི་ཨེཕ་ གཟུགས་བརྙན་མངོན་གསལ་འབད་མི་གིས་ གཟུགས་བརྙན་འདི་ ཧ་གོ་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-gif.c:668
+#: gdk-pixbuf/io-gif.c:667
 msgid "Bad code encountered"
 msgstr "ཀོཌི་བྱང་ཉེས་དང་ ཁ་ཐུག་བརྐྱབས་ཅི།"
 
-#: gdk-pixbuf/io-gif.c:678
+#: gdk-pixbuf/io-gif.c:677
 msgid "Circular table entry in GIF file"
 msgstr "ཇི་ཨའི་ཨེཕ་ཡིག་སྣོད་ནང་ སྒོར་ཅན་ཐིག་ཁྲམ་གྱི་ ཐོ་བཀོད་འདུག"
 
-#: gdk-pixbuf/io-gif.c:866 gdk-pixbuf/io-gif.c:1488 gdk-pixbuf/io-gif.c:1541
-#: gdk-pixbuf/io-gif.c:1657
+#: gdk-pixbuf/io-gif.c:865 gdk-pixbuf/io-gif.c:1468 gdk-pixbuf/io-gif.c:1521
+#: gdk-pixbuf/io-gif.c:1636
 msgid "Not enough memory to load GIF file"
 msgstr "ཇི་ཨའི་ཨེཕ་ཡིག་སྣོད་ མངོན་གསལ་འབད་ནིའི་ དྲན་ཚད་ལངམ་མིན་འདུག"
 
-#: gdk-pixbuf/io-gif.c:960
+#: gdk-pixbuf/io-gif.c:959
 msgid "Not enough memory to composite a frame in GIF file"
 msgstr "ཇི་ཨའི་ཨེཕ་ཡིག་སྣོད་ནང་ གཞི་ཁྲམ་ཅིག་བཟོ་ནིའི་དོན་ལུ་ དྲན་ཚད་ལངམ་མིན་འདུག"
 
-#: gdk-pixbuf/io-gif.c:1132
+#: gdk-pixbuf/io-gif.c:1131
 msgid "GIF image is corrupt (incorrect LZW compression)"
 msgstr "ཇི་ཨའི་ཨེཕ་གཟུགས་བརྙན་ ངན་ཅན་ཨིན་མས།(ཨེལ་ཛེཊི་དྲབ་ལུ་ ཨེབ་བཙུགས་ཚུལ་མིན་འདུག)"
 
-#: gdk-pixbuf/io-gif.c:1182
+#: gdk-pixbuf/io-gif.c:1181
 msgid "File does not appear to be a GIF file"
 msgstr "ཡིག་སྣོད་དེ་ ཇི་ཨའི་ཨེཕ་གི་ཡིག་སྣོད་བཟུམ་ཅིག་སྦེ་ མི་མཐོང་པས།"
 
-#: gdk-pixbuf/io-gif.c:1194
+#: gdk-pixbuf/io-gif.c:1193
 #, c-format
 msgid "Version %s of the GIF file format is not supported"
 msgstr "ཇི་ཨའི་ཨེཕ་ཡིག་སྣོད་ཀྱི་རྩ་སྒྲིག་ ཐོན་རིམ་ %s དེ་ལུ་ རྒྱབ་སྐྱོར་མིན་འདུག"
 
-#: gdk-pixbuf/io-gif.c:1241
-#, fuzzy
-msgid "Resulting GIF image has zero size"
-msgstr "གཟུགས་བརྙན་ལུ་ རྒྱ་ཚད་ཀླད་ཀོར་ཨིན་པས།"
-
-#: gdk-pixbuf/io-gif.c:1320
+#: gdk-pixbuf/io-gif.c:1302
 msgid ""
 "GIF image has no global colormap, and a frame inside it has no local "
 "colormap."
@@ -363,7 +357,7 @@ msgstr ""
 "ཇི་ཨའི་ཨེཕ་གཟུགས་བརྙན་ལུ་ སྤྱི་ཁྱབ་ཚོས་གཞི་ས་ཁྲ་མིན་འདུག དེ་ནང་ཡོད་མི་ གཞི་ཁྲམ་ཅིག་ལུ་ཡང་ ཉེ་གནས་ཀྱི་"
 "ཚོས་གཞི་ས་ཁྲ་མིན་འདུག"
 
-#: gdk-pixbuf/io-gif.c:1564
+#: gdk-pixbuf/io-gif.c:1543
 msgid "GIF image was truncated or incomplete."
 msgstr "ཇི་ཨའི་ཨེཕ་གཟུགས་བརྙན་དེ་ ཆད་སོང་ནུག ཡང་ཅིན་ ཆ་མ་ཚང་པས།"
 
@@ -465,12 +459,12 @@ msgstr "གྱལ་རིམ་གནད་སྡུད་ཀྱི་དོན
 msgid "The JPEG 2000 image format"
 msgstr "ཇེ་པི་ཨི་ཇི་ གཟུགས་བརྙན་གྱི་རྩ་སྒྲིག"
 
-#: gdk-pixbuf/io-jpeg.c:126
+#: gdk-pixbuf/io-jpeg.c:116
 #, c-format
 msgid "Error interpreting JPEG image file (%s)"
 msgstr "ཇེ་པི་ཨི་ཇི་ཡིག་སྣོད་ (%s) ཁ་བསྒྱུར་ནི་ལུ་འཛོལ་བ། "
 
-#: gdk-pixbuf/io-jpeg.c:604
+#: gdk-pixbuf/io-jpeg.c:527
 msgid ""
 "Insufficient memory to load image, try exiting some applications to free "
 "memory"
@@ -478,25 +472,20 @@ msgstr ""
 "གཟུགས་བརྙན་མངོན་གསལ་འབད་ནིའི་ དྲན་ཚད་ལངམ་མིན་འདུག དྲན་ཚད་བཟོ་ནིའི་དོན་ལུ་ གློག་རིམ་ལ་ལོ་ཅིག་ ཕྱིར་"
 "ཐོན་འབད་ནི་ལུ་ འབད་རྩོལ་བསྐྱེད་གནང༌།"
 
-#: gdk-pixbuf/io-jpeg.c:651 gdk-pixbuf/io-jpeg.c:865
+#: gdk-pixbuf/io-jpeg.c:568 gdk-pixbuf/io-jpeg.c:781
 #, c-format
 msgid "Unsupported JPEG color space (%s)"
 msgstr "ཇེ་པི་ཨི་ཇི་ ཚོས་གཞིའི་བར་སྟོང་ (%s) དེ་ལུ་ རྒྱབ་སྐྱོར་མིན་འདུག"
 
-#: gdk-pixbuf/io-jpeg.c:764 gdk-pixbuf/io-jpeg.c:1044
-#: gdk-pixbuf/io-jpeg.c:1308 gdk-pixbuf/io-jpeg.c:1318
+#: gdk-pixbuf/io-jpeg.c:680 gdk-pixbuf/io-jpeg.c:950 gdk-pixbuf/io-jpeg.c:1183
+#: gdk-pixbuf/io-jpeg.c:1192
 msgid "Couldn't allocate memory for loading JPEG file"
 msgstr "ཇེ་པི་ཨི་ཇི་ཡིག་སྣོད་ མངོན་གསལ་འབད་ནིའི་དོན་ལུ་ དྲན་ཚད་སྤྲོད་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-jpeg.c:1018
+#: gdk-pixbuf/io-jpeg.c:925
 #, fuzzy
 msgid "Transformed JPEG has zero width or height."
 msgstr "བཟོ་བསྒྱུར་ཅན་གྱི་ པི་ཨེན་ཇི་ལུ་ རྒྱ་ཚད་དམ་མཐོ་ཚད་ ཀླད་ཀོར་འདུག"
-
-#: gdk-pixbuf/io-jpeg.c:1279
-#, c-format
-msgid "Color profile has invalid length '%u'."
-msgstr ""
 
 #: gdk-pixbuf/io-pcx.c:186
 msgid "Couldn't allocate memory for header"
@@ -554,69 +543,69 @@ msgstr "བཟོ་བསྒྱུར་ཅན་གྱི་ པི་ཨེ�
 msgid "The GdkPixdata format"
 msgstr "ཇི་ཨའི་ཨེཕ་གཟུགས་བརྙན་གྱི་རྩ་སྒྲིག"
 
-#: gdk-pixbuf/io-png.c:55
+#: gdk-pixbuf/io-png.c:54
 msgid "Bits per channel of PNG image is invalid."
 msgstr "པི་ཨེན་ཇི་ གཟུགས་བརྙན་གྱི་ རྒྱུ་ལམ་རེ་རེའི་ བིཊིསི་ཚུ་ ནུས་མེད་ཨིན་པས།"
 
-#: gdk-pixbuf/io-png.c:136 gdk-pixbuf/io-png.c:642
+#: gdk-pixbuf/io-png.c:135 gdk-pixbuf/io-png.c:641
 msgid "Transformed PNG has zero width or height."
 msgstr "བཟོ་བསྒྱུར་ཅན་གྱི་ པི་ཨེན་ཇི་ལུ་ རྒྱ་ཚད་དམ་མཐོ་ཚད་ ཀླད་ཀོར་འདུག"
 
-#: gdk-pixbuf/io-png.c:144
+#: gdk-pixbuf/io-png.c:143
 msgid "Bits per channel of transformed PNG is not 8."
 msgstr "བཟོ་བསྒྱུར་ཅན་གྱི་ པི་ཨེན་ཇི་གི་ རྒྱུ་ལམ་རེ་རེའི་ བིཊིསི་ ༨ མེན་པས།"
 
-#: gdk-pixbuf/io-png.c:153
+#: gdk-pixbuf/io-png.c:152
 msgid "Transformed PNG not RGB or RGBA."
 msgstr "བཟོ་བསྒྱུར་ཅན་གྱི་ པི་ཨེན་ཇི་དེ་ ཨར་ཇི་བི་ ཡང་ན་ ཨར་ཇི་བི་ཨེ་མེན་པས།"
 
-#: gdk-pixbuf/io-png.c:162
+#: gdk-pixbuf/io-png.c:161
 msgid "Transformed PNG has unsupported number of channels, must be 3 or 4."
 msgstr "བཟོ་བསྒྱུར་ཅན་གྱི་ པི་ཨེན་ཇི་ལུ་ རྒྱབ་སྐྱོར་མེད་པའི་ རྒྱུ་ལམ་ཚུ་འདུག དེ་ཚུ་ ༣ ཡང་ཅིན་ ༤ ཨིན་དགོ"
 
-#: gdk-pixbuf/io-png.c:183
+#: gdk-pixbuf/io-png.c:182
 #, c-format
 msgid "Fatal error in PNG image file: %s"
 msgstr "པི་ཨེན་ཇི་ གཟུགས་བརྙན་ཡིག་སྣོད་ %s ནང་ ཚབས་ཆེན་གྱི་འཛོལ་བ།"
 
-#: gdk-pixbuf/io-png.c:316
+#: gdk-pixbuf/io-png.c:315
 msgid "Insufficient memory to load PNG file"
 msgstr "པི་ཨེན་ཇི་ ཡིག་སྣོད་མངོན་གསལ་འབད་ནིའི་ དྲན་ཚད་ལངམ་མིན་འདུག"
 
-#: gdk-pixbuf/io-png.c:657
-#, fuzzy, c-format
+#: gdk-pixbuf/io-png.c:656
+#, c-format
 msgid ""
-"Insufficient memory to store a %lu by %lu image; try exiting some "
+"Insufficient memory to store a %ld by %ld image; try exiting some "
 "applications to reduce memory usage"
 msgstr ""
 " གཟུགས་བརྙན་ %ld གིས་ %ld གསོག་འཇོག་འབད་ནིའི་ དྲན་ཚད་ལངམ་མིན་འདུག དྲན་ཚད་ལག་ལེན་མར་ཕབ་ཀྱི་"
 "དོན་ལུ་ གློག་རིམ་ལ་ལོ་ཅིག་ ཕྱིར་འཐོད་འབད་ནི་ལུ་ འབད་རྩོལ་བསྐྱེད།"
 
-#: gdk-pixbuf/io-png.c:720
+#: gdk-pixbuf/io-png.c:719
 msgid "Fatal error reading PNG image file"
 msgstr "པི་ཨེན་ཇི་ གཟུགས་བརྙན་གྱི་ ཡིག་སྣོད་ལྷག་ནི་ལུ་ ཚབས་ཆེན་གྱི་འཛོལ་བ།"
 
-#: gdk-pixbuf/io-png.c:769
+#: gdk-pixbuf/io-png.c:768
 #, c-format
 msgid "Fatal error reading PNG image file: %s"
 msgstr "པི་ཨེན་ཇི་ གཟུགས་བརྙན་གྱི་ཡིག་སྣོད་ %s ལྷག་ནི་ལུ་ ཚབས་ཆེན་གྱི་འཛོལ་བ།"
 
-#: gdk-pixbuf/io-png.c:859
+#: gdk-pixbuf/io-png.c:862
 msgid ""
 "Keys for PNG text chunks must have at least 1 and at most 79 characters."
 msgstr ""
 "པི་ཨེན་ཇི་ ཚིག་ཡིག་གི་དུམ་བུ་ཚུའི་ ལྡེ་མིག་ཚུ་ལུ་ ཉུང་ཤོས་ཡིག་འབྲུ་ ༡ དང་ མང་ཤོས་ཡིག་འབྲུ་ ༧༩ འོང་དགོ"
 
-#: gdk-pixbuf/io-png.c:868
+#: gdk-pixbuf/io-png.c:871
 msgid "Keys for PNG text chunks must be ASCII characters."
 msgstr "པི་ཨེན་ཇི་གི་ ཚིག་ཡིག་དུམ་བུའི་ལྡེ་མིག་ཚུ་ ཡིག་འབྲུ་ ཨེ་ཨེསི་སི་ཨའི་ཨའི་ ཨིན་དགོ"
 
-#: gdk-pixbuf/io-png.c:882 gdk-pixbuf/io-tiff.c:667
+#: gdk-pixbuf/io-png.c:885 gdk-pixbuf/io-tiff.c:737
 #, c-format
 msgid "Color profile has invalid length %d."
 msgstr ""
 
-#: gdk-pixbuf/io-png.c:895
+#: gdk-pixbuf/io-png.c:898
 #, c-format
 msgid ""
 "PNG compression level must be a value between 0 and 9; value '%s' could not "
@@ -625,7 +614,7 @@ msgstr ""
 "པི་ཨེན་ཇི་གི་ ཨེབ་བཙུགས་གནས་རིམ་དེ་ བེ་ལུ་ ༠ ལས་ ༩ གི་བར་ན་འོང་དགོ  བེ་ལུ་ ’%s’ དེ་ མིང་དཔྱད་"
 "འབད་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-png.c:908
+#: gdk-pixbuf/io-png.c:911
 #, c-format
 msgid ""
 "PNG compression level must be a value between 0 and 9; value '%d' is not "
@@ -633,14 +622,14 @@ msgid ""
 msgstr ""
 "པི་ཨེན་ཇི་གི་ ཨེབ་བཙུགས་གནས་རིམ་དེ་ བེ་ལུ་ ༠ ལས་ ༩ གི་བར་ན་འོང་དགོ  བེ་ལུ་ ’%d’ དེ་མི་ཆོག"
 
-#: gdk-pixbuf/io-png.c:956
+#: gdk-pixbuf/io-png.c:959
 #, c-format
 msgid "Value for PNG text chunk %s cannot be converted to ISO-8859-1 encoding."
 msgstr ""
 "པི་ཨེན་ཇི་གི་ ཚིག་ཡིག་གྱི་དུམ་བུ་ %s གི་ བེ་ལུ་དེ་ ཨའི་ཨེསི་ཨོ་ -༨༨༥༩-༡ ཨིན་ཀོ་ཌིང་ལུ་ གཞི་བསྒྱུར་འབད་"
 "མི་བཏུབ།"
 
-#: gdk-pixbuf/io-png.c:1119
+#: gdk-pixbuf/io-png.c:1122
 msgid "The PNG image format"
 msgstr "པི་ཨེན་ཇི་ གཟུགས་བརྙན་གྱི་རྩ་སྒྲིག"
 
@@ -716,7 +705,7 @@ msgstr ""
 msgid "Failed to read QTIF header"
 msgstr "མགོ་ཡིག་སྡུད་འབྲི་མ་ཚུགས།\n"
 
-#: gdk-pixbuf/io-qtif.c:152 gdk-pixbuf/io-qtif.c:189 gdk-pixbuf/io-qtif.c:459
+#: gdk-pixbuf/io-qtif.c:152 gdk-pixbuf/io-qtif.c:189 gdk-pixbuf/io-qtif.c:460
 #, c-format
 msgid "QTIF atom size too large (%d byte)"
 msgid_plural "QTIF atom size too large (%d bytes)"
@@ -757,7 +746,7 @@ msgstr "ཚིག་མཛོད་ཟུར་ཐོ་ འབྲི་མ་�
 msgid "Failed to find an image data atom."
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ གཟུགས་བརྙན་ཁ་ཕྱེ་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-qtif.c:618
+#: gdk-pixbuf/io-qtif.c:619
 #, fuzzy
 msgid "The QTIF image format"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ གཟུགས་བརྙན་རྩ་སྒྲིག་།"
@@ -844,55 +833,59 @@ msgstr "ཡིག་སྣོད་ནང་ གནད་སྡུད་ཐེ�
 msgid "The Targa image format"
 msgstr "ཊར་ག་ གཟུགས་བརྙན་གྱི་རྩ་སྒྲིག་།"
 
-#: gdk-pixbuf/io-tiff.c:104
+#: gdk-pixbuf/io-tiff.c:164
 msgid "Could not get image width (bad TIFF file)"
 msgstr "གཟུགས་བརྙན་གྱི་རྒྱ་ཚད་ཐོབ་མ་ཚུགས།(ཊི་ཨའི་ཨེཕ་ཨེཕ་ཡིག་སྣོད་བྱང་ཉེས)"
 
-#: gdk-pixbuf/io-tiff.c:112
+#: gdk-pixbuf/io-tiff.c:171
 msgid "Could not get image height (bad TIFF file)"
 msgstr "གཟུགས་བརྙན་གྱི་མཐོ་ཚད་ཐོབ་མ་ཚུགས།(ཊི་ཨའི་ཨེཕ་ཨེཕ་ཡིག་སྣོད་བྱང་ཉེས)"
 
-#: gdk-pixbuf/io-tiff.c:120
+#: gdk-pixbuf/io-tiff.c:179
 msgid "Width or height of TIFF image is zero"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་གི་ གཟུགས་བརྙན་གྱི་རྒྱ་ཚད་དམ་ མཐོ་ཚད་ཀླད་ཀོར་ཨིན་པས།"
 
-#: gdk-pixbuf/io-tiff.c:129 gdk-pixbuf/io-tiff.c:138
+#: gdk-pixbuf/io-tiff.c:188 gdk-pixbuf/io-tiff.c:197
 msgid "Dimensions of TIFF image too large"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ གཟུགས་བརྙན་གྱི་ རྒྱ་ཁྱོན་ཚུ་ སྦོམ་དྲགས་པས།"
 
-#: gdk-pixbuf/io-tiff.c:162 gdk-pixbuf/io-tiff.c:174 gdk-pixbuf/io-tiff.c:491
+#: gdk-pixbuf/io-tiff.c:221 gdk-pixbuf/io-tiff.c:233 gdk-pixbuf/io-tiff.c:560
 msgid "Insufficient memory to open TIFF file"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ཡིག་སྣོད་ ཁ་ཕྱེ་ནི་ལུ་ དྲན་ཚད་ལངམ་མིན་འདུག"
 
-#: gdk-pixbuf/io-tiff.c:236
+#: gdk-pixbuf/io-tiff.c:294
 msgid "Failed to load RGB data from TIFF file"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ཡིག་སྣོད་ནང་ལས་ ཨར་ཇི་བི་ གནད་སྡུད་མངོན་གསལ་འབད་མ་ཚུགས།།"
 
-#: gdk-pixbuf/io-tiff.c:293
+#: gdk-pixbuf/io-tiff.c:350
 msgid "Failed to open TIFF image"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ གཟུགས་བརྙན་ཁ་ཕྱེ་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-tiff.c:427 gdk-pixbuf/io-tiff.c:440
+#: gdk-pixbuf/io-tiff.c:362 gdk-pixbuf/io-tiff.c:777
+msgid "TIFFClose operation failed"
+msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ཁ་བསྡམ་ བཀོལ་སྤྱོད་འབད་མ་ཚུགས།"
+
+#: gdk-pixbuf/io-tiff.c:492 gdk-pixbuf/io-tiff.c:505
 msgid "Failed to load TIFF image"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ གཟུགས་བརྙན་མངོན་གསལ་འབད་མ་ཚུགས།།"
 
-#: gdk-pixbuf/io-tiff.c:623
+#: gdk-pixbuf/io-tiff.c:691
 msgid "Failed to save TIFF image"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ གཟུགས་བརྙན་བསྲུང་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-tiff.c:656
+#: gdk-pixbuf/io-tiff.c:726
 msgid "TIFF compression doesn't refer to a valid codec."
 msgstr ""
 
-#: gdk-pixbuf/io-tiff.c:696
+#: gdk-pixbuf/io-tiff.c:766
 msgid "Failed to write TIFF data"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་གནད་སྡུད་འབྲི་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-tiff.c:733
+#: gdk-pixbuf/io-tiff.c:813
 msgid "Couldn't write to TIFF file"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ཡིག་སྣོད་ལུ་ འབྲི་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-tiff.c:788
+#: gdk-pixbuf/io-tiff.c:868
 msgid "The TIFF image format"
 msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ གཟུགས་བརྙན་རྩ་སྒྲིག་།"
 
@@ -916,19 +909,19 @@ msgstr "གཞན་སྲུང་མ་ཚུགས།"
 msgid "The WBMP image format"
 msgstr "དྲབ་ལུ་བི་ཨེམ་པི་ གཟུགས་བརྙན་གྱི་རྩ་སྒྲིག་།"
 
-#: gdk-pixbuf/io-xbm.c:304
+#: gdk-pixbuf/io-xbm.c:296
 msgid "Invalid XBM file"
 msgstr "ནུས་མེད་ཨེགསི་ཨེམ་བི་ཡིག་སྣོད།"
 
-#: gdk-pixbuf/io-xbm.c:314
+#: gdk-pixbuf/io-xbm.c:306
 msgid "Insufficient memory to load XBM image file"
 msgstr "ཨེགསི་ཨེམ་བི་ གཟུགས་བརྙན་གྱི་ཡིག་སྣོད་ མངོན་གསལ་འབད་ནི་ལུ་ དྲན་ཚད་ལངམ་མིན་འདུག"
 
-#: gdk-pixbuf/io-xbm.c:462
+#: gdk-pixbuf/io-xbm.c:454
 msgid "Failed to write to temporary file when loading XBM image"
 msgstr "ཨེགསི་ཨེམ་བི་ གཟུགས་བརྙན་མངོན་གསལ་འབད་བའི་སྐབས་ གནས་སྐབས་ཀྱི་ཡིག་སྣོད་ལུ་ འབྲི་མ་ཚུགས།"
 
-#: gdk-pixbuf/io-xbm.c:501
+#: gdk-pixbuf/io-xbm.c:493
 msgid "The XBM image format"
 msgstr "ཨེགསི་ཨེམ་བི་ གཟུགས་བརྙན་རྩ་སྒྲིག་དེ།"
 
@@ -971,12 +964,6 @@ msgstr "ཨེགསི་པི་ཨེམ་ གཟུགས་བརྙན�
 #: gdk-pixbuf/io-xpm.c:817
 msgid "The XPM image format"
 msgstr "ཨེགསི་པི་ཨེམ་ གཟུགས་བརྙན་རྩ་སྒྲིག་དེ།"
-
-#~ msgid "Unsupported animation type"
-#~ msgstr "རྒྱབ་སྐྱོར་མེད་པའི་ བསྒུལ་བཟོའི་དབྱེ་བ།"
-
-#~ msgid "TIFFClose operation failed"
-#~ msgstr "ཊི་ཨའི་ཨེཕ་ཨེཕ་ཁ་བསྡམ་ བཀོལ་སྤྱོད་འབད་མ་ཚུགས།"
 
 #~ msgid "Couldn't allocate memory for paletted data"
 #~ msgstr "པེ་ལི་ཊེཊི་ གནད་སྡུད་ཀྱི་དོན་ལུ་ དྲན་ཚད་སྤྲོད་མ་ཚུགས།"

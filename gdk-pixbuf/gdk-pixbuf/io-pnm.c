@@ -17,9 +17,7 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "config.h"
@@ -1050,7 +1048,7 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 {
-	static GdkPixbufModulePattern signature[] = {
+	static const GdkPixbufModulePattern signature[] = {
 		{ "P1", NULL, 100 },
 		{ "P2", NULL, 100 },
 		{ "P3", NULL, 100 },
@@ -1059,14 +1057,14 @@ MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 		{ "P6", NULL, 100 },
 		{ NULL, NULL, 0 }
 	};
-	static gchar * mime_types[] = {
+	static const gchar *mime_types[] = {
 		"image/x-portable-anymap",
 		"image/x-portable-bitmap",
 		"image/x-portable-graymap",
 		"image/x-portable-pixmap",
 		NULL
 	};
-	static gchar * extensions[] = {
+	static const gchar *extensions[] = {
 		"pnm",
 		"pbm",
 		"pgm",
@@ -1075,10 +1073,10 @@ MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 	};
 
 	info->name = "pnm";
-	info->signature = signature;
-	info->description = N_("The PNM/PBM/PGM/PPM image format family");
-	info->mime_types = mime_types;
-	info->extensions = extensions;
+	info->signature = (GdkPixbufModulePattern *) signature;
+	info->description = NC_("image format", "PNM/PBM/PGM/PPM");
+	info->mime_types = (gchar **) mime_types;
+	info->extensions = (gchar **) extensions;
 	info->flags = GDK_PIXBUF_FORMAT_THREADSAFE;
 	info->license = "LGPL";
 }

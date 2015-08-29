@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: mr\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gdk-"
 "pixbuf\n"
-"POT-Creation-Date: 2013-11-11 10:51-0500\n"
+"POT-Creation-Date: 2012-02-04 18:44-0500\n"
 "PO-Revision-Date: 2011-03-23 17:04+0530\n"
 "Last-Translator: Sandeep Shedmake <sshedmak@redhat.com>\n"
 "Language-Team: Marathi <fedora-trans-mr@redhat.com>\n"
@@ -20,18 +20,27 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:160 gdk-pixbuf/gdk-pixbuf-io.c:1064
-#: gdk-pixbuf/gdk-pixbuf-io.c:1330
+#: gdk-pixbuf/gdk-pixbuf-animation.c:146 gdk-pixbuf/gdk-pixbuf-io.c:1083
+#: gdk-pixbuf/gdk-pixbuf-io.c:1349
 #, c-format
 msgid "Failed to open file '%s': %s"
 msgstr "'%1s' फाइल उघडण्यात असफल: %2s"
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:173 gdk-pixbuf/gdk-pixbuf-io.c:1076
+#: gdk-pixbuf/gdk-pixbuf-animation.c:159 gdk-pixbuf/gdk-pixbuf-io.c:1095
 #, c-format
 msgid "Image file '%s' contains no data"
 msgstr "प्रतिमा फाइल '%s' मध्ये कोणतीही माहीती नाही "
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:212
+#: gdk-pixbuf/gdk-pixbuf-animation.c:201 gdk-pixbuf/gdk-pixbuf-io.c:1131
+#: gdk-pixbuf/gdk-pixbuf-io.c:1401
+#, c-format
+msgid ""
+"Failed to load image '%s': reason not known, probably a corrupt image file"
+msgstr ""
+"प्रतिमा '%s' ला सुरु करण्यात असफल: कारण माहीत नाही , बहुदा ही एक दुषित प्रतिमा फाइल "
+"असावी "
+
+#: gdk-pixbuf/gdk-pixbuf-animation.c:234
 #, c-format
 msgid ""
 "Failed to load animation '%s': reason not known, probably a corrupt "
@@ -40,21 +49,12 @@ msgstr ""
 "प्रतिमा '%s' ला सुरु करण्यात असफल: कारण माहीत नाही, बहुदा ही एक दुषित प्रतिमा फाइल "
 "असावी "
 
-#: gdk-pixbuf/gdk-pixbuf-animation.c:280 gdk-pixbuf/gdk-pixbuf-io.c:1112
-#: gdk-pixbuf/gdk-pixbuf-io.c:1382
-#, c-format
-msgid ""
-"Failed to load image '%s': reason not known, probably a corrupt image file"
-msgstr ""
-"प्रतिमा '%s' ला सुरु करण्यात असफल: कारण माहीत नाही , बहुदा ही एक दुषित प्रतिमा फाइल "
-"असावी "
-
-#: gdk-pixbuf/gdk-pixbuf-io.c:790
+#: gdk-pixbuf/gdk-pixbuf-io.c:809
 #, c-format
 msgid "Unable to load image-loading module: %s: %s"
 msgstr "प्रतिमा सुरु करण्याची पध्दत %1s: सुरु करण्यास असमर्थ: %2s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:805
+#: gdk-pixbuf/gdk-pixbuf-io.c:824
 #, c-format
 msgid ""
 "Image-loading module %s does not export the proper interface; perhaps it's "
@@ -63,53 +63,53 @@ msgstr ""
 "इमेज-लोडिंग घटक %s योग्य संवाद एक्सपोर्ट करत नाही; बहुदा वेगळ्या gdk-pixbug आवृत्तीपासून "
 "असावे?"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:814 gdk-pixbuf/gdk-pixbuf-io.c:865
+#: gdk-pixbuf/gdk-pixbuf-io.c:833 gdk-pixbuf/gdk-pixbuf-io.c:884
 #, c-format
 msgid "Image type '%s' is not supported"
 msgstr "'%s' प्रतिमेला आधार नाही"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:950
+#: gdk-pixbuf/gdk-pixbuf-io.c:964
 #, c-format
 msgid "Couldn't recognize the image file format for file '%s'"
 msgstr "फाइल '%s' कोणत्या प्रकारची फाइल आहे ते उमगले नाही"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:958
+#: gdk-pixbuf/gdk-pixbuf-io.c:972
 msgid "Unrecognized image file format"
 msgstr "अपरिचित असणारी प्रतिमा फाइल"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:1121
+#: gdk-pixbuf/gdk-pixbuf-io.c:1140
 #, c-format
 msgid "Failed to load image '%s': %s"
 msgstr "'%1s' प्रतिमा उघडण्यास असमर्थ: %2s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2015 gdk-pixbuf/io-gdip-utils.c:837
+#: gdk-pixbuf/gdk-pixbuf-io.c:2028 gdk-pixbuf/io-gdip-utils.c:888
 #, c-format
 msgid "Error writing to image file: %s"
 msgstr "प्रतिमा फाइलवर लिहिण्यात चूक: %s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2057 gdk-pixbuf/gdk-pixbuf-io.c:2178
+#: gdk-pixbuf/gdk-pixbuf-io.c:2073 gdk-pixbuf/gdk-pixbuf-io.c:2203
 #, c-format
 msgid "This build of gdk-pixbuf does not support saving the image format: %s"
 msgstr "प्रतिमेची रचना रक्षित करण्यासाठी या भागातgdk-pixbf चे सहकार्य नाही : %s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2088
+#: gdk-pixbuf/gdk-pixbuf-io.c:2107
 msgid "Insufficient memory to save image to callback"
 msgstr "कॉलबॅकसाठी प्रतिमा सुरक्षित करण्यासाठी पुरेशी स्मृती नाही"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2101
+#: gdk-pixbuf/gdk-pixbuf-io.c:2120
 msgid "Failed to open temporary file"
 msgstr "तात्कालिक फाइल उघडण्यात असफल"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2124
+#: gdk-pixbuf/gdk-pixbuf-io.c:2146
 msgid "Failed to read from temporary file"
 msgstr "तात्कालिक फाइलमधून वाचण्यास असफल"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2372
+#: gdk-pixbuf/gdk-pixbuf-io.c:2399
 #, c-format
 msgid "Failed to open '%s' for writing: %s"
 msgstr "लिहण्यासाठी '%1$s' ही फाइल उघडण्यास अपयशी: %2$s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2398
+#: gdk-pixbuf/gdk-pixbuf-io.c:2425
 #, c-format
 msgid ""
 "Failed to close '%s' while writing image, all data may not have been saved: "
@@ -117,15 +117,15 @@ msgid ""
 msgstr ""
 "लेखन करताना '%s' ला बन्द करता आले नाही,  बहुदा सर्व माहीती रक्षित झाली नसेल:%s"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2619 gdk-pixbuf/gdk-pixbuf-io.c:2671
+#: gdk-pixbuf/gdk-pixbuf-io.c:2646 gdk-pixbuf/gdk-pixbuf-io.c:2698
 msgid "Insufficient memory to save image into a buffer"
 msgstr "प्रतिमा बफरमध्ये सुरक्षित करण्यासाठी अपुरी स्मृती"
 
-#: gdk-pixbuf/gdk-pixbuf-io.c:2717
+#: gdk-pixbuf/gdk-pixbuf-io.c:2744
 msgid "Error writing to image stream"
 msgstr "प्रतिमा स्ट्रीम करीता लिहीतेवेळी त्रुटी आढळली"
 
-#: gdk-pixbuf/gdk-pixbuf-loader.c:393
+#: gdk-pixbuf/gdk-pixbuf-loader.c:395
 #, c-format
 msgid ""
 "Internal error: Image loader module '%s' failed to complete an operation, "
@@ -134,7 +134,7 @@ msgstr ""
 "अंतर्गत चूक: प्रतिमा लोडर माड्यूल '%s' संक्रिया पूर्ण करू शकला नाही, परंतू याचे कारण दिलेले "
 "नाही"
 
-#: gdk-pixbuf/gdk-pixbuf-loader.c:435
+#: gdk-pixbuf/gdk-pixbuf-loader.c:437
 #, c-format
 msgid "Incremental loading of image type '%s' is not supported"
 msgstr "प्रतिमा प्रकार '%s' चे वाढीव लोडिंग करण्यासाठी कोणतीही मदत नाही"
@@ -162,26 +162,25 @@ msgstr[1] "%u बाईटस्चे इमेज बफर वाटप क�
 msgid "Unexpected icon chunk in animation"
 msgstr "एनिमेशनमध्ये अनपेक्षित चिन्ह चंक"
 
-#: gdk-pixbuf/io-ani.c:342 gdk-pixbuf/io-ani.c:400 gdk-pixbuf/io-ani.c:426
-#: gdk-pixbuf/io-ani.c:449 gdk-pixbuf/io-ani.c:476 gdk-pixbuf/io-ani.c:563
+#: gdk-pixbuf/io-ani.c:337
+msgid "Unsupported animation type"
+msgstr "असमर्थनीय एनिमेशन प्रकार"
+
+#: gdk-pixbuf/io-ani.c:348 gdk-pixbuf/io-ani.c:406 gdk-pixbuf/io-ani.c:432
+#: gdk-pixbuf/io-ani.c:455 gdk-pixbuf/io-ani.c:482 gdk-pixbuf/io-ani.c:569
 msgid "Invalid header in animation"
 msgstr "एनिमेशनमधील मथळा अयोग्य आहे"
 
-#: gdk-pixbuf/io-ani.c:352 gdk-pixbuf/io-ani.c:374 gdk-pixbuf/io-ani.c:458
-#: gdk-pixbuf/io-ani.c:485 gdk-pixbuf/io-ani.c:536 gdk-pixbuf/io-ani.c:608
+#: gdk-pixbuf/io-ani.c:358 gdk-pixbuf/io-ani.c:380 gdk-pixbuf/io-ani.c:464
+#: gdk-pixbuf/io-ani.c:491 gdk-pixbuf/io-ani.c:542 gdk-pixbuf/io-ani.c:614
 msgid "Not enough memory to load animation"
 msgstr "एनिमेशन भारीत करण्यासाठी पुरेशी स्मृती नाही"
 
-#: gdk-pixbuf/io-ani.c:392 gdk-pixbuf/io-ani.c:418 gdk-pixbuf/io-ani.c:437
+#: gdk-pixbuf/io-ani.c:398 gdk-pixbuf/io-ani.c:424 gdk-pixbuf/io-ani.c:443
 msgid "Malformed chunk in animation"
 msgstr "एनिमेशनमध्ये बिघडलेला चंक"
 
-#: gdk-pixbuf/io-ani.c:630
-#, fuzzy
-msgid "ANI image was truncated or incomplete."
-msgstr "GIF प्रतिमा अपूर्ण किंवा सदोष होते."
-
-#: gdk-pixbuf/io-ani.c:671
+#: gdk-pixbuf/io-ani.c:711
 msgid "The ANI image format"
 msgstr "ANI प्रतिमा स्वरूप"
 
@@ -223,7 +222,7 @@ msgstr "BMP फाइल स्वरूप"
 msgid "The EMF image format"
 msgstr "EMF प्रतिमा स्वरूप"
 
-#: gdk-pixbuf/io-gdip-gif.c:80 gdk-pixbuf/io-gif.c:1720
+#: gdk-pixbuf/io-gdip-gif.c:80 gdk-pixbuf/io-gif.c:1699
 msgid "The GIF image format"
 msgstr "GIF प्रतिमा स्वरूप"
 
@@ -231,7 +230,7 @@ msgstr "GIF प्रतिमा स्वरूप"
 msgid "The ICO image format"
 msgstr "ICO प्रतिमा स्वरूप"
 
-#: gdk-pixbuf/io-gdip-jpeg.c:53 gdk-pixbuf/io-jpeg.c:1249
+#: gdk-pixbuf/io-gdip-jpeg.c:53 gdk-pixbuf/io-jpeg.c:1139
 #, c-format
 msgid ""
 "JPEG quality must be a value between 0 and 100; value '%s' could not be "
@@ -239,13 +238,13 @@ msgid ""
 msgstr ""
 "JPEG ची  गुणवत्ता ० ते 1०0 दरम्यान असायला हवी; %s ची गुणवत्ता मोजली जाऊ शकत नाही."
 
-#: gdk-pixbuf/io-gdip-jpeg.c:68 gdk-pixbuf/io-jpeg.c:1265
+#: gdk-pixbuf/io-gdip-jpeg.c:68 gdk-pixbuf/io-jpeg.c:1154
 #, c-format
 msgid ""
 "JPEG quality must be a value between 0 and 100; value '%d' is not allowed."
 msgstr "JPEG मधील गुणवत्ता किंमत  ० ते 1०0 दरम्यान असायला हवी; '%d' वैध नाही."
 
-#: gdk-pixbuf/io-gdip-jpeg.c:136 gdk-pixbuf/io-jpeg.c:1478
+#: gdk-pixbuf/io-gdip-jpeg.c:136 gdk-pixbuf/io-jpeg.c:1316
 msgid "The JPEG image format"
 msgstr "JPEG प्रतिमा स्वरूप"
 
@@ -270,19 +269,19 @@ msgstr "माहिती ते स्ट्रीम रूपांतर �
 msgid "Could not read from stream: %s"
 msgstr "स्ट्रीम पासून वाचण्यास अपयशी: %s"
 
-#: gdk-pixbuf/io-gdip-utils.c:617
+#: gdk-pixbuf/io-gdip-utils.c:617 gdk-pixbuf/io-gdip-utils.c:752
 msgid "Couldn't load bitmap"
 msgstr "bitmap दाखल करू शकले नाही"
 
-#: gdk-pixbuf/io-gdip-utils.c:773
+#: gdk-pixbuf/io-gdip-utils.c:774
 msgid "Couldn't load metafile"
 msgstr "मेटाफाइल दाखल करू शकले नाही"
 
-#: gdk-pixbuf/io-gdip-utils.c:878
+#: gdk-pixbuf/io-gdip-utils.c:933
 msgid "Unsupported image format for GDI+"
 msgstr "GDI+ करीता असमर्थीत प्रतिमा प्रकार"
 
-#: gdk-pixbuf/io-gdip-utils.c:885
+#: gdk-pixbuf/io-gdip-utils.c:940
 msgid "Couldn't save"
 msgstr "संचयीत करू शकले नाही"
 
@@ -290,71 +289,66 @@ msgstr "संचयीत करू शकले नाही"
 msgid "The WMF image format"
 msgstr "WMF प्रतिमा स्वरूपन"
 
-#: gdk-pixbuf/io-gif.c:222
+#: gdk-pixbuf/io-gif.c:221
 #, c-format
 msgid "Failure reading GIF: %s"
 msgstr "GIF %s मधील मजकूर वाचता येत नाहीः"
 
-#: gdk-pixbuf/io-gif.c:496 gdk-pixbuf/io-gif.c:1502 gdk-pixbuf/io-gif.c:1669
+#: gdk-pixbuf/io-gif.c:495 gdk-pixbuf/io-gif.c:1482 gdk-pixbuf/io-gif.c:1648
 msgid "GIF file was missing some data (perhaps it was truncated somehow?)"
 msgstr "GIF फाइल मधील काही माहीती हरवली आहे (बहुदा ती माहीती अन्यत्र साठलेली असेल)"
 
-#: gdk-pixbuf/io-gif.c:505
+#: gdk-pixbuf/io-gif.c:504
 #, c-format
 msgid "Internal error in the GIF loader (%s)"
 msgstr "GIF प्रतिमेमध्ये (%s) अंतर्गत त्रुटी आहेत"
 
-#: gdk-pixbuf/io-gif.c:579
+#: gdk-pixbuf/io-gif.c:578
 msgid "Stack overflow"
 msgstr "माहीती साठवण क्षमतेपेक्षा अधिक आहे"
 
-#: gdk-pixbuf/io-gif.c:639
+#: gdk-pixbuf/io-gif.c:638
 msgid "GIF image loader cannot understand this image."
 msgstr "GIF प्रतिमा भारक ही प्रतिमा समजू शकत नाही."
 
-#: gdk-pixbuf/io-gif.c:668
+#: gdk-pixbuf/io-gif.c:667
 msgid "Bad code encountered"
 msgstr "सदोष सुत्रे मिळाली"
 
-#: gdk-pixbuf/io-gif.c:678
+#: gdk-pixbuf/io-gif.c:677
 msgid "Circular table entry in GIF file"
 msgstr "GIF फाइल मध्ये वर्तुळाकार तक्त्याची नोंद आहे"
 
-#: gdk-pixbuf/io-gif.c:866 gdk-pixbuf/io-gif.c:1488 gdk-pixbuf/io-gif.c:1541
-#: gdk-pixbuf/io-gif.c:1657
+#: gdk-pixbuf/io-gif.c:865 gdk-pixbuf/io-gif.c:1468 gdk-pixbuf/io-gif.c:1521
+#: gdk-pixbuf/io-gif.c:1636
 msgid "Not enough memory to load GIF file"
 msgstr "GIF फाइलसाठी पुरेशी स्मरणशक्ती उपलब्ध नाही"
 
-#: gdk-pixbuf/io-gif.c:960
+#: gdk-pixbuf/io-gif.c:959
 msgid "Not enough memory to composite a frame in GIF file"
 msgstr "GIF फाइलमध्ये चौकट बसवण्यासाठी पुरेशी स्मृती नाही"
 
-#: gdk-pixbuf/io-gif.c:1132
+#: gdk-pixbuf/io-gif.c:1131
 msgid "GIF image is corrupt (incorrect LZW compression)"
 msgstr "GIF प्रतिमा खराब आहे  (चुकीचे  LZW संक्षेप )"
 
-#: gdk-pixbuf/io-gif.c:1182
+#: gdk-pixbuf/io-gif.c:1181
 msgid "File does not appear to be a GIF file"
 msgstr "ही फाइल GIF फाइल वाटत नाही "
 
-#: gdk-pixbuf/io-gif.c:1194
+#: gdk-pixbuf/io-gif.c:1193
 #, c-format
 msgid "Version %s of the GIF file format is not supported"
 msgstr "GIF फाइल मधील %s भागाला समर्थन नाही"
 
-#: gdk-pixbuf/io-gif.c:1241
-#, fuzzy
-msgid "Resulting GIF image has zero size"
-msgstr "प्रतिमेची रुंदी शून्य आहे"
-
-#: gdk-pixbuf/io-gif.c:1320
+#: gdk-pixbuf/io-gif.c:1302
 msgid ""
 "GIF image has no global colormap, and a frame inside it has no local "
 "colormap."
 msgstr ""
 "GIF प्रतिमेमध्ये व्यापक रंगसंगती नाही आणि चित्रामधील चौकटीत स्थानिकरंगसंगती उपलब्ध नाहीत."
 
-#: gdk-pixbuf/io-gif.c:1564
+#: gdk-pixbuf/io-gif.c:1543
 msgid "GIF image was truncated or incomplete."
 msgstr "GIF प्रतिमा अपूर्ण किंवा सदोष होते."
 
@@ -447,36 +441,31 @@ msgstr "बफर प्रतिमा माहिती करीता स�
 msgid "The JPEG 2000 image format"
 msgstr "JPEG 2000 प्रतिमा स्वरूपन"
 
-#: gdk-pixbuf/io-jpeg.c:126
+#: gdk-pixbuf/io-jpeg.c:116
 #, c-format
 msgid "Error interpreting JPEG image file (%s)"
 msgstr "JPEG फाइल (%s) मधील चित्रणाचा अर्थ/आशय कळण्यात चुक आढळते"
 
-#: gdk-pixbuf/io-jpeg.c:604
+#: gdk-pixbuf/io-jpeg.c:527
 msgid ""
 "Insufficient memory to load image, try exiting some applications to free "
 "memory"
 msgstr ""
 "प्रतिमा सुरू करण्यासाठी पुरेशी स्मरणशक्ती नाही, त्यातील काही भाग काढून स्मरणशक्ती वाढवावी"
 
-#: gdk-pixbuf/io-jpeg.c:651 gdk-pixbuf/io-jpeg.c:865
+#: gdk-pixbuf/io-jpeg.c:568 gdk-pixbuf/io-jpeg.c:781
 #, c-format
 msgid "Unsupported JPEG color space (%s)"
 msgstr "असमर्थनीय JPEG रंग अंतराळ (%s)"
 
-#: gdk-pixbuf/io-jpeg.c:764 gdk-pixbuf/io-jpeg.c:1044
-#: gdk-pixbuf/io-jpeg.c:1308 gdk-pixbuf/io-jpeg.c:1318
+#: gdk-pixbuf/io-jpeg.c:680 gdk-pixbuf/io-jpeg.c:950 gdk-pixbuf/io-jpeg.c:1183
+#: gdk-pixbuf/io-jpeg.c:1192
 msgid "Couldn't allocate memory for loading JPEG file"
 msgstr "JPEG मधील फाइल सुरु करण्यासाठी आवश्यक ती स्मरणशक्ती देता येत नाही"
 
-#: gdk-pixbuf/io-jpeg.c:1018
+#: gdk-pixbuf/io-jpeg.c:925
 msgid "Transformed JPEG has zero width or height."
 msgstr "रूपांतरीत JPEG मधील ऊंची किंवा रुंदी शून्य आहे."
-
-#: gdk-pixbuf/io-jpeg.c:1279
-#, fuzzy, c-format
-msgid "Color profile has invalid length '%u'."
-msgstr "रंग प्रोफाइलची अवैध लांबी %d."
 
 #: gdk-pixbuf/io-pcx.c:186
 msgid "Couldn't allocate memory for header"
@@ -533,69 +522,69 @@ msgstr "परिवर्तित PNG मधील ऊंची  किंव�
 msgid "The GdkPixdata format"
 msgstr "GIF प्रतिमा स्वरूप"
 
-#: gdk-pixbuf/io-png.c:55
+#: gdk-pixbuf/io-png.c:54
 msgid "Bits per channel of PNG image is invalid."
 msgstr "PNG चित्रामधील प्रती ओळीतील कणसमुहांची(बिट्स) संख्या अवैध आहे."
 
-#: gdk-pixbuf/io-png.c:136 gdk-pixbuf/io-png.c:642
+#: gdk-pixbuf/io-png.c:135 gdk-pixbuf/io-png.c:641
 msgid "Transformed PNG has zero width or height."
 msgstr "परिवर्तित PNG मधील ऊंची  किंवा रुंदी शुन्य आहे."
 
-#: gdk-pixbuf/io-png.c:144
+#: gdk-pixbuf/io-png.c:143
 msgid "Bits per channel of transformed PNG is not 8."
 msgstr "परिवर्तित PNG चित्रामधील प्रती ओळीतील कणसमुहांची(बिट्स) 8 ही संख्या अवैध  आहे."
 
-#: gdk-pixbuf/io-png.c:153
+#: gdk-pixbuf/io-png.c:152
 msgid "Transformed PNG not RGB or RGBA."
 msgstr "परिवर्तित PNG, हे प्रतिमा RGB किंवा RGBA प्रतिमा नाही."
 
-#: gdk-pixbuf/io-png.c:162
+#: gdk-pixbuf/io-png.c:161
 msgid "Transformed PNG has unsupported number of channels, must be 3 or 4."
 msgstr ""
 "परिवर्तित PNG प्रतिमेमधील ओळींमधे समर्थन नसनार्या ओळी आहेत, त्या 3 किंवा 4 असाव्यात."
 
-#: gdk-pixbuf/io-png.c:183
+#: gdk-pixbuf/io-png.c:182
 #, c-format
 msgid "Fatal error in PNG image file: %s"
 msgstr "PNG प्रतिमा %s फाइल मध्ये  घातक त्रुटी आहेः"
 
-#: gdk-pixbuf/io-png.c:316
+#: gdk-pixbuf/io-png.c:315
 msgid "Insufficient memory to load PNG file"
 msgstr "PNG फाइल सुरु करण्यासाठी पुरेशी स्मरणशक्ती नाही"
 
-#: gdk-pixbuf/io-png.c:657
-#, fuzzy, c-format
+#: gdk-pixbuf/io-png.c:656
+#, c-format
 msgid ""
-"Insufficient memory to store a %lu by %lu image; try exiting some "
+"Insufficient memory to store a %ld by %ld image; try exiting some "
 "applications to reduce memory usage"
 msgstr ""
 "%ld x %ld आकाराचे प्रतिमा साठविण्यासाठी पुरेशी स्मरणशक्ती नाही; नको असणाऱ्या "
 "बाबीकाढून उपलब्ध स्मरणशक्तीचा साठा वाढवा"
 
-#: gdk-pixbuf/io-png.c:720
+#: gdk-pixbuf/io-png.c:719
 msgid "Fatal error reading PNG image file"
 msgstr "PNG प्रतिमेची फाइल वाचताना घातक चुक झाली आहे"
 
-#: gdk-pixbuf/io-png.c:769
+#: gdk-pixbuf/io-png.c:768
 #, c-format
 msgid "Fatal error reading PNG image file: %s"
 msgstr "PNG प्रतिमा फाइल वाचतेवेळी त्रुटी आढळली: %s"
 
-#: gdk-pixbuf/io-png.c:859
+#: gdk-pixbuf/io-png.c:862
 msgid ""
 "Keys for PNG text chunks must have at least 1 and at most 79 characters."
 msgstr "PNG पाठ चंकसाठी कळा किमान 1 आणि कमाल 7९ अक्षरी असाव्यात."
 
-#: gdk-pixbuf/io-png.c:868
+#: gdk-pixbuf/io-png.c:871
 msgid "Keys for PNG text chunks must be ASCII characters."
 msgstr "PNG पाठ चंकसाठी कळा ASCII अक्षरांच्याच असाव्यात."
 
-#: gdk-pixbuf/io-png.c:882 gdk-pixbuf/io-tiff.c:667
+#: gdk-pixbuf/io-png.c:885 gdk-pixbuf/io-tiff.c:737
 #, c-format
 msgid "Color profile has invalid length %d."
 msgstr "रंग प्रोफाइलची अवैध लांबी %d."
 
-#: gdk-pixbuf/io-png.c:895
+#: gdk-pixbuf/io-png.c:898
 #, c-format
 msgid ""
 "PNG compression level must be a value between 0 and 9; value '%s' could not "
@@ -604,19 +593,19 @@ msgstr ""
 "PNG संकुचन स्तराचे मुल्य 0 ते 9 च्या दरम्यानच असायला हवे; मुल्य '%s' विश्लेषित केले जाऊ शकत "
 "नाही."
 
-#: gdk-pixbuf/io-png.c:908
+#: gdk-pixbuf/io-png.c:911
 #, c-format
 msgid ""
 "PNG compression level must be a value between 0 and 9; value '%d' is not "
 "allowed."
 msgstr "PNG संकुचन स्तराचे मुल्य 0 ते 9 च्या दरम्यानच असायला हवे; मुल्य '%d' अनुमत केलेलेनाही."
 
-#: gdk-pixbuf/io-png.c:956
+#: gdk-pixbuf/io-png.c:959
 #, c-format
 msgid "Value for PNG text chunk %s cannot be converted to ISO-8859-1 encoding."
 msgstr "PNG पाठ चंक %s चे मुल्य ISO-8859-1 एनकोडिंगमध्ये परिवर्तीत केले जाऊ शकत नाही."
 
-#: gdk-pixbuf/io-png.c:1119
+#: gdk-pixbuf/io-png.c:1122
 msgid "The PNG image format"
 msgstr "PNM प्रतिमा स्वरूप"
 
@@ -688,7 +677,7 @@ msgstr "इंपुट फाइल डिस्क्रीप्टर NULL �
 msgid "Failed to read QTIF header"
 msgstr "QTIF हेड्डर वाचण्यास अपयशी"
 
-#: gdk-pixbuf/io-qtif.c:152 gdk-pixbuf/io-qtif.c:189 gdk-pixbuf/io-qtif.c:459
+#: gdk-pixbuf/io-qtif.c:152 gdk-pixbuf/io-qtif.c:189 gdk-pixbuf/io-qtif.c:460
 #, fuzzy, c-format
 msgid "QTIF atom size too large (%d byte)"
 msgid_plural "QTIF atom size too large (%d bytes)"
@@ -726,7 +715,7 @@ msgstr "GdkPixbufLoader ऑब्जेक्ट निर्माण करण
 msgid "Failed to find an image data atom."
 msgstr "प्रतिमा डाटा ऍटम शोधण्यास अपयशी."
 
-#: gdk-pixbuf/io-qtif.c:618
+#: gdk-pixbuf/io-qtif.c:619
 msgid "The QTIF image format"
 msgstr "QTIF प्रतिमा रूपण"
 
@@ -811,55 +800,59 @@ msgstr "फाइलमधील अतिरीक्त माहिती"
 msgid "The Targa image format"
 msgstr "Targa प्रतिमा स्वरूप"
 
-#: gdk-pixbuf/io-tiff.c:104
+#: gdk-pixbuf/io-tiff.c:164
 msgid "Could not get image width (bad TIFF file)"
 msgstr "प्रतिमेची रुंदी आढळली नाही (TIFF फाइल प्रदुषित आहे)"
 
-#: gdk-pixbuf/io-tiff.c:112
+#: gdk-pixbuf/io-tiff.c:171
 msgid "Could not get image height (bad TIFF file)"
 msgstr " प्रतिमेची ऊंची  आढळली नाही(TIFF फाइल प्रदुषित आहे)"
 
-#: gdk-pixbuf/io-tiff.c:120
+#: gdk-pixbuf/io-tiff.c:179
 msgid "Width or height of TIFF image is zero"
 msgstr "TIFF प्रतिमेची रुंदी किंवा ऊंची शून्य आहे "
 
-#: gdk-pixbuf/io-tiff.c:129 gdk-pixbuf/io-tiff.c:138
+#: gdk-pixbuf/io-tiff.c:188 gdk-pixbuf/io-tiff.c:197
 msgid "Dimensions of TIFF image too large"
 msgstr "TIFF प्रतिमेची रुपे बरीच मोठी आहेत"
 
-#: gdk-pixbuf/io-tiff.c:162 gdk-pixbuf/io-tiff.c:174 gdk-pixbuf/io-tiff.c:491
+#: gdk-pixbuf/io-tiff.c:221 gdk-pixbuf/io-tiff.c:233 gdk-pixbuf/io-tiff.c:560
 msgid "Insufficient memory to open TIFF file"
 msgstr "TIFF फाइल उघडण्यासाठी जागा अपुरी आहे"
 
-#: gdk-pixbuf/io-tiff.c:236
+#: gdk-pixbuf/io-tiff.c:294
 msgid "Failed to load RGB data from TIFF file"
 msgstr "TIFF फाइल मधून  RGB माहीती सुरू करण्यात असफल"
 
-#: gdk-pixbuf/io-tiff.c:293
+#: gdk-pixbuf/io-tiff.c:350
 msgid "Failed to open TIFF image"
 msgstr "TIFF प्रतिमा उघडण्यात असफल"
 
-#: gdk-pixbuf/io-tiff.c:427 gdk-pixbuf/io-tiff.c:440
+#: gdk-pixbuf/io-tiff.c:362 gdk-pixbuf/io-tiff.c:777
+msgid "TIFFClose operation failed"
+msgstr "TIFFClose ही क्रिया असफल"
+
+#: gdk-pixbuf/io-tiff.c:492 gdk-pixbuf/io-tiff.c:505
 msgid "Failed to load TIFF image"
 msgstr "TIFF प्रतिमा सुरु करण्यात असफल"
 
-#: gdk-pixbuf/io-tiff.c:623
+#: gdk-pixbuf/io-tiff.c:691
 msgid "Failed to save TIFF image"
 msgstr "TIFF प्रतिमा सुरक्षित करण्यात असफल"
 
-#: gdk-pixbuf/io-tiff.c:656
+#: gdk-pixbuf/io-tiff.c:726
 msgid "TIFF compression doesn't refer to a valid codec."
 msgstr "TIFF संकोचन वैध कोडेककरीता संदर्भ पुरवत नाही."
 
-#: gdk-pixbuf/io-tiff.c:696
+#: gdk-pixbuf/io-tiff.c:766
 msgid "Failed to write TIFF data"
 msgstr "TIFF डेटा लिहीण्यास असफल"
 
-#: gdk-pixbuf/io-tiff.c:733
+#: gdk-pixbuf/io-tiff.c:813
 msgid "Couldn't write to TIFF file"
 msgstr "TIFF फाइलवर लिहीता आले नाही"
 
-#: gdk-pixbuf/io-tiff.c:788
+#: gdk-pixbuf/io-tiff.c:868
 msgid "The TIFF image format"
 msgstr "TIFF प्रतिमा स्वरूप"
 
@@ -883,19 +876,19 @@ msgstr "उर्वरीत (माहीती) साठवता येऊ 
 msgid "The WBMP image format"
 msgstr "WBMP प्रतिमा स्वरूप"
 
-#: gdk-pixbuf/io-xbm.c:304
+#: gdk-pixbuf/io-xbm.c:296
 msgid "Invalid XBM file"
 msgstr "अवैध XBM फाइल"
 
-#: gdk-pixbuf/io-xbm.c:314
+#: gdk-pixbuf/io-xbm.c:306
 msgid "Insufficient memory to load XBM image file"
 msgstr "XBM प्रतिमेची फाइल सुरू करण्यासाठी पुरेशी जागा नाही"
 
-#: gdk-pixbuf/io-xbm.c:462
+#: gdk-pixbuf/io-xbm.c:454
 msgid "Failed to write to temporary file when loading XBM image"
 msgstr "XBM प्रतिमा फाइल सुरु करताना तात्पुरत्या फाइलमध्ये लेखन करतेवेळी असफल"
 
-#: gdk-pixbuf/io-xbm.c:501
+#: gdk-pixbuf/io-xbm.c:493
 msgid "The XBM image format"
 msgstr "XBM प्रतिमा स्वरूप"
 
@@ -938,9 +931,3 @@ msgstr "XPM प्रतिमा सुरु करताना तात्�
 #: gdk-pixbuf/io-xpm.c:817
 msgid "The XPM image format"
 msgstr "XPM प्रतिमा स्वरूप"
-
-#~ msgid "Unsupported animation type"
-#~ msgstr "असमर्थनीय एनिमेशन प्रकार"
-
-#~ msgid "TIFFClose operation failed"
-#~ msgstr "TIFFClose ही क्रिया असफल"

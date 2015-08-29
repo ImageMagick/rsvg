@@ -14,9 +14,7 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -241,7 +239,7 @@ static GdkPixbuf *get_contiguous_pixbuf (guint width,
 					 gboolean has_alpha)
 {
 	guchar *pixels;
-	guint channels, rowstride, bytes;
+	guint channels, rowstride;
 	
 	if (has_alpha) 
 		channels = 4;
@@ -253,12 +251,7 @@ static GdkPixbuf *get_contiguous_pixbuf (guint width,
 	if (rowstride / channels != width)
                 return NULL;                
 
-	bytes = height * rowstride;
-
-        if (bytes / rowstride != height)
-                return NULL;                
-
-        pixels = g_try_malloc (bytes);
+        pixels = g_try_malloc_n (height, rowstride);
 
 	if (!pixels)
 		return NULL;
@@ -983,7 +976,7 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 {
-	static GdkPixbufModulePattern signature[] = {
+	static const GdkPixbufModulePattern signature[] = {
 		{ " \x1\x1", "x  ", 100 },
 		{ " \x1\x9", "x  ", 100 },
 		{ "  \x2", "xz ",  99 }, /* only 99 since .CUR also matches this */
@@ -992,21 +985,21 @@ MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 		{ "  \xb", "xz ", 100 },
 		{ NULL, NULL, 0 }
 	};
-	static gchar * mime_types[] = {
+	static const gchar *mime_types[] = {
 		"image/x-tga",
 		NULL
 	};
-	static gchar * extensions[] = {
+	static const gchar *extensions[] = {
 		"tga",
 		"targa",
 		NULL
 	};
 
 	info->name = "tga";
-	info->signature = signature;
-	info->description = N_("The Targa image format");
-	info->mime_types = mime_types;
-	info->extensions = extensions;
+	info->signature = (GdkPixbufModulePattern *) signature;
+	info->description = NC_("image format", "Targa");
+	info->mime_types = (gchar **) mime_types;
+	info->extensions = (gchar **) extensions;
 	info->flags = GDK_PIXBUF_FORMAT_THREADSAFE;
 	info->license = "LGPL";
 }

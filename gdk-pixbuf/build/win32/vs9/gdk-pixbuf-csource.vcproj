@@ -22,7 +22,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\gdk-pixbuf.vsprops"
+			InheritedPropertySheets=".\gdk-pixbuf-build-defines.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
@@ -45,7 +45,6 @@
 				AdditionalDependencies=""
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/gdk-pixbuf-csource.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -54,7 +53,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			InheritedPropertySheets=".\gdk-pixbuf.vsprops"
+			InheritedPropertySheets=".\gdk-pixbuf-build-defines.vsprops"
 			ConfigurationType="1"
 			CharacterSet="2"
 			>
@@ -75,6 +74,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies=""
 				LinkIncremental="1"
+				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -86,7 +86,7 @@
 		<Configuration
 			Name="Debug|x64"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\gdk-pixbuf.vsprops"
+			InheritedPropertySheets=".\gdk-pixbuf-build-defines.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
@@ -119,7 +119,7 @@
 		<Configuration
 			Name="Release|x64"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\gdk-pixbuf.vsprops"
+			InheritedPropertySheets=".\gdk-pixbuf-build-defines.vsprops"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>

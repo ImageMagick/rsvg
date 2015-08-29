@@ -15,9 +15,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "config.h"
@@ -48,13 +46,15 @@
  * given size, scale an original image to fit, and then return the
  * new pixbuf.
  * 
+ * If the destination pixbuf was created from a readonly source, these
+ * operations will force a copy into a mutable buffer.
  * 
  * Scaling and compositing functions take advantage of MMX hardware
  * acceleration on systems where MMX is supported.  If gdk-pixbuf is built
  * with the Sun mediaLib library, these functions are instead accelerated
  * using mediaLib, which provides hardware acceleration on Intel, AMD,
  * and Sparc chipsets.  If desired, mediaLib support can be turned off by
- * setting the GDK_DISABLE_MEDIALIB environment variable.  
+ * setting the `GDK_DISABLE_MEDIALIB` environment variable.  
  * 
  * 
  * The following example demonstrates handling an expose event by
@@ -66,11 +66,9 @@
  * gdk_pixbuf_composite_color() function has exactly the same effect
  * as calling gdk_pixbuf_scale().
  * 
- * 
- * <example>
- * <title>Handling an expose event.</title>
- * <para>
- * <programlisting>
+ * ## Handling an expose event
+ *
+ * |[
  * gboolean
  * expose_cb (GtkWidget *widget, GdkEventExpose *event, gpointer data)
  * {
@@ -95,9 +93,7 @@
  *   
  *   return TRUE;
  * }
- * </programlisting>
- * </para>
- * </example>
+ * ]|
  */
 
 
@@ -142,6 +138,9 @@ gdk_pixbuf_scale (const GdkPixbuf *src,
 		  double           scale_y,
 		  GdkInterpType    interp_type)
 {
+  const guint8 *src_pixels;
+  guint8 *dest_pixels;
+
   g_return_if_fail (GDK_IS_PIXBUF (src));
   g_return_if_fail (GDK_IS_PIXBUF (dest));
   g_return_if_fail (dest_x >= 0 && dest_x + dest_width <= dest->width);
@@ -150,8 +149,12 @@ gdk_pixbuf_scale (const GdkPixbuf *src,
   offset_x = floor (offset_x + 0.5);
   offset_y = floor (offset_y + 0.5);
 
-  _pixops_scale (dest->pixels, dest->width, dest->height, dest->rowstride,
-                 dest->n_channels, dest->has_alpha, src->pixels, src->width,
+  /* Force an implicit copy */
+  dest_pixels = gdk_pixbuf_get_pixels (dest);
+  src_pixels = gdk_pixbuf_read_pixels (src);
+
+  _pixops_scale (dest_pixels, dest->width, dest->height, dest->rowstride,
+                 dest->n_channels, dest->has_alpha, src_pixels, src->width,
                  src->height, src->rowstride, src->n_channels, src->has_alpha,
                  dest_x, dest_y, dest_width, dest_height, offset_x, offset_y,
                  scale_x, scale_y, (PixopsInterpType)interp_type);
@@ -183,11 +186,8 @@ gdk_pixbuf_scale (const GdkPixbuf *src,
  * image, the data at the edges of the source image is replicated
  * to infinity. 
  *
- * <figure id="pixbuf-composite-diagram">
- *   <title>Compositing of pixbufs</title>
- *   <graphic fileref="composite.png" format="PNG"/>
- * </figure>
- **/
+ * ![](composite.png)
+ */
 void
 gdk_pixbuf_composite (const GdkPixbuf *src,
 		      GdkPixbuf       *dest,
@@ -202,6 +202,9 @@ gdk_pixbuf_composite (const GdkPixbuf *src,
 		      GdkInterpType    interp_type,
 		      int              overall_alpha)
 {
+  const guint8 *src_pixels;
+  guint8 *dest_pixels;
+
   g_return_if_fail (GDK_IS_PIXBUF (src));
   g_return_if_fail (GDK_IS_PIXBUF (dest));
   g_return_if_fail (dest_x >= 0 && dest_x + dest_width <= dest->width);
@@ -211,8 +214,12 @@ gdk_pixbuf_composite (const GdkPixbuf *src,
   offset_x = floor (offset_x + 0.5);
   offset_y = floor (offset_y + 0.5);
 
-  _pixops_composite (dest->pixels, dest->width, dest->height, dest->rowstride,
-                     dest->n_channels, dest->has_alpha, src->pixels,
+  /* Force an implicit copy */
+  dest_pixels = gdk_pixbuf_get_pixels (dest);
+  src_pixels = gdk_pixbuf_read_pixels (src);
+
+  _pixops_composite (dest_pixels, dest->width, dest->height, dest->rowstride,
+                     dest->n_channels, dest->has_alpha, src_pixels,
                      src->width, src->height, src->rowstride, src->n_channels,
                      src->has_alpha, dest_x, dest_y, dest_width, dest_height,
                      offset_x, offset_y, scale_x, scale_y,
@@ -269,6 +276,9 @@ gdk_pixbuf_composite_color (const GdkPixbuf *src,
 			    guint32          color1,
 			    guint32          color2)
 {
+  const guint8 *src_pixels;
+  guint8 *dest_pixels;
+
   g_return_if_fail (GDK_IS_PIXBUF (src));
   g_return_if_fail (GDK_IS_PIXBUF (dest));
   g_return_if_fail (dest_x >= 0 && dest_x + dest_width <= dest->width);
@@ -278,9 +288,13 @@ gdk_pixbuf_composite_color (const GdkPixbuf *src,
   offset_x = floor (offset_x + 0.5);
   offset_y = floor (offset_y + 0.5);
   
-  _pixops_composite_color (dest->pixels, dest_width, dest_height,
+  /* Force an implicit copy */
+  dest_pixels = gdk_pixbuf_get_pixels (dest);
+  src_pixels = gdk_pixbuf_read_pixels (src);
+
+  _pixops_composite_color (dest_pixels, dest_width, dest_height,
 			   dest->rowstride, dest->n_channels, dest->has_alpha,
-			   src->pixels, src->width, src->height,
+			   src_pixels, src->width, src->height,
 			   src->rowstride, src->n_channels, src->has_alpha,
 			   dest_x, dest_y, dest_width, dest_height, offset_x,
 			   offset_y, scale_x, scale_y,
@@ -392,8 +406,8 @@ gdk_pixbuf_composite_color_simple (const GdkPixbuf *src,
  * Rotates a pixbuf by a multiple of 90 degrees, and returns the
  * result in a new pixbuf.
  *
- * Returns: (transfer full): the new #GdkPixbuf, or %NULL if not enough memory could be
- * allocated for it.
+ * Returns: (nullable) (transfer full): the new #GdkPixbuf, or %NULL
+ * if not enough memory could be allocated for it.
  *
  * Since: 2.6
  */
@@ -401,9 +415,14 @@ GdkPixbuf *
 gdk_pixbuf_rotate_simple (const GdkPixbuf   *src,
 			  GdkPixbufRotation  angle)
 {
+  const guint8 *src_pixels;
+  guint8 *dest_pixels;
   GdkPixbuf *dest;
-  guchar *p, *q;
+  const guchar *p;
+  guchar *q;
   gint x, y;
+
+  src_pixels = gdk_pixbuf_read_pixels (src);
 
   switch (angle % 360)
     {
@@ -419,12 +438,14 @@ gdk_pixbuf_rotate_simple (const GdkPixbuf   *src,
       if (!dest)
 	return NULL;
 
+      dest_pixels = gdk_pixbuf_get_pixels (dest);
+
       for (y = 0; y < src->height; y++) 
 	{ 
 	  for (x = 0; x < src->width; x++) 
 	    { 
-	      p = src->pixels + OFFSET (src, x, y); 
-	      q = dest->pixels + OFFSET (dest, y, src->width - x - 1); 
+	      p = src_pixels + OFFSET (src, x, y); 
+	      q = dest_pixels + OFFSET (dest, y, src->width - x - 1); 
 	      memcpy (q, p, dest->n_channels);
 	    }
 	} 
@@ -438,12 +459,14 @@ gdk_pixbuf_rotate_simple (const GdkPixbuf   *src,
       if (!dest)
 	return NULL;
 
+      dest_pixels = gdk_pixbuf_get_pixels (dest);
+
       for (y = 0; y < src->height; y++) 
 	{ 
 	  for (x = 0; x < src->width; x++) 
 	    { 
-	      p = src->pixels + OFFSET (src, x, y); 
-	      q = dest->pixels + OFFSET (dest, src->width - x - 1, src->height - y - 1); 
+	      p = src_pixels + OFFSET (src, x, y); 
+	      q = dest_pixels + OFFSET (dest, src->width - x - 1, src->height - y - 1); 
 	      memcpy (q, p, dest->n_channels);
 	    }
 	} 
@@ -457,12 +480,14 @@ gdk_pixbuf_rotate_simple (const GdkPixbuf   *src,
       if (!dest)
 	return NULL;
 
+      dest_pixels = gdk_pixbuf_get_pixels (dest);
+
       for (y = 0; y < src->height; y++) 
 	{ 
 	  for (x = 0; x < src->width; x++) 
 	    { 
-	      p = src->pixels + OFFSET (src, x, y); 
-	      q = dest->pixels + OFFSET (dest, src->height - y - 1, x); 
+	      p = src_pixels + OFFSET (src, x, y); 
+	      q = dest_pixels + OFFSET (dest, src->height - y - 1, x); 
 	      memcpy (q, p, dest->n_channels);
 	    }
 	} 
@@ -485,8 +510,8 @@ gdk_pixbuf_rotate_simple (const GdkPixbuf   *src,
  * Flips a pixbuf horizontally or vertically and returns the
  * result in a new pixbuf.
  *
- * Returns: (transfer full): the new #GdkPixbuf, or %NULL if not enough memory could be
- * allocated for it.
+ * Returns: (nullable) (transfer full): the new #GdkPixbuf, or %NULL
+ * if not enough memory could be allocated for it.
  *
  * Since: 2.6
  */
@@ -494,8 +519,11 @@ GdkPixbuf *
 gdk_pixbuf_flip (const GdkPixbuf *src,
 		 gboolean         horizontal)
 {
+  const guint8 *src_pixels;
+  guint8 *dest_pixels;
   GdkPixbuf *dest;
-  guchar *p, *q;
+  const guchar *p;
+  guchar *q;
   gint x, y;
 
   dest = gdk_pixbuf_new (src->colorspace, 
@@ -506,12 +534,15 @@ gdk_pixbuf_flip (const GdkPixbuf *src,
   if (!dest)
     return NULL;
 
+  dest_pixels = gdk_pixbuf_get_pixels (dest);
+  src_pixels = gdk_pixbuf_read_pixels (src);
+
   if (!horizontal) /* flip vertical */
     {
       for (y = 0; y < dest->height; y++)
 	{
-	  p = src->pixels + OFFSET (src, 0, y);
-	  q = dest->pixels + OFFSET (dest, 0, dest->height - y - 1);
+	  p = src_pixels + OFFSET (src, 0, y);
+	  q = dest_pixels + OFFSET (dest, 0, dest->height - y - 1);
 	  memcpy (q, p, dest->rowstride);
 	}
     }
@@ -521,8 +552,8 @@ gdk_pixbuf_flip (const GdkPixbuf *src,
 	{
 	  for (x = 0; x < dest->width; x++)
 	    {
-	      p = src->pixels + OFFSET (src, x, y);
-	      q = dest->pixels + OFFSET (dest, dest->width - x - 1, y);
+	      p = src_pixels + OFFSET (src, x, y);
+	      q = dest_pixels + OFFSET (dest, dest->width - x - 1, y);
 	      memcpy (q, p, dest->n_channels);
 	    }
 	}

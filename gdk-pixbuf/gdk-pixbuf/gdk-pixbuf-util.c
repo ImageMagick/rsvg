@@ -16,14 +16,12 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "config.h"
 #include <string.h>
-//#include <libintl.h>
+#include <libintl.h>
 
 #include "gdk-pixbuf-transform.h"
 #include "gdk-pixbuf-private.h"
@@ -67,11 +65,15 @@ gdk_pixbuf_add_alpha (const GdkPixbuf *pixbuf,
 {
 	GdkPixbuf *new_pixbuf;
 	int x, y;
+	const guint8 *src_pixels;
+	guint8 *ret_pixels;
 
 	g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), NULL);
 	g_return_val_if_fail (pixbuf->colorspace == GDK_COLORSPACE_RGB, NULL);
 	g_return_val_if_fail (pixbuf->n_channels == 3 || pixbuf->n_channels == 4, NULL);
 	g_return_val_if_fail (pixbuf->bits_per_sample == 8, NULL);
+
+	src_pixels = gdk_pixbuf_read_pixels (pixbuf);
 
 	if (pixbuf->has_alpha) {
 		new_pixbuf = gdk_pixbuf_copy (pixbuf);
@@ -87,12 +89,15 @@ gdk_pixbuf_add_alpha (const GdkPixbuf *pixbuf,
 	if (!new_pixbuf)
 		return NULL;
 
+	ret_pixels = gdk_pixbuf_get_pixels (new_pixbuf);
+
 	for (y = 0; y < pixbuf->height; y++) {
-		guchar *src, *dest;
+		const guchar *src;
+		guchar *dest;
 		guchar tr, tg, tb;
 
-		src = pixbuf->pixels + y * pixbuf->rowstride;
-		dest = new_pixbuf->pixels + y * new_pixbuf->rowstride;
+		src = src_pixels + y * pixbuf->rowstride;
+		dest = ret_pixels + y * new_pixbuf->rowstride;
                 
                 if (pixbuf->has_alpha) {
                         /* Just subst color, we already copied everything else */
@@ -210,9 +215,9 @@ gdk_pixbuf_saturate_and_pixelate(const GdkPixbuf *src,
         } else {
                 int i, j, t;
                 int width, height, has_alpha, src_rowstride, dest_rowstride, bytes_per_pixel;
-		guchar *src_line;
+		const guchar *src_line;
 		guchar *dest_line;
-                guchar *src_pixel;
+                const guchar *src_pixel;
 		guchar *dest_pixel;
                 guchar intensity;
 
@@ -223,8 +228,8 @@ gdk_pixbuf_saturate_and_pixelate(const GdkPixbuf *src,
                 src_rowstride = gdk_pixbuf_get_rowstride (src);
                 dest_rowstride = gdk_pixbuf_get_rowstride (dest);
                 
-                src_line = gdk_pixbuf_get_pixels (src);
                 dest_line = gdk_pixbuf_get_pixels (dest);
+                src_line = gdk_pixbuf_read_pixels (src);
 		
 #define DARK_FACTOR 0.7
 #define INTENSITY(r, g, b) ((r) * 0.30 + (g) * 0.59 + (b) * 0.11)
@@ -344,25 +349,28 @@ gdk_pixbuf_apply_embedded_orientation (GdkPixbuf *src)
         return dest;
 }
 
-#ifdef G_OS_WIN32
+#ifdef GDK_PIXBUF_RELOCATABLE
 
 static const gchar *
 get_localedir (void)
 {
     gchar *temp;
-    gchar *retval;
     
-    /* In gdk-pixbuf-io.c */
-    extern char *_gdk_pixbuf_win32_get_toplevel (void);
+    temp = g_build_filename (gdk_pixbuf_get_toplevel (), "share/locale", NULL);
 
-    temp = g_build_filename (_gdk_pixbuf_win32_get_toplevel (), "share/locale", NULL);
-
-    /* The localedir is passed to bindtextdomain() which isn't
-     * UTF-8-aware.
-     */
-    retval = g_win32_locale_filename_from_utf8 (temp);
-    g_free (temp);
-    return retval;
+#ifdef G_OS_WIN32
+    {
+      gchar *retval;
+      /* The localedir is passed to bindtextdomain() which isn't
+      * UTF-8-aware.
+      */
+      retval = g_win32_locale_filename_from_utf8 (temp);
+      g_free (temp);
+      return retval;
+    }
+#else
+    return temp;
+#endif
 }
 
 #undef GDK_PIXBUF_LOCALEDIR
@@ -370,18 +378,22 @@ get_localedir (void)
 
 #endif
 
-const gchar *
-gdk_pixbuf_gettext (const gchar *msgid)
+void
+_gdk_pixbuf_init_gettext (void)
 {
         static gsize gettext_initialized = FALSE;
 
-        /*if (G_UNLIKELY (g_once_init_enter (&gettext_initialized))) {
+        if (G_UNLIKELY (g_once_init_enter (&gettext_initialized))) {
                 bindtextdomain (GETTEXT_PACKAGE, GDK_PIXBUF_LOCALEDIR);
 #ifdef HAVE_BIND_TEXTDOMAIN_CODESET
                 bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 #endif
                 g_once_init_leave (&gettext_initialized, TRUE);
-        }*/
+        }
+}
 
+const gchar *
+gdk_pixbuf_gettext (const gchar *msgid)
+{
         return g_dgettext (GETTEXT_PACKAGE, msgid);
 }

@@ -1,7 +1,7 @@
-include $(top_srcdir)/Makefile.decl
 -include $(INTROSPECTION_MAKEFILE)
 
 INTROSPECTION_GIRS =
+INTROSPECTION_SCANNER_ENV = CC="$(CC)"
 
 SUBDIRS = pixops
 
@@ -513,7 +513,7 @@ noinst_LTLIBRARIES =		\
 builtin_objs = @INCLUDED_LOADER_OBJ@ $(STATIC_PIXDATA_LIB)
 
 DEPS = libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la
-INCLUDES = \
+AM_CPPFLAGS = \
 	-DG_LOG_DOMAIN=\"GdkPixbuf\"					\
 	-DGDK_PIXBUF_COMPILATION					\
 	-I$(top_srcdir) -I$(top_builddir) 				\
@@ -526,9 +526,10 @@ INCLUDES = \
 	$(INCLUDED_LOADER_DEFINE) 					\
 	$(GDK_PIXBUF_DEBUG_FLAGS)					\
 	$(GDK_PIXBUF_DEP_CFLAGS)					\
-	-DGDK_PIXBUF_ENABLE_BACKEND
+	-DGDK_PIXBUF_ENABLE_BACKEND					\
+	-DPIXBUF_LIBDIR=\"$(loaderdir)\"				\
+	-DBUILT_MODULES_DIR=\"$(srcdir)/.libs\"
 
-AM_CPPFLAGS = "-DPIXBUF_LIBDIR=\"$(loaderdir)\"" "-DBUILT_MODULES_DIR=\"$(srcdir)/.libs\""
 LDADDS = libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la $(GDK_PIXBUF_DEP_LIBS)
 
 noinst_PROGRAMS = test-gdk-pixbuf
@@ -552,7 +553,6 @@ gdk_pixbuf_query_loaders_SOURCES = queryloaders.c
 #
 libgdk_pixbufincludedir = $(includedir)/gdk-pixbuf-2.0/gdk-pixbuf
 libgdk_pixbuf_2_0_la_SOURCES =   \
-	gdk-pixbuf-i18n.h	 \
 	gdk-pixbuf.c		 \
 	gdk-pixbuf-animation.c	 \
 	gdk-pixbuf-data.c	 \
@@ -580,6 +580,7 @@ libgdk_pixbuf_2_0_la_DEPENDENCIES = pixops/libpixops.la $(builtin_objs) $(gdk_pi
 
 gdk_pixbuf_headers = 			\
 	gdk-pixbuf.h			\
+	gdk-pixbuf-autocleanups.h	\
 	gdk-pixbuf-core.h		\
 	gdk-pixbuf-transform.h		\
 	gdk-pixbuf-io.h			\
@@ -671,7 +672,7 @@ distclean-local:
 	  rm -f $(MAINTAINERCLEANFILES); \
 	fi
 
-EXTRA_DIST +=					\
+EXTRA_DIST =					\
         gdk-pixbuf-csource.1			\
 	makefile.msc				\
 	gdk-pixbuf.symbols			\
@@ -720,7 +721,7 @@ dist-hook: ../build/win32/vs9/gdk-pixbuf.vcproj ../build/win32/vs10/gdk-pixbuf.v
 if HAVE_INTROSPECTION
 
 GdkPixbuf-2.0.gir: libgdk_pixbuf-2.0.la Makefile
-GdkPixbuf_2_0_gir_SCANNERFLAGS = --warn-all --strip-prefix=Gdk --c-include="gdk-pixbuf/gdk-pixbuf.h"
+GdkPixbuf_2_0_gir_SCANNERFLAGS = --warn-all --identifier-prefix=Gdk --c-include="gdk-pixbuf/gdk-pixbuf.h"
 GdkPixbuf_2_0_gir_EXPORT_PACKAGES = gdk-pixbuf-2.0
 GdkPixbuf_2_0_gir_INCLUDES = GModule-2.0 Gio-2.0
 GdkPixbuf_2_0_gir_LIBS = libgdk_pixbuf-2.0.la

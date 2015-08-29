@@ -21,9 +21,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 
@@ -192,16 +190,13 @@ convert_cmyk_to_rgb (struct jpeg_decompress_struct *cinfo,
 			m = p[1];
 			y = p[2];
 			k = p[3];
-			if (cinfo->saw_Adobe_marker) {
-				p[0] = k*c / 255;
-				p[1] = k*m / 255;
-				p[2] = k*y / 255;
-			}
-			else {
-				p[0] = (255 - k)*(255 - c) / 255;
-				p[1] = (255 - k)*(255 - m) / 255;
-				p[2] = (255 - k)*(255 - y) / 255;
-			}
+
+			/* We now assume that all CMYK JPEG files
+			 * use inverted CMYK, as Photoshop does
+			 * See https://bugzilla.gnome.org/show_bug.cgi?id=618096 */
+			p[0] = k*c / 255;
+			p[1] = k*m / 255;
+			p[2] = k*y / 255;
 			p[3] = 255;
 			p += 4;
 		}
@@ -472,18 +467,23 @@ jpeg_parse_exif_app1 (JpegExifContext *context, jpeg_saved_marker_ptr marker)
 		guint tag   = de_get16(&marker->data[i + 0], endian);
 		guint type  = de_get16(&marker->data[i + 2], endian);
 		guint count = de_get32(&marker->data[i + 4], endian);
-		/* values of types small enough to fit are stored directly in the (first) bytes of the Value Offset field */
-		guint short_value = de_get16(&marker->data[i + 8], endian);
 
 		/* orientation tag? */
 		if (tag == 0x112){
 
-			/* The orientation field should consist of a single 2-byte integer */
-			if (type != 0x3 || count != 1)
-				continue;
+			/* The orientation field should consist of a single 2-byte integer,
+			 * but might be a signed long.
+			 * Values of types smaller than 4 bytes are stored directly in the
+			 * Value Offset field */
+			if (type == 0x3 && count == 1) {
+				guint short_value = de_get16(&marker->data[i + 8], endian);
 
-			/* get the orientation value */
-			context->orientation = short_value <= 8 ? short_value : 0;
+				context->orientation = short_value <= 8 ? short_value : 0;
+			} else if (type == 0x9 && count == 1) {
+				guint long_value = de_get32(&marker->data[i + 8], endian);
+
+				context->orientation = long_value <= 8 ? long_value : 0;
+			}
 		}
 		/* move the pointer to the next 12-byte tag field. */
 		i = i + 12;
@@ -512,10 +512,7 @@ jpeg_parse_exif (JpegExifContext *context, j_decompress_ptr cinfo)
 static void
 jpeg_destroy_exif_context (JpegExifContext *context)
 {
-	if (context == NULL)
-		return;
 	g_free (context->icc_profile);
-	g_free (context);
 }
 
 /* Shared library entry point */
@@ -524,6 +521,7 @@ gdk_pixbuf__jpeg_image_load (FILE *f, GError **error)
 {
 	gint   i;
 	char   otag_str[5];
+	char  *density_str;
 	GdkPixbuf * volatile pixbuf = NULL;
 	guchar *dptr;
 	guchar *lines[4]; /* Used to expand rows, via rec_outbuf_height, 
@@ -536,7 +534,7 @@ gdk_pixbuf__jpeg_image_load (FILE *f, GError **error)
 	struct error_handler_data jerr;
 	stdio_src_ptr src;
 	gchar *icc_profile_base64;
-	JpegExifContext *exif_context;
+	JpegExifContext exif_context = { 0, };
 
 	/* setup error handler */
 	cinfo.err = jpeg_std_error (&jerr.pub);
@@ -550,6 +548,7 @@ gdk_pixbuf__jpeg_image_load (FILE *f, GError **error)
 			g_object_unref (pixbuf);
 
 		jpeg_destroy_decompress (&cinfo);
+		jpeg_destroy_exif_context (&exif_context);
 
 		/* error should have been set by fatal_error_handler () */
 		return NULL;
@@ -580,8 +579,7 @@ gdk_pixbuf__jpeg_image_load (FILE *f, GError **error)
 	jpeg_read_header (&cinfo, TRUE);
 
 	/* parse exif data */
-	exif_context = g_new0 (JpegExifContext, 1);
-	jpeg_parse_exif (exif_context, &cinfo);
+	jpeg_parse_exif (&exif_context, &cinfo);
 	
 	jpeg_start_decompress (&cinfo);
 	cinfo.do_fancy_upsampling = FALSE;
@@ -592,8 +590,6 @@ gdk_pixbuf__jpeg_image_load (FILE *f, GError **error)
 				 8, cinfo.output_width, cinfo.output_height);
 	      
 	if (!pixbuf) {
-		jpeg_destroy_decompress (&cinfo);
-
                 /* broken check for *error == NULL for robustness against
                  * crappy JPEG library
                  */
@@ -603,19 +599,40 @@ gdk_pixbuf__jpeg_image_load (FILE *f, GError **error)
                                              GDK_PIXBUF_ERROR_INSUFFICIENT_MEMORY,
                                              _("Insufficient memory to load image, try exiting some applications to free memory"));
                 }
-                
-		return NULL;
+               
+		goto out; 
+	}
+
+	switch (cinfo.density_unit) {
+	case 1:
+		/* Dots per inch (no conversion required) */
+		density_str = g_strdup_printf ("%d", cinfo.X_density);
+		gdk_pixbuf_set_option (pixbuf, "x-dpi", density_str);
+		g_free (density_str);
+		density_str = g_strdup_printf ("%d", cinfo.Y_density);
+		gdk_pixbuf_set_option (pixbuf, "y-dpi", density_str);
+		g_free (density_str);
+		break;
+	case 2:
+		/* Dots per cm - convert into dpi */
+		density_str = g_strdup_printf ("%d", DPCM_TO_DPI (cinfo.X_density));
+		gdk_pixbuf_set_option (pixbuf, "x-dpi", density_str);
+		g_free (density_str);
+		density_str = g_strdup_printf ("%d", DPCM_TO_DPI (cinfo.Y_density));
+		gdk_pixbuf_set_option (pixbuf, "y-dpi", density_str);
+		g_free (density_str);
+		break;
 	}
 
 	/* if orientation tag was found */
-	if (exif_context->orientation != 0) {
-		g_snprintf (otag_str, sizeof (otag_str), "%d", exif_context->orientation);
+	if (exif_context.orientation != 0) {
+		g_snprintf (otag_str, sizeof (otag_str), "%d", exif_context.orientation);
 		gdk_pixbuf_set_option (pixbuf, "orientation", otag_str);
 	}
 
 	/* if icc profile was found */
-	if (exif_context->icc_profile != NULL) {
-		icc_profile_base64 = g_base64_encode ((const guchar *) exif_context->icc_profile, exif_context->icc_profile_size);
+	if (exif_context.icc_profile != NULL) {
+		icc_profile_base64 = g_base64_encode ((const guchar *) exif_context.icc_profile, exif_context.icc_profile_size);
 		gdk_pixbuf_set_option (pixbuf, "icc-profile", icc_profile_base64);
 		g_free (icc_profile_base64);
 	}
@@ -644,6 +661,7 @@ gdk_pixbuf__jpeg_image_load (FILE *f, GError **error)
 		      break;
 		    default:
 		      g_object_unref (pixbuf);
+		      pixbuf = NULL;
 		      if (error && *error == NULL) {
                         g_set_error (error,
                                      GDK_PIXBUF_ERROR,
@@ -651,15 +669,14 @@ gdk_pixbuf__jpeg_image_load (FILE *f, GError **error)
 				     _("Unsupported JPEG color space (%s)"),
 				     colorspace_name (cinfo.out_color_space)); 
 		      }
-                
-		      jpeg_destroy_decompress (&cinfo);
-		      return NULL;
+               	      goto out; 
 		}
 	}
 
+out:
 	jpeg_finish_decompress (&cinfo);
 	jpeg_destroy_decompress (&cinfo);
-	jpeg_destroy_exif_context (exif_context);
+	jpeg_destroy_exif_context (&exif_context);
 
 	return pixbuf;
 }
@@ -907,7 +924,9 @@ gdk_pixbuf__jpeg_image_load_increment (gpointer data,
 	const guchar    *bufhd;
 	gint             width, height;
 	char             otag_str[5];
-	JpegExifContext *exif_context = NULL;
+	gchar 		*icc_profile_base64;
+	char            *density_str;
+	JpegExifContext  exif_context = { 0, };
 	gboolean	 retval;
 
 	g_return_val_if_fail (context != NULL, FALSE);
@@ -946,8 +965,6 @@ gdk_pixbuf__jpeg_image_load_increment (gpointer data,
 		retval = TRUE;
 		goto out;
 	}
-	/* collect exif data */
-	exif_context = g_new0 (JpegExifContext, 1);
 
 	last_num_left = num_left;
 	last_bytes_left = 0;
@@ -996,6 +1013,7 @@ gdk_pixbuf__jpeg_image_load_increment (gpointer data,
 			int rc;
 		
 			jpeg_save_markers (cinfo, JPEG_APP0+1, 0xffff);
+			jpeg_save_markers (cinfo, JPEG_APP0+2, 0xffff);
 			rc = jpeg_read_header (cinfo, TRUE);
 			context->src_initialized = TRUE;
 			
@@ -1005,7 +1023,7 @@ gdk_pixbuf__jpeg_image_load_increment (gpointer data,
 			context->got_header = TRUE;
 
 			/* parse exif data */
-			jpeg_parse_exif (exif_context, cinfo);
+			jpeg_parse_exif (&exif_context, cinfo);
 		
 			width = cinfo->image_width;
 			height = cinfo->image_height;
@@ -1045,12 +1063,40 @@ gdk_pixbuf__jpeg_image_load_increment (gpointer data,
                                 retval = FALSE;
 				goto out;
 			}
+
+			switch (cinfo->density_unit) {
+			case 1:
+				/* Dots per inch (no conversion required) */
+				density_str = g_strdup_printf ("%d", cinfo->X_density);
+				gdk_pixbuf_set_option (context->pixbuf, "x-dpi", density_str);
+				g_free (density_str);
+				density_str = g_strdup_printf ("%d", cinfo->Y_density);
+				gdk_pixbuf_set_option (context->pixbuf, "y-dpi", density_str);
+				g_free (density_str);
+				break;
+			case 2:
+				/* Dots per cm - convert into dpi */
+				density_str = g_strdup_printf ("%d", DPCM_TO_DPI (cinfo->X_density));
+				gdk_pixbuf_set_option (context->pixbuf, "x-dpi", density_str);
+				g_free (density_str);
+				density_str = g_strdup_printf ("%d", DPCM_TO_DPI (cinfo->Y_density));
+				gdk_pixbuf_set_option (context->pixbuf, "y-dpi", density_str);
+				g_free (density_str);
+				break;
+			}
 		
 		        /* if orientation tag was found set an option to remember its value */
-			if (exif_context->orientation != 0) {
-				g_snprintf (otag_str, sizeof (otag_str), "%d", exif_context->orientation);
+			if (exif_context.orientation != 0) {
+				g_snprintf (otag_str, sizeof (otag_str), "%d", exif_context.orientation);
 		                gdk_pixbuf_set_option (context->pixbuf, "orientation", otag_str);
 		        }
+			/* if icc profile was found */
+			if (exif_context.icc_profile != NULL) {
+				icc_profile_base64 = g_base64_encode ((const guchar *) exif_context.icc_profile, exif_context.icc_profile_size);
+				gdk_pixbuf_set_option (context->pixbuf, "icc-profile", icc_profile_base64);
+				g_free (icc_profile_base64);
+			}
+
 
 			/* Use pixbuf buffer to store decompressed data */
 			context->dptr = context->pixbuf->pixels;
@@ -1127,7 +1173,7 @@ gdk_pixbuf__jpeg_image_load_increment (gpointer data,
 		}
 	}
 out:
-	jpeg_destroy_exif_context (exif_context);
+	jpeg_destroy_exif_context (&exif_context);
 	return retval;
 }
 
@@ -1226,6 +1272,8 @@ real_save_jpeg (GdkPixbuf          *pixbuf,
        int n_channels;
        struct error_handler_data jerr;
        ToFunctionDestinationManager to_callback_destmgr;
+       int x_density = 0;
+       int y_density = 0;
        gchar *icc_profile = NULL;
        gchar *data;
        gint retval = TRUE;
@@ -1264,6 +1312,48 @@ real_save_jpeg (GdkPixbuf          *pixbuf,
                                                     GDK_PIXBUF_ERROR_BAD_OPTION,
                                                     _("JPEG quality must be a value between 0 and 100; value '%d' is not allowed."),
                                                     quality);
+
+                                       retval = FALSE;
+                                       goto cleanup;
+                               }
+                       } else if (strcmp (*kiter, "x-dpi") == 0) {
+                               char *endptr = NULL;
+                               x_density = strtol (*viter, &endptr, 10);
+                               if (endptr == *viter)
+                                       x_density = -1;
+
+                               if (x_density <= 0 ||
+                                   x_density > 65535) {
+                                       /* This is a user-visible error;
+                                        * lets people skip the range-checking
+                                        * in their app.
+                                        */
+                                       g_set_error (error,
+                                                    GDK_PIXBUF_ERROR,
+                                                    GDK_PIXBUF_ERROR_BAD_OPTION,
+                                                    _("JPEG x-dpi must be a value between 1 and 65535; value '%s' is not allowed."),
+                                                    *viter);
+
+                                       retval = FALSE;
+                                       goto cleanup;
+                               }
+                       } else if (strcmp (*kiter, "y-dpi") == 0) {
+                               char *endptr = NULL;
+                               y_density = strtol (*viter, &endptr, 10);
+                               if (endptr == *viter)
+                                       y_density = -1;
+
+                               if (y_density <= 0 ||
+                                   y_density > 65535) {
+                                       /* This is a user-visible error;
+                                        * lets people skip the range-checking
+                                        * in their app.
+                                        */
+                                       g_set_error (error,
+                                                    GDK_PIXBUF_ERROR,
+                                                    GDK_PIXBUF_ERROR_BAD_OPTION,
+                                                    _("JPEG y-dpi must be a value between 1 and 65535; value '%s' is not allowed."),
+                                                    *viter);
 
                                        retval = FALSE;
                                        goto cleanup;
@@ -1354,6 +1444,13 @@ real_save_jpeg (GdkPixbuf          *pixbuf,
        /* set up jepg compression parameters */
        jpeg_set_defaults (&cinfo);
        jpeg_set_quality (&cinfo, quality, TRUE);
+
+       /* set density information */
+       if (x_density > 0 && y_density > 0) {
+           cinfo.density_unit = 1; /* Dots per inch */
+           cinfo.X_density = x_density;
+           cinfo.Y_density = y_density;
+       }
 
        jpeg_start_compress (&cinfo, TRUE);
 
@@ -1458,15 +1555,15 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 {
-	static GdkPixbufModulePattern signature[] = {
+	static const GdkPixbufModulePattern signature[] = {
 		{ "\xff\xd8", NULL, 100 },
 		{ NULL, NULL, 0 }
 	};
-	static gchar * mime_types[] = {
+	static const gchar *mime_types[] = {
 		"image/jpeg",
 		NULL
 	};
-	static gchar * extensions[] = {
+	static const gchar *extensions[] = {
 		"jpeg",
 		"jpe",
 		"jpg",
@@ -1474,10 +1571,10 @@ MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 	};
 
 	info->name = "jpeg";
-	info->signature = signature;
-	info->description = N_("The JPEG image format");
-	info->mime_types = mime_types;
-	info->extensions = extensions;
+	info->signature = (GdkPixbufModulePattern *) signature;
+	info->description = NC_("image format", "JPEG");
+	info->mime_types = (gchar **) mime_types;
+	info->extensions = (gchar **) extensions;
 	info->flags = GDK_PIXBUF_FORMAT_WRITABLE | GDK_PIXBUF_FORMAT_THREADSAFE;
 	info->license = "LGPL";
 }

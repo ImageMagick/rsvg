@@ -17,9 +17,7 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "config.h"
@@ -374,7 +372,7 @@ int main (int argc, char **argv)
         else {
                 char *cwd = g_get_current_dir ();
 
-                for (i = 1; i < argc; i++) {
+                for (i = first_file; i < argc; i++) {
                         char *infilename = argv[i];
 #ifdef G_OS_WIN32
                         infilename = g_locale_to_utf8 (infilename,

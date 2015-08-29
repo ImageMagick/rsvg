@@ -21,9 +21,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef GDK_PIXBUF_IO_H
@@ -60,6 +58,14 @@ gchar     *gdk_pixbuf_format_get_license     (GdkPixbufFormat *format);
 GdkPixbufFormat *gdk_pixbuf_get_file_info    (const gchar     *filename,
 					      gint            *width, 
 					      gint            *height);
+void             gdk_pixbuf_get_file_info_async  (const gchar          *filename,
+						  GCancellable         *cancellable,
+						  GAsyncReadyCallback   callback,
+						  gpointer              user_data);
+GdkPixbufFormat *gdk_pixbuf_get_file_info_finish (GAsyncResult         *async_result,
+						  gint                 *width,
+						  gint                 *height,
+						  GError              **error);
 
 GdkPixbufFormat *gdk_pixbuf_format_copy (const GdkPixbufFormat *format);
 void             gdk_pixbuf_format_free (GdkPixbufFormat       *format);
@@ -80,7 +86,7 @@ void             gdk_pixbuf_format_free (GdkPixbufFormat       *format);
  * The function is expected to set @width and @height to the desired
  * size to which the image should be scaled. If a module has no efficient 
  * way to achieve the desired scaling during the loading of the image, it may
- * either ignore the size request, or only approximate it -- &gdk-pixbuf; will
+ * either ignore the size request, or only approximate it - gdk-pixbuf will
  * then perform the required scaling on the completely loaded image. 
  * 
  * If the function sets @width or @height to zero, the module should interpret
@@ -153,13 +159,13 @@ typedef void (* GdkPixbufModuleUpdatedFunc)  (GdkPixbuf *pixbuf,
  * Each prefix has an associated integer that describes the relevance of 
  * the prefix, with 0 meaning a mismatch and 100 a "perfect match".
  * 
- * Starting with &gdk-pixbuf; 2.8, the first byte of the mask may be '*', 
+ * Starting with gdk-pixbuf 2.8, the first byte of the mask may be '*', 
  * indicating an unanchored pattern that matches not only at the beginning, 
  * but also in the middle. Versions prior to 2.8 will interpret the '*'
  * like an 'x'. 
  * 
  * The signature of a module is stored as an array of 
- * #GdkPixbufModulePattern<!-- -->s. The array is terminated by a pattern
+ * #GdkPixbufModulePatterns. The array is terminated by a pattern
  * where the @prefix is %NULL.
  * 
  * 
@@ -291,7 +297,7 @@ gboolean gdk_pixbuf_set_option  (GdkPixbuf   *pixbuf,
  * GdkPixbufFormatFlags:
  * @GDK_PIXBUF_FORMAT_WRITABLE: the module can write out images in the format.
  * @GDK_PIXBUF_FORMAT_SCALABLE: the image format is scalable
- * @GDK_PIXBUF_FORMAT_THREADSAFE: the module is threadsafe. &gdk-pixbuf;
+ * @GDK_PIXBUF_FORMAT_THREADSAFE: the module is threadsafe. gdk-pixbuf
  *     ignores modules that are not marked as threadsafe. (Since 2.28).
  * 
  * Flags which allow a module to specify further details about the supported

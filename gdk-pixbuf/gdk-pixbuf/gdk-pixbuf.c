@@ -18,9 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "config.h"
@@ -55,18 +53,15 @@
  * in %NULL as the destroy notification function so that the data
  * will not be freed.
  * 
- * 
  * The gdk_pixbuf_new() function can be used as a convenience to
  * create a pixbuf with an empty buffer.  This is equivalent to
- * allocating a data buffer using <function>malloc()</function> and 
- * then wrapping it with gdk_pixbuf_new_from_data(). The gdk_pixbuf_new() 
- * function will compute an optimal rowstride so that rendering can be 
- * performed with an efficient algorithm.
- * 
+ * allocating a data buffer using malloc() and then wrapping it with
+ * gdk_pixbuf_new_from_data(). The gdk_pixbuf_new() function will
+ * compute an optimal rowstride so that rendering can be performed
+ * with an efficient algorithm.
  * 
  * As a special case, you can use the gdk_pixbuf_new_from_xpm_data()
  * function to create a pixbuf from inline XPM image data.
- * 
  * 
  * You can also copy an existing pixbuf with the gdk_pixbuf_copy()
  * function.  This is not the same as just doing a g_object_ref()
@@ -89,25 +84,19 @@
  * its reference count drops to zero.  Newly-created #GdkPixbuf
  * structures start with a reference count of one.
  * 
+ * > As #GdkPixbuf is derived from #GObject now, gdk_pixbuf_ref() and
+ * > gdk_pixbuf_unref() are deprecated in favour of g_object_ref()
+ * > and g_object_unref() resp.
  * 
- * <note>
- * As #GdkPixbuf is derived from #GObject now, gdk_pixbuf_ref() and
- * gdk_pixbuf_unref() are deprecated in favour of g_object_ref()
- * and g_object_unref () resp.
- * </note>
- * 
- * <emphasis>Finalizing</emphasis> a pixbuf means to free its pixel
- * data and to free the #GdkPixbuf structure itself.  Most of the
- * library functions that create #GdkPixbuf structures create the
- * pixel data by themselves and define the way it should be freed;
- * you do not need to worry about those.  The only function that lets
- * you specify how to free the pixel data is
- * gdk_pixbuf_new_from_data().  Since you pass it a pre-allocated
- * pixel buffer, you must also specify a way to free that data.  This
- * is done with a function of type #GdkPixbufDestroyNotify.  When a
- * pixbuf created with gdk_pixbuf_new_from_data() is finalized, your
- * destroy notification function will be called, and it is its
- * responsibility to free the pixel array.
+ * Finalizing a pixbuf means to free its pixel data and to free the
+ * #GdkPixbuf structure itself.  Most of the library functions that
+ * create #GdkPixbuf structures create the pixel data by themselves
+ * and define the way it should be freed; you do not need to worry
+ * about those.
+ *
+ * To provide preallocated pixel data, use
+ * gdk_pixbuf_new_from_bytes().  The gdk_pixbuf_new_from_data() API is
+ * an older variant that predates the existence of #GBytes.
  */
 
 static void gdk_pixbuf_finalize     (GObject        *object);
@@ -131,7 +120,8 @@ enum
   PROP_WIDTH,
   PROP_HEIGHT,
   PROP_ROWSTRIDE,
-  PROP_PIXELS
+  PROP_PIXELS,
+  PROP_PIXEL_BYTES
 };
 
 static void gdk_pixbuf_icon_iface_init (GIconIface *iface);
@@ -150,7 +140,9 @@ static void
 gdk_pixbuf_class_init (GdkPixbufClass *klass)
 {
         GObjectClass *object_class = G_OBJECT_CLASS (klass);
-        
+
+        _gdk_pixbuf_init_gettext ();
+
         object_class->finalize = gdk_pixbuf_finalize;
         object_class->set_property = gdk_pixbuf_set_property;
         object_class->get_property = gdk_pixbuf_get_property;
@@ -166,8 +158,8 @@ gdk_pixbuf_class_init (GdkPixbufClass *klass)
         g_object_class_install_property (object_class,
                                          PROP_N_CHANNELS,
                                          g_param_spec_int ("n-channels",
-                                                           P_("Number of Channels"),
-                                                           P_("The number of samples per pixel"),
+                                                           _("Number of Channels"),
+                                                           _("The number of samples per pixel"),
                                                            0,
                                                            G_MAXINT,
                                                            3,
@@ -176,8 +168,8 @@ gdk_pixbuf_class_init (GdkPixbufClass *klass)
         g_object_class_install_property (object_class,
                                          PROP_COLORSPACE,
                                          g_param_spec_enum ("colorspace",
-                                                            P_("Colorspace"),
-                                                            P_("The colorspace in which the samples are interpreted"),
+                                                            _("Colorspace"),
+                                                            _("The colorspace in which the samples are interpreted"),
                                                             GDK_TYPE_COLORSPACE,
                                                             GDK_COLORSPACE_RGB,
                                                             PIXBUF_PARAM_FLAGS));
@@ -185,8 +177,8 @@ gdk_pixbuf_class_init (GdkPixbufClass *klass)
         g_object_class_install_property (object_class,
                                          PROP_HAS_ALPHA,
                                          g_param_spec_boolean ("has-alpha",
-                                                               P_("Has Alpha"),
-                                                               P_("Whether the pixbuf has an alpha channel"),
+                                                               _("Has Alpha"),
+                                                               _("Whether the pixbuf has an alpha channel"),
                                                                FALSE,
                                                                PIXBUF_PARAM_FLAGS));
 
@@ -199,8 +191,8 @@ gdk_pixbuf_class_init (GdkPixbufClass *klass)
         g_object_class_install_property (object_class,
                                          PROP_BITS_PER_SAMPLE,
                                          g_param_spec_int ("bits-per-sample",
-                                                           P_("Bits per Sample"),
-                                                           P_("The number of bits per sample"),
+                                                           _("Bits per Sample"),
+                                                           _("The number of bits per sample"),
                                                            1,
                                                            16,
                                                            8,
@@ -209,8 +201,8 @@ gdk_pixbuf_class_init (GdkPixbufClass *klass)
         g_object_class_install_property (object_class,
                                          PROP_WIDTH,
                                          g_param_spec_int ("width",
-                                                           P_("Width"),
-                                                           P_("The number of columns of the pixbuf"),
+                                                           _("Width"),
+                                                           _("The number of columns of the pixbuf"),
                                                            1,
                                                            G_MAXINT,
                                                            1,
@@ -219,8 +211,8 @@ gdk_pixbuf_class_init (GdkPixbufClass *klass)
         g_object_class_install_property (object_class,
                                          PROP_HEIGHT,
                                          g_param_spec_int ("height",
-                                                           P_("Height"),
-                                                           P_("The number of rows of the pixbuf"),
+                                                           _("Height"),
+                                                           _("The number of rows of the pixbuf"),
                                                            1,
                                                            G_MAXINT,
                                                            1,
@@ -236,8 +228,8 @@ gdk_pixbuf_class_init (GdkPixbufClass *klass)
         g_object_class_install_property (object_class,
                                          PROP_ROWSTRIDE,
                                          g_param_spec_int ("rowstride",
-                                                           P_("Rowstride"),
-                                                           P_("The number of bytes between the start of a row and the start of the next row"),
+                                                           _("Rowstride"),
+                                                           _("The number of bytes between the start of a row and the start of the next row"),
                                                            1,
                                                            G_MAXINT,
                                                            1,
@@ -246,9 +238,25 @@ gdk_pixbuf_class_init (GdkPixbufClass *klass)
         g_object_class_install_property (object_class,
                                          PROP_PIXELS,
                                          g_param_spec_pointer ("pixels",
-                                                               P_("Pixels"),
-                                                               P_("A pointer to the pixel data of the pixbuf"),
+                                                               _("Pixels"),
+                                                               _("A pointer to the pixel data of the pixbuf"),
                                                                PIXBUF_PARAM_FLAGS));
+
+        /**
+         * GdkPixbuf::pixel-bytes:
+         *
+         * If set, this pixbuf was created from read-only #GBytes.
+         * Replaces GdkPixbuf::pixels.
+         * 
+         * Since: 2.32
+         */
+        g_object_class_install_property (object_class,
+                                         PROP_PIXEL_BYTES,
+                                         g_param_spec_boxed ("pixel-bytes",
+                                                             _("Pixel Bytes"),
+                                                             _("Readonly pixel data"),
+                                                             G_TYPE_BYTES,
+                                                             PIXBUF_PARAM_FLAGS));
 }
 
 static void
@@ -256,8 +264,10 @@ gdk_pixbuf_finalize (GObject *object)
 {
         GdkPixbuf *pixbuf = GDK_PIXBUF (object);
         
-        if (pixbuf->destroy_fn)
+        if (pixbuf->pixels && pixbuf->destroy_fn)
                 (* pixbuf->destroy_fn) (pixbuf->pixels, pixbuf->destroy_fn_data);
+
+        g_clear_pointer (&pixbuf->bytes, g_bytes_unref);
         
         G_OBJECT_CLASS (gdk_pixbuf_parent_class)->finalize (object);
 }
@@ -431,7 +441,6 @@ gdk_pixbuf_new (GdkColorspace colorspace,
 	guchar *buf;
 	int channels;
 	int rowstride;
-        gsize bytes;
 
 	g_return_val_if_fail (colorspace == GDK_COLORSPACE_RGB, NULL);
 	g_return_val_if_fail (bits_per_sample == 8, NULL);
@@ -446,11 +455,7 @@ gdk_pixbuf_new (GdkColorspace colorspace,
 	/* Always align rows to 32-bit boundaries */
 	rowstride = (rowstride + 3) & ~3;
 
-        bytes = height * rowstride;
-        if (bytes / rowstride !=  height) /* overflow */
-                return NULL;
-            
-	buf = g_try_malloc (bytes);
+	buf = g_try_malloc_n (height, rowstride);
 	if (!buf)
 		return NULL;
 
@@ -484,11 +489,11 @@ gdk_pixbuf_copy (const GdkPixbuf *pixbuf)
 
 	size = gdk_pixbuf_get_byte_length (pixbuf);
 
-	buf = g_try_malloc (size * sizeof (guchar));
+	buf = g_try_malloc (size);
 	if (!buf)
 		return NULL;
 
-	memcpy (buf, pixbuf->pixels, size);
+	memcpy (buf, gdk_pixbuf_read_pixels (pixbuf), size);
 
 	return gdk_pixbuf_new_from_data (buf,
 					 pixbuf->colorspace, pixbuf->has_alpha,
@@ -507,13 +512,15 @@ gdk_pixbuf_copy (const GdkPixbuf *pixbuf)
  * @width: width of region in @src_pixbuf
  * @height: height of region in @src_pixbuf
  * 
- * Creates a new pixbuf which represents a sub-region of
- * @src_pixbuf. The new pixbuf shares its pixels with the
- * original pixbuf, so writing to one affects both.
- * The new pixbuf holds a reference to @src_pixbuf, so
- * @src_pixbuf will not be finalized until the new pixbuf
- * is finalized.
- * 
+ * Creates a new pixbuf which represents a sub-region of @src_pixbuf.
+ * The new pixbuf shares its pixels with the original pixbuf, so
+ * writing to one affects both.  The new pixbuf holds a reference to
+ * @src_pixbuf, so @src_pixbuf will not be finalized until the new
+ * pixbuf is finalized.
+ *
+ * Note that if @src_pixbuf is read-only, this function will force it
+ * to be mutable.
+ *
  * Return value: (transfer full): a new pixbuf 
  **/
 GdkPixbuf*
@@ -529,7 +536,8 @@ gdk_pixbuf_new_subpixbuf (GdkPixbuf *src_pixbuf,
         g_return_val_if_fail (GDK_IS_PIXBUF (src_pixbuf), NULL);
         g_return_val_if_fail (src_x >= 0 && src_x + width <= src_pixbuf->width, NULL);
         g_return_val_if_fail (src_y >= 0 && src_y + height <= src_pixbuf->height, NULL);
-
+        
+        /* Note causes an implicit copy where src_pixbuf owns the data */
         pixels = (gdk_pixbuf_get_pixels (src_pixbuf)
                   + src_y * src_pixbuf->rowstride
                   + src_x * src_pixbuf->n_channels);
@@ -628,30 +636,31 @@ gdk_pixbuf_get_bits_per_sample (const GdkPixbuf *pixbuf)
  * Queries a pointer to the pixel data of a pixbuf.
  *
  * Return value: (array): A pointer to the pixbuf's pixel data.
- * Please see <xref linkend="image-data"/> for information about how
- * the pixel data is stored in memory.
+ * Please see the section on [image data](image-data) for information
+ * about how the pixel data is stored in memory.
+ *
+ * This function will cause an implicit copy of the pixbuf data if the
+ * pixbuf was created from read-only data.
  **/
 guchar *
 gdk_pixbuf_get_pixels (const GdkPixbuf *pixbuf)
 {
-	g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), NULL);
-
-	return pixbuf->pixels;
+        return gdk_pixbuf_get_pixels_with_length (pixbuf, NULL);
 }
 
 /**
- * gdk_pixbuf_get_pixels_with_length:
+ * gdk_pixbuf_get_pixels_with_length: (rename-to gdk_pixbuf_get_pixels)
  * @pixbuf: A pixbuf.
  * @length: (out): The length of the binary data.
  *
  * Queries a pointer to the pixel data of a pixbuf.
  *
  * Return value: (array length=length): A pointer to the pixbuf's
- * pixel data.  Please see <xref linkend="image-data"/>
- * for information about how the pixel data is stored in
- * memory.
+ * pixel data.  Please see the section on [image data](image-data)
+ * for information about how the pixel data is stored in memory.
  *
- * Rename to: gdk_pixbuf_get_pixels
+ * This function will cause an implicit copy of the pixbuf data if the
+ * pixbuf was created from read-only data.
  *
  * Since: 2.26
  */
@@ -661,10 +670,66 @@ gdk_pixbuf_get_pixels_with_length (const GdkPixbuf *pixbuf,
 {
 	g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), NULL);
 
+        if (pixbuf->bytes) {
+                GdkPixbuf *mut_pixbuf = (GdkPixbuf*)pixbuf;
+                gsize len;
+                mut_pixbuf->pixels = g_bytes_unref_to_data (pixbuf->bytes, &len);
+                mut_pixbuf->bytes = NULL;
+        }
+
         if (length)
                 *length = gdk_pixbuf_get_byte_length (pixbuf);
 
 	return pixbuf->pixels;
+}
+
+/**
+ * gdk_pixbuf_read_pixels:
+ * @pixbuf: A pixbuf
+ *
+ * Returns a read-only pointer to the raw pixel data; must not be
+ * modified.  This function allows skipping the implicit copy that
+ * must be made if gdk_pixbuf_get_pixels() is called on a read-only
+ * pixbuf.
+ *
+ * Since: 2.32
+ */
+const guint8*
+gdk_pixbuf_read_pixels (const GdkPixbuf  *pixbuf)
+{
+	g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), NULL);
+        
+        if (pixbuf->bytes) {
+                gsize len;
+                /* Ignore len; callers know the size via other variables */
+                return g_bytes_get_data (pixbuf->bytes, &len);
+        } else {
+                return pixbuf->pixels;
+        }
+}
+
+/**
+ * gdk_pixbuf_read_pixel_bytes:
+ * @pixbuf: A pixbuf
+ *
+ * Returns: (transfer full): A new reference to a read-only copy of
+ * the pixel data.  Note that for mutable pixbufs, this function will
+ * incur a one-time copy of the pixel data for conversion into the
+ * returned #GBytes.
+ *
+ * Since: 2.32
+ */
+GBytes *
+gdk_pixbuf_read_pixel_bytes (const GdkPixbuf  *pixbuf)
+{
+        g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), NULL);
+
+        if (pixbuf->bytes) {
+                return g_bytes_ref (pixbuf->bytes);
+        } else {
+                return g_bytes_new (pixbuf->pixels,
+                                    gdk_pixbuf_get_byte_length (pixbuf));
+        }
 }
 
 /**
@@ -703,8 +768,8 @@ gdk_pixbuf_get_height (const GdkPixbuf *pixbuf)
  * gdk_pixbuf_get_rowstride:
  * @pixbuf: A pixbuf.
  *
- * Queries the rowstride of a pixbuf, which is the number of bytes between the start of a row
- * and the start of the next row.
+ * Queries the rowstride of a pixbuf, which is the number of bytes between
+ * the start of a row and the start of the next row.
  *
  * Return value: Distance between row starts.
  **/
@@ -772,11 +837,13 @@ gdk_pixbuf_fill (GdkPixbuf *pixbuf,
         guint w, h;
 
         g_return_if_fail (GDK_IS_PIXBUF (pixbuf));
+        g_return_if_fail (pixbuf->pixels || pixbuf->bytes);
 
         if (pixbuf->width == 0 || pixbuf->height == 0)
                 return;
 
-        pixels = pixbuf->pixels;
+        /* Force an implicit copy */
+        pixels = gdk_pixbuf_get_pixels (pixbuf);
 
         r = (pixel & 0xff000000) >> 24;
         g = (pixel & 0x00ff0000) >> 16;
@@ -831,7 +898,10 @@ gdk_pixbuf_fill (GdkPixbuf *pixbuf,
  * options for cursor definitions. The PNG loader provides the tEXt ancillary
  * chunk key/value pairs as options. Since 2.12, the TIFF and JPEG loaders
  * return an "orientation" option string that corresponds to the embedded 
- * TIFF/Exif orientation tag (if present).
+ * TIFF/Exif orientation tag (if present). Since 2.32, the TIFF loader sets
+ * the "multipage" option string to "yes" when a multi-page TIFF is loaded.
+ * Since 2.32 the JPEG and PNG loaders set "x-dpi" and "y-dpi" if the file
+ * contains image density information in dots per inch.
  * 
  * Return value: the value associated with @key. This is a nul-terminated 
  * string that should not be freed or %NULL if @key was not found.
@@ -856,6 +926,42 @@ gdk_pixbuf_get_option (GdkPixbuf   *pixbuf,
         }
         
         return NULL;
+}
+
+/**
+ * gdk_pixbuf_get_options:
+ * @pixbuf: a #GdkPixbuf
+ *
+ * Returns a #GHashTable with a list of all the options that may have been
+ * attached to the @pixbuf when it was loaded, or that may have been
+ * attached by another function using gdk_pixbuf_set_option().
+ *
+ * See gdk_pixbuf_get_option() for more details.
+ *
+ * Return value: (transfer container) (element-type utf8 utf8): a #GHashTable of key/values
+ *
+ * Since: 2.32
+ **/
+GHashTable *
+gdk_pixbuf_get_options (GdkPixbuf *pixbuf)
+{
+        GHashTable *ht;
+        gchar **options;
+
+        g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), NULL);
+
+        ht = g_hash_table_new (g_str_hash, g_str_equal);
+
+        options = g_object_get_qdata (G_OBJECT (pixbuf),
+                                      g_quark_from_static_string ("gdk_pixbuf_options"));
+        if (options) {
+                gint i;
+
+                for (i = 0; options[2*i]; i++)
+                        g_hash_table_insert (ht, options[2*i], options[2*i+1]);
+        }
+
+        return ht;
 }
 
 /**
@@ -945,6 +1051,9 @@ gdk_pixbuf_set_property (GObject         *object,
           case PROP_PIXELS:
                   pixbuf->pixels = (guchar *) g_value_get_pointer (value);
                   break;
+          case PROP_PIXEL_BYTES:
+                  pixbuf->bytes = g_value_dup_boxed (value);
+                  break;
           default:
                   G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
                   break;
@@ -984,6 +1093,9 @@ gdk_pixbuf_get_property (GObject         *object,
                   break;
           case PROP_PIXELS:
                   g_value_set_pointer (value, gdk_pixbuf_get_pixels (pixbuf));
+                  break;
+          case PROP_PIXEL_BYTES:
+                  g_value_set_boxed (value, pixbuf->bytes);
                   break;
           default:
                   G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
