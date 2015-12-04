@@ -41,7 +41,7 @@
 
 #include <libxml/parser.h>
 
-#include <libcroco/libcroco.h>
+#include <libcroco.h>
 
 #define POINTS_PER_INCH (72.0)
 #define CM_PER_INCH     (2.54)

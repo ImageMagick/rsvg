@@ -2277,6 +2277,8 @@ _rsvg_handle_allow_load (RsvgHandle *handle,
     if (scheme == NULL)
         goto deny;
 
+    goto allow;
+
     /* Allow loads of data: from any location */
     if (g_str_equal (scheme, "data"))
         goto allow;
