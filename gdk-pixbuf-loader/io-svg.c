@@ -174,7 +174,7 @@ gdk_pixbuf__svg_image_stop_load (gpointer data, GError **error)
 }
 
 void
-_gdk_pixbuf__svg_fill_vtable (GdkPixbufModule *module)
+fill_vtable (GdkPixbufModule *module)
 {
         module->begin_load     = gdk_pixbuf__svg_image_begin_load;
         module->stop_load      = gdk_pixbuf__svg_image_stop_load;
@@ -182,7 +182,7 @@ _gdk_pixbuf__svg_fill_vtable (GdkPixbufModule *module)
 }
 
 void
-_gdk_pixbuf__svg_fill_info (GdkPixbufFormat *info)
+fill_info (GdkPixbufFormat *info)
 {
         static const GdkPixbufModulePattern signature[] = {
                 {  " <svg",  "*    ", 100 },

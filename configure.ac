@@ -1,6 +1,6 @@
 m4_define([rsvg_major_version],[2])
 m4_define([rsvg_minor_version],[40])
-m4_define([rsvg_micro_version],[10])
+m4_define([rsvg_micro_version],[12])
 m4_define([rsvg_extra_version],[])
 m4_define([rsvg_version],[rsvg_major_version.rsvg_minor_version.rsvg_micro_version()rsvg_extra_version])
 m4_define([rsvg_lt_version_info],m4_eval(rsvg_major_version + rsvg_minor_version):rsvg_micro_version:rsvg_minor_version)
@@ -120,6 +120,8 @@ case "$host" in
     ;;
 esac
 
+GLIB_TESTS
+
 dnl ===========================================================================
 
 AC_CHECK_FUNCS(strtok_r)
@@ -210,15 +212,15 @@ AC_SUBST([GTK_PREFIX],[$($PKG_CONFIG --variable=prefix gdk-pixbuf-2.0)])
 AC_SUBST([CAIRO_PREFIX],[$($PKG_CONFIG --variable=prefix cairo)])
 
 dnl ===========================================================================
-dnl Do we build the miscellaenous tools provided with librsvg ?
+dnl Do we build the miscellaneous tools provided with librsvg ?
 
 AC_ARG_ENABLE(tools,
               AC_HELP_STRING([--disable-tools],
-                             [do not build miscellaenous tools [default=no]]),
+                             [do not build miscellaneous tools [default=no]]),
               [build_misc_tools=$enableval],
               [build_misc_tools=yes])
 
-AC_MSG_CHECKING(whether to build miscellaenous tools)
+AC_MSG_CHECKING(whether to build miscellaneous tools)
 if test "x$build_misc_tools" = "xyes" ; then
 	AC_MSG_RESULT(yes)
 else
@@ -268,10 +270,17 @@ Makefile
 librsvg-zip
 gdk-pixbuf-loader/Makefile
 tests/Makefile
-tests/pdiff/Makefile
 tools/Makefile
 doc/Makefile
 doc/version.xml
+config.h.win32
+build/Makefile
+build/win32/Makefile
+build/win32/vs9/Makefile
+build/win32/vs10/Makefile
+build/win32/vs11/Makefile
+build/win32/vs12/Makefile
+build/win32/vs14/Makefile
 ])
 
 AC_CONFIG_FILES([librsvg-${RSVG_API_VERSION}.pc:librsvg.pc.in],[],[RSVG_API_VERSION=$RSVG_API_VERSION])
@@ -290,5 +299,5 @@ librsvg-$VERSION
 	Build Vala bindings:            ${enable_vala}
 	Build GdkPixbuf loader:         ${enable_pixbuf_loader}
         GTK+ $GTK3_REQUIRED or later:           ${have_gtk_3}
-	Build miscellaenous tools:      ${build_misc_tools}
+	Build miscellaneous tools:      ${build_misc_tools}
 "

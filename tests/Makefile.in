@@ -14,6 +14,11 @@
 
 @SET_MAKE@
 
+# GLIB - Library of useful C routines
+
+
+
+
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
@@ -78,54 +83,115 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-TESTS = rsvg-test$(EXEEXT) crash$(EXEEXT) styles$(EXEEXT)
-EXTRA_PROGRAMS = $(am__EXEEXT_1)
+DIST_COMMON = $(top_srcdir)/glib-tap.mk $(srcdir)/Makefile.in \
+	$(srcdir)/Makefile.am $(top_srcdir)/depcomp \
+	$(top_srcdir)/test-driver
+TESTS = $(am__EXEEXT_1)
+installed_test_PROGRAMS = $(am__EXEEXT_4)
+noinst_PROGRAMS = $(am__EXEEXT_5)
+check_PROGRAMS = $(am__EXEEXT_3)
+@ENABLE_ALWAYS_BUILD_TESTS_TRUE@am__append_1 = $(all_test_ltlibs)
+@ENABLE_ALWAYS_BUILD_TESTS_TRUE@am__append_2 = $(all_test_programs)
+@ENABLE_ALWAYS_BUILD_TESTS_TRUE@am__append_3 = $(all_test_scripts)
+@ENABLE_ALWAYS_BUILD_TESTS_TRUE@am__append_4 = $(all_test_data)
+@ENABLE_ALWAYS_BUILD_TESTS_FALSE@am__append_5 = $(all_test_ltlibs)
+@ENABLE_ALWAYS_BUILD_TESTS_FALSE@am__append_6 = $(all_test_programs)
+@ENABLE_ALWAYS_BUILD_TESTS_FALSE@am__append_7 = $(all_test_scripts)
+@ENABLE_ALWAYS_BUILD_TESTS_FALSE@am__append_8 = $(all_test_data)
+@ENABLE_INSTALLED_TESTS_TRUE@am__append_9 = $(test_programs) $(installed_test_programs) \
+@ENABLE_INSTALLED_TESTS_TRUE@                          $(test_extra_programs) $(installed_test_extra_programs)
+
+@ENABLE_INSTALLED_TESTS_TRUE@am__append_10 = $(test_scripts) \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(installed_test_scripts) \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(test_extra_scripts) \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(test_installed_extra_scripts) \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(dist_test_scripts) \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(dist_test_extra_scripts) \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(dist_installed_test_scripts) \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(dist_installed_test_extra_scripts)
+@ENABLE_INSTALLED_TESTS_TRUE@am__append_11 = $(test_data) \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(installed_test_data) \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(dist_test_data) \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(dist_installed_test_data)
+@ENABLE_INSTALLED_TESTS_TRUE@am__append_12 = $(test_ltlibraries) $(installed_test_ltlibraries)
+@ENABLE_INSTALLED_TESTS_TRUE@am__append_13 = $(installed_test_meta_DATA)
 subdir = tests
-DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/depcomp $(top_srcdir)/test-driver
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/gtk-doc.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/vapigen.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/glibtests.m4 \
+	$(top_srcdir)/m4/gtk-doc.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/vapigen.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-LTLIBRARIES = $(noinst_LTLIBRARIES)
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__uninstall_files_from_dir = { \
+  test -z "$$files" \
+    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
+    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+         $(am__cd) "$$dir" && rm -f $$files; }; \
+  }
+am__installdirs = "$(DESTDIR)$(installed_testdir)" \
+	"$(DESTDIR)$(installed_testdir)" \
+	"$(DESTDIR)$(installed_testdir)" \
+	"$(DESTDIR)$(installed_test_metadir)" \
+	"$(DESTDIR)$(installed_testdir)"
+LTLIBRARIES = $(installed_test_LTLIBRARIES) $(noinst_LTLIBRARIES)
+am__EXEEXT_1 = rsvg-test$(EXEEXT) crash$(EXEEXT) styles$(EXEEXT)
+am__EXEEXT_2 = $(am__EXEEXT_1)
+@ENABLE_ALWAYS_BUILD_TESTS_FALSE@am__EXEEXT_3 = $(am__EXEEXT_2)
+@ENABLE_INSTALLED_TESTS_TRUE@am__EXEEXT_4 = $(am__EXEEXT_1)
+@ENABLE_ALWAYS_BUILD_TESTS_TRUE@am__EXEEXT_5 = $(am__EXEEXT_2)
+PROGRAMS = $(installed_test_PROGRAMS) $(noinst_PROGRAMS)
+am_crash_OBJECTS = crash.$(OBJEXT) test-utils.$(OBJEXT)
+crash_OBJECTS = $(am_crash_OBJECTS)
+crash_LDADD = $(LDADD)
 am__DEPENDENCIES_1 =
-libtest_utils_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libtest_utils_la_OBJECTS = test-utils.lo rsvg-size-callback.lo
-libtest_utils_la_OBJECTS = $(am_libtest_utils_la_OBJECTS)
+crash_DEPENDENCIES =  \
+	$(top_builddir)/librsvg-@RSVG_API_MAJOR_VERSION@.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am__EXEEXT_1 = rsvg-test$(EXEEXT) crash$(EXEEXT) styles$(EXEEXT)
-crash_SOURCES = crash.c
-crash_OBJECTS = crash.$(OBJEXT)
-crash_LDADD = $(LDADD)
-crash_DEPENDENCIES =  \
-	$(top_builddir)/librsvg-@RSVG_API_MAJOR_VERSION@.la \
-	$(top_builddir)/tests/libtest-utils.la \
-	$(top_builddir)/tests/pdiff/libpdiff.la $(am__DEPENDENCIES_1)
-rsvg_test_SOURCES = rsvg-test.c
-rsvg_test_OBJECTS = rsvg-test.$(OBJEXT)
+am_rsvg_test_OBJECTS = rsvg-test.$(OBJEXT) test-utils.$(OBJEXT)
+rsvg_test_OBJECTS = $(am_rsvg_test_OBJECTS)
 rsvg_test_LDADD = $(LDADD)
 rsvg_test_DEPENDENCIES =  \
 	$(top_builddir)/librsvg-@RSVG_API_MAJOR_VERSION@.la \
-	$(top_builddir)/tests/libtest-utils.la \
-	$(top_builddir)/tests/pdiff/libpdiff.la $(am__DEPENDENCIES_1)
-styles_SOURCES = styles.c
-styles_OBJECTS = styles.$(OBJEXT)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_styles_OBJECTS = styles.$(OBJEXT) test-utils.$(OBJEXT)
+styles_OBJECTS = $(am_styles_OBJECTS)
 styles_LDADD = $(LDADD)
 styles_DEPENDENCIES =  \
 	$(top_builddir)/librsvg-@RSVG_API_MAJOR_VERSION@.la \
-	$(top_builddir)/tests/libtest-utils.la \
-	$(top_builddir)/tests/pdiff/libpdiff.la $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+SCRIPTS = $(installed_test_SCRIPTS) $(noinst_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -160,30 +226,15 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libtest_utils_la_SOURCES) crash.c rsvg-test.c styles.c
-DIST_SOURCES = $(libtest_utils_la_SOURCES) crash.c rsvg-test.c \
-	styles.c
-RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
-	ctags-recursive dvi-recursive html-recursive info-recursive \
-	install-data-recursive install-dvi-recursive \
-	install-exec-recursive install-html-recursive \
-	install-info-recursive install-pdf-recursive \
-	install-ps-recursive install-recursive installcheck-recursive \
-	installdirs-recursive pdf-recursive ps-recursive \
-	tags-recursive uninstall-recursive
+SOURCES = $(crash_SOURCES) $(rsvg_test_SOURCES) $(styles_SOURCES)
+DIST_SOURCES = $(crash_SOURCES) $(rsvg_test_SOURCES) $(styles_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
-  distclean-recursive maintainer-clean-recursive
-am__recursive_targets = \
-  $(RECURSIVE_TARGETS) \
-  $(RECURSIVE_CLEAN_TARGETS) \
-  $(am__extra_recursive_targets)
-AM_RECURSIVE_TARGETS = $(am__recursive_targets:-recursive=) TAGS CTAGS \
-	check recheck distdir
+DATA = $(installed_test_meta_DATA) $(nobase_installed_test_DATA) \
+	$(noinst_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -225,33 +276,6 @@ am__tty_colors = { \
     std='[m'; \
   fi; \
 }
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__uninstall_files_from_dir = { \
-  test -z "$$files" \
-    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
-    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
-         $(am__cd) "$$dir" && rm -f $$files; }; \
-  }
 am__recheck_rx = ^[ 	]*:recheck:[ 	]*
 am__global_test_result_rx = ^[ 	]*:global-test-result:[ 	]*
 am__copy_in_global_log_rx = ^[ 	]*:copy-in-global-log:[ 	]*
@@ -386,9 +410,9 @@ am__set_TESTS_bases = \
   bases=`for i in $$bases; do echo $$i; done | sed 's/\.log$$//'`; \
   bases=`echo $$bases`
 RECHECK_LOGS = $(TEST_LOGS)
+AM_RECURSIVE_TARGETS = check recheck
 TEST_SUITE_LOG = test-suite.log
 TEST_EXTENSIONS = @EXEEXT@ .test
-LOG_DRIVER = $(SHELL) $(top_srcdir)/test-driver
 LOG_COMPILE = $(LOG_COMPILER) $(AM_LOG_FLAGS) $(LOG_FLAGS)
 am__set_b = \
   case '$@' in \
@@ -406,33 +430,7 @@ TEST_LOGS = $(am__test_logs2:.test.log=.log)
 TEST_LOG_DRIVER = $(SHELL) $(top_srcdir)/test-driver
 TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 	$(TEST_LOG_FLAGS)
-DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-am__relativize = \
-  dir0=`pwd`; \
-  sed_first='s,^\([^/]*\)/.*$$,\1,'; \
-  sed_rest='s,^[^/]*/*,,'; \
-  sed_last='s,^.*/\([^/]*\)$$,\1,'; \
-  sed_butlast='s,/*[^/]*$$,,'; \
-  while test -n "$$dir1"; do \
-    first=`echo "$$dir1" | sed -e "$$sed_first"`; \
-    if test "$$first" != "."; then \
-      if test "$$first" = ".."; then \
-        dir2=`echo "$$dir0" | sed -e "$$sed_last"`/"$$dir2"; \
-        dir0=`echo "$$dir0" | sed -e "$$sed_butlast"`; \
-      else \
-        first2=`echo "$$dir2" | sed -e "$$sed_first"`; \
-        if test "$$first2" = "$$first"; then \
-          dir2=`echo "$$dir2" | sed -e "$$sed_rest"`; \
-        else \
-          dir2="../$$dir2"; \
-        fi; \
-        dir0="$$dir0"/"$$first"; \
-      fi; \
-    fi; \
-    dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
-  done; \
-  reldir="$$dir2"
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_CFLAGS = @AM_CFLAGS@
@@ -587,6 +585,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+installed_test_metadir = @installed_test_metadir@
+installed_testdir = @installed_testdir@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -606,38 +606,95 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = pdiff .
-noinst_LTLIBRARIES = \
-	libtest-utils.la
+TESTS_ENVIRONMENT = \
+	G_TEST_SRCDIR="$(abs_srcdir)" 		\
+	G_TEST_BUILDDIR="$(abs_builddir)" 	\
+	G_DEBUG=gc-friendly 			\
+	MALLOC_CHECK_=2 			\
+	MALLOC_PERTURB_=$$(($${RANDOM:-256} % 256))
+
+LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/tap-driver.sh
+LOG_COMPILER = $(top_srcdir)/tap-test
+NULL = 
+
+# initialize variables for unconditional += appending
+BUILT_SOURCES = 
+BUILT_EXTRA_DIST = 
+CLEANFILES = *.log *.trs $(am__append_13)
+DISTCLEANFILES = 
+MAINTAINERCLEANFILES = 
+EXTRA_DIST = $(all_dist_test_scripts) $(all_dist_test_data)
+installed_test_LTLIBRARIES = $(am__append_12)
+installed_test_SCRIPTS = $(am__append_10)
+nobase_installed_test_DATA = $(am__append_11)
+noinst_LTLIBRARIES = $(am__append_1)
+noinst_SCRIPTS = $(am__append_3)
+noinst_DATA = $(am__append_4)
+check_LTLIBRARIES = $(am__append_5)
+check_SCRIPTS = $(am__append_7)
+check_DATA = $(am__append_8)
+
+# Note: build even the installed-only targets during 'make check' to ensure that they still work.
+# We need to do a bit of trickery here and manage disting via EXTRA_DIST instead of using dist_ prefixes to
+# prevent automake from mistreating gmake functions like $(wildcard ...) and $(addprefix ...) as if they were
+# filenames, including removing duplicate instances of the opening part before the space, eg. '$(addprefix'.
+all_test_programs = $(test_programs) $(uninstalled_test_programs) $(installed_test_programs) \
+                        $(test_extra_programs) $(uninstalled_test_extra_programs) $(installed_test_extra_programs)
+
+all_test_scripts = $(test_scripts) $(uninstalled_test_scripts) \
+	$(installed_test_scripts) $(test_extra_scripts) \
+	$(uninstalled_test_extra_scripts) \
+	$(installed_test_extra_scripts) $(all_dist_test_scripts)
+all_dist_test_scripts = $(dist_test_scripts) $(dist_uninstalled_test_scripts) $(dist_installed_test_scripts) \
+                        $(dist_test_extra_scripts) $(dist_uninstalled_test_extra_scripts) $(dist_installed_test_extra_scripts)
+
+all_test_data = $(test_data) $(uninstalled_test_data) \
+	$(installed_test_data) $(all_dist_test_data)
+all_dist_test_data = $(dist_test_data) $(dist_uninstalled_test_data) $(dist_installed_test_data)
+all_test_ltlibs = $(test_ltlibraries) $(uninstalled_test_ltlibraries) $(installed_test_ltlibraries)
+@ENABLE_INSTALLED_TESTS_TRUE@installed_testcases = $(test_programs) $(installed_test_programs) \
+@ENABLE_INSTALLED_TESTS_TRUE@                      $(test_scripts) $(installed_test_scripts) \
+@ENABLE_INSTALLED_TESTS_TRUE@                      $(dist_test_scripts) $(dist_installed_test_scripts)
+
+@ENABLE_INSTALLED_TESTS_TRUE@installed_test_meta_DATA = $(installed_testcases:=.test)
+test_programs = \
+	rsvg-test	\
+	crash		\
+	styles
+
+rsvg_test_SOURCES = \
+	rsvg-test.c	\
+	test-utils.c	\
+	test-utils.h
+
+crash_SOURCES = \
+	crash.c		\
+	test-utils.c	\
+	test-utils.h
+
+styles_SOURCES = \
+	styles.c	\
+	test-utils.c	\
+	test-utils.h
 
 LDADD = $(top_builddir)/librsvg-@RSVG_API_MAJOR_VERSION@.la		\
-	$(top_builddir)/tests/libtest-utils.la	\
-	$(top_builddir)/tests/pdiff/libpdiff.la \
-	$(LIBRSVG_LIBS)
+	$(LIBRSVG_LIBS)							\
+	$(LIBM)
 
 INCLUDES = -I$(srcdir) 							\
 	   -I$(top_srcdir)						\
-	   -I$(srcdir)/pdiff						\
 	   -DTEST_DATA_DIR="\"$(srcdir)\""				\
 	   -DTEST_SRC_DIR="\"$(PWD)\""					\
 	   -DTOP_SRC_DIR="\"$(top_srcdir)\""				\
 	  $(LIBRSVG_CFLAGS)
 
-CLEANFILES = $(TESTS)
-DISTCLEANFILES = rsvg-test.html			\
-		 rsvg-test.log
-
-libtest_utils_la_SOURCES = \
-	test-utils.c	   				\
-	test-utils.h					\
-	$(top_srcdir)/rsvg-size-callback.c		\
-	$(top_srcdir)/rsvg-size-callback.h
-
-libtest_utils_la_LIBADD = \
-	$(LIBM)
-
-EXTRA_DIST = \
-	fixtures/crash/bug620238.svg			\
+dist_installed_test_data = \
+	$(wildcard $(srcdir)/fixtures/crash/*.svg) 	\
+	$(wildcard $(srcdir)/fixtures/crash/*.png) 	\
+	$(wildcard $(srcdir)/fixtures/reftests/*.svg) 	\
+	$(wildcard $(srcdir)/fixtures/reftests/*.png) 	\
+	$(wildcard $(srcdir)/fixtures/reftests/bugs*.svg) 	\
+	$(wildcard $(srcdir)/fixtures/reftests/bugs*.png) 	\
 	fixtures/dimensions/bug564527.svg		\
 	fixtures/dimensions/bug614018.svg		\
 	fixtures/dimensions/bug612951.svg		\
@@ -655,11 +712,12 @@ EXTRA_DIST = \
 	fixtures/styles/bug418823.svg			\
 	fixtures/styles/order.svg
 
-all: all-recursive
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .log .o .obj .test .test$(EXEEXT) .trs
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/glib-tap.mk $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -680,6 +738,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
+$(top_srcdir)/glib-tap.mk:
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
@@ -689,6 +748,52 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+
+clean-checkLTLIBRARIES:
+	-test -z "$(check_LTLIBRARIES)" || rm -f $(check_LTLIBRARIES)
+	@list='$(check_LTLIBRARIES)'; \
+	locs=`for p in $$list; do echo $$p; done | \
+	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
+	      sort -u`; \
+	test -z "$$locs" || { \
+	  echo rm -f $${locs}; \
+	  rm -f $${locs}; \
+	}
+
+install-installed_testLTLIBRARIES: $(installed_test_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	@list='$(installed_test_LTLIBRARIES)'; test -n "$(installed_testdir)" || list=; \
+	list2=; for p in $$list; do \
+	  if test -f $$p; then \
+	    list2="$$list2 $$p"; \
+	  else :; fi; \
+	done; \
+	test -z "$$list2" || { \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(installed_testdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(installed_testdir)" || exit 1; \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(installed_testdir)'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(installed_testdir)"; \
+	}
+
+uninstall-installed_testLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(installed_test_LTLIBRARIES)'; test -n "$(installed_testdir)" || list=; \
+	for p in $$list; do \
+	  $(am__strip_dir) \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(installed_testdir)/$$f'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(installed_testdir)/$$f"; \
+	done
+
+clean-installed_testLTLIBRARIES:
+	-test -z "$(installed_test_LTLIBRARIES)" || rm -f $(installed_test_LTLIBRARIES)
+	@list='$(installed_test_LTLIBRARIES)'; \
+	locs=`for p in $$list; do echo $$p; done | \
+	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
+	      sort -u`; \
+	test -z "$$locs" || { \
+	  echo rm -f $${locs}; \
+	  rm -f $${locs}; \
+	}
 
 clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
@@ -701,8 +806,72 @@ clean-noinstLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-libtest-utils.la: $(libtest_utils_la_OBJECTS) $(libtest_utils_la_DEPENDENCIES) $(EXTRA_libtest_utils_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK)  $(libtest_utils_la_OBJECTS) $(libtest_utils_la_LIBADD) $(LIBS)
+clean-checkPROGRAMS:
+	@list='$(check_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+install-installed_testPROGRAMS: $(installed_test_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	@list='$(installed_test_PROGRAMS)'; test -n "$(installed_testdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(installed_testdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(installed_testdir)" || exit 1; \
+	fi; \
+	for p in $$list; do echo "$$p $$p"; done | \
+	sed 's/$(EXEEXT)$$//' | \
+	while read p p1; do if test -f $$p \
+	 || test -f $$p1 \
+	  ; then echo "$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n;h' \
+	    -e 's|.*|.|' \
+	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
+	sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
+	    else { print "f", $$3 "/" $$4, $$1; } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	    test -z "$$files" || { \
+	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(installed_testdir)$$dir'"; \
+	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(installed_testdir)$$dir" || exit $$?; \
+	    } \
+	; done
+
+uninstall-installed_testPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(installed_test_PROGRAMS)'; test -n "$(installed_testdir)" || list=; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
+	      -e 's/$$/$(EXEEXT)/' \
+	`; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(installed_testdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(installed_testdir)" && rm -f $$files
+
+clean-installed_testPROGRAMS:
+	@list='$(installed_test_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
 
 crash$(EXEEXT): $(crash_OBJECTS) $(crash_DEPENDENCIES) $(EXTRA_crash_DEPENDENCIES) 
 	@rm -f crash$(EXEEXT)
@@ -715,6 +884,41 @@ rsvg-test$(EXEEXT): $(rsvg_test_OBJECTS) $(rsvg_test_DEPENDENCIES) $(EXTRA_rsvg_
 styles$(EXEEXT): $(styles_OBJECTS) $(styles_DEPENDENCIES) $(EXTRA_styles_DEPENDENCIES) 
 	@rm -f styles$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(styles_OBJECTS) $(styles_LDADD) $(LIBS)
+install-installed_testSCRIPTS: $(installed_test_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	@list='$(installed_test_SCRIPTS)'; test -n "$(installed_testdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(installed_testdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(installed_testdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f "$$d$$p"; then echo "$$d$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n' \
+	    -e 'h;s|.*|.|' \
+	    -e 'p;x;s,.*/,,;$(transform)' | sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1; } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) { files[d] = files[d] " " $$1; \
+	      if (++n[d] == $(am__install_max)) { \
+		print "f", d, files[d]; n[d] = 0; files[d] = "" } } \
+	    else { print "f", d "/" $$4, $$1 } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	     if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	     test -z "$$files" || { \
+	       echo " $(INSTALL_SCRIPT) $$files '$(DESTDIR)$(installed_testdir)$$dir'"; \
+	       $(INSTALL_SCRIPT) $$files "$(DESTDIR)$(installed_testdir)$$dir" || exit $$?; \
+	     } \
+	; done
+
+uninstall-installed_testSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(installed_test_SCRIPTS)'; test -n "$(installed_testdir)" || exit 0; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	       sed -e 's,.*/,,;$(transform)'`; \
+	dir='$(DESTDIR)$(installed_testdir)'; $(am__uninstall_files_from_dir)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -723,10 +927,9 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/crash.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsvg-size-callback.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsvg-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/styles.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-utils.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -749,74 +952,65 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-rsvg-size-callback.lo: $(top_srcdir)/rsvg-size-callback.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rsvg-size-callback.lo -MD -MP -MF $(DEPDIR)/rsvg-size-callback.Tpo -c -o rsvg-size-callback.lo `test -f '$(top_srcdir)/rsvg-size-callback.c' || echo '$(srcdir)/'`$(top_srcdir)/rsvg-size-callback.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/rsvg-size-callback.Tpo $(DEPDIR)/rsvg-size-callback.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/rsvg-size-callback.c' object='rsvg-size-callback.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o rsvg-size-callback.lo `test -f '$(top_srcdir)/rsvg-size-callback.c' || echo '$(srcdir)/'`$(top_srcdir)/rsvg-size-callback.c
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-
-# This directory's subdirectories are mostly independent; you can cd
-# into them and run 'make' without going through this Makefile.
-# To change the values of 'make' variables: instead of editing Makefiles,
-# (1) if the variable is set in 'config.status', edit 'config.status'
-#     (which will cause the Makefiles to be regenerated when you run 'make');
-# (2) otherwise, pass the desired values on the 'make' command line.
-$(am__recursive_targets):
-	@fail=; \
-	if $(am__make_keepgoing); then \
-	  failcom='fail=yes'; \
-	else \
-	  failcom='exit 1'; \
+install-installed_test_metaDATA: $(installed_test_meta_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(installed_test_meta_DATA)'; test -n "$(installed_test_metadir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(installed_test_metadir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(installed_test_metadir)" || exit 1; \
 	fi; \
-	dot_seen=no; \
-	target=`echo $@ | sed s/-recursive//`; \
-	case "$@" in \
-	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
-	  *) list='$(SUBDIRS)' ;; \
-	esac; \
-	for subdir in $$list; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    dot_seen=yes; \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done; \
-	if test "$$dot_seen" = "no"; then \
-	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
-	fi; test -z "$$fail"
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(installed_test_metadir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(installed_test_metadir)" || exit $$?; \
+	done
+
+uninstall-installed_test_metaDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(installed_test_meta_DATA)'; test -n "$(installed_test_metadir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(installed_test_metadir)'; $(am__uninstall_files_from_dir)
+install-nobase_installed_testDATA: $(nobase_installed_test_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(nobase_installed_test_DATA)'; test -n "$(installed_testdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(installed_testdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(installed_testdir)" || exit 1; \
+	fi; \
+	$(am__nobase_list) | while read dir files; do \
+	  xfiles=; for file in $$files; do \
+	    if test -f "$$file"; then xfiles="$$xfiles $$file"; \
+	    else xfiles="$$xfiles $(srcdir)/$$file"; fi; done; \
+	  test -z "$$xfiles" || { \
+	    test "x$$dir" = x. || { \
+	      echo " $(MKDIR_P) '$(DESTDIR)$(installed_testdir)/$$dir'"; \
+	      $(MKDIR_P) "$(DESTDIR)$(installed_testdir)/$$dir"; }; \
+	    echo " $(INSTALL_DATA) $$xfiles '$(DESTDIR)$(installed_testdir)/$$dir'"; \
+	    $(INSTALL_DATA) $$xfiles "$(DESTDIR)$(installed_testdir)/$$dir" || exit $$?; }; \
+	done
+
+uninstall-nobase_installed_testDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(nobase_installed_test_DATA)'; test -n "$(installed_testdir)" || list=; \
+	$(am__nobase_strip_setup); files=`$(am__nobase_strip)`; \
+	dir='$(DESTDIR)$(installed_testdir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
-tags: tags-recursive
+tags: tags-am
 TAGS: tags
 
 tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
 	set x; \
 	here=`pwd`; \
-	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
-	  include_option=--etags-include; \
-	  empty_fix=.; \
-	else \
-	  include_option=--include; \
-	  empty_fix=; \
-	fi; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test ! -f $$subdir/TAGS || \
-	      set "$$@" "$$include_option=$$here/$$subdir/TAGS"; \
-	  fi; \
-	done; \
 	$(am__define_uniq_tagged_files); \
 	shift; \
 	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
@@ -829,7 +1023,7 @@ tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
 	      $$unique; \
 	  fi; \
 	fi
-ctags: ctags-recursive
+ctags: ctags-am
 
 CTAGS: ctags
 ctags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
@@ -842,7 +1036,7 @@ GTAGS:
 	here=`$(am__cd) $(top_builddir) && pwd` \
 	  && $(am__cd) $(top_srcdir) \
 	  && gtags -i $(GTAGS_ARGS) "$$here"
-cscopelist: cscopelist-recursive
+cscopelist: cscopelist-am
 
 cscopelist-am: $(am__tagged_files)
 	list='$(am__tagged_files)'; \
@@ -991,7 +1185,7 @@ check-TESTS:
 	log_list=`echo $$log_list`; trs_list=`echo $$trs_list`; \
 	$(MAKE) $(AM_MAKEFLAGS) $(TEST_SUITE_LOG) TEST_LOGS="$$log_list"; \
 	exit $$?;
-recheck: all 
+recheck: all $(check_LTLIBRARIES) $(check_PROGRAMS) $(check_SCRIPTS) $(check_DATA)
 	@test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
 	@set +e; $(am__set_TESTS_bases); \
 	bases=`for i in $$bases; do echo $$i; done \
@@ -1068,46 +1262,27 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	@list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    $(am__make_dryrun) \
-	      || test -d "$(distdir)/$$subdir" \
-	      || $(MKDIR_P) "$(distdir)/$$subdir" \
-	      || exit 1; \
-	    dir1=$$subdir; dir2="$(distdir)/$$subdir"; \
-	    $(am__relativize); \
-	    new_distdir=$$reldir; \
-	    dir1=$$subdir; dir2="$(top_distdir)"; \
-	    $(am__relativize); \
-	    new_top_distdir=$$reldir; \
-	    echo " (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir="$$new_top_distdir" distdir="$$new_distdir" \\"; \
-	    echo "     am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir)"; \
-	    ($(am__cd) $$subdir && \
-	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="$$new_top_distdir" \
-	        distdir="$$new_distdir" \
-		am__remove_distdir=: \
-		am__skip_length_check=: \
-		am__skip_mode_fix=: \
-	        distdir) \
-	      || exit 1; \
-	  fi; \
-	done
 check-am: all-am
+	$(MAKE) $(AM_MAKEFLAGS) $(check_LTLIBRARIES) $(check_PROGRAMS) \
+	  $(check_SCRIPTS) $(check_DATA)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: check-recursive
-all-am: Makefile $(LTLIBRARIES)
-installdirs: installdirs-recursive
-installdirs-am:
-install: install-recursive
-install-exec: install-exec-recursive
-install-data: install-data-recursive
-uninstall: uninstall-recursive
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(DATA)
+installdirs:
+	for dir in "$(DESTDIR)$(installed_testdir)" "$(DESTDIR)$(installed_testdir)" "$(DESTDIR)$(installed_testdir)" "$(DESTDIR)$(installed_test_metadir)" "$(DESTDIR)$(installed_testdir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
+install-exec: install-exec-am
+install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-recursive
+installcheck: installcheck-am
 install-strip:
 	if test -z '$(STRIP)'; then \
 	  $(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
@@ -1134,99 +1309,121 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-recursive
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
+	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
+clean-am: clean-checkLTLIBRARIES clean-checkPROGRAMS clean-generic \
+	clean-installed_testLTLIBRARIES clean-installed_testPROGRAMS \
+	clean-libtool clean-noinstLTLIBRARIES clean-noinstPROGRAMS \
 	mostlyclean-am
 
-distclean: distclean-recursive
+distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
 
-dvi: dvi-recursive
+dvi: dvi-am
 
 dvi-am:
 
-html: html-recursive
+html: html-am
 
 html-am:
 
-info: info-recursive
+info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-installed_testLTLIBRARIES \
+	install-installed_testPROGRAMS install-installed_testSCRIPTS \
+	install-installed_test_metaDATA \
+	install-nobase_installed_testDATA
 
-install-dvi: install-dvi-recursive
+install-dvi: install-dvi-am
 
 install-dvi-am:
 
 install-exec-am:
 
-install-html: install-html-recursive
+install-html: install-html-am
 
 install-html-am:
 
-install-info: install-info-recursive
+install-info: install-info-am
 
 install-info-am:
 
 install-man:
 
-install-pdf: install-pdf-recursive
+install-pdf: install-pdf-am
 
 install-pdf-am:
 
-install-ps: install-ps-recursive
+install-ps: install-ps-am
 
 install-ps-am:
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-recursive
+maintainer-clean: maintainer-clean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-recursive
+mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool
 
-pdf: pdf-recursive
+pdf: pdf-am
 
 pdf-am:
 
-ps: ps-recursive
+ps: ps-am
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-installed_testLTLIBRARIES \
+	uninstall-installed_testPROGRAMS \
+	uninstall-installed_testSCRIPTS \
+	uninstall-installed_test_metaDATA \
+	uninstall-nobase_installed_testDATA
 
-.MAKE: $(am__recursive_targets) check-am install-am install-strip
+.MAKE: all check check-am install install-am install-strip
 
-.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am check \
-	check-TESTS check-am clean clean-generic clean-libtool \
-	clean-noinstLTLIBRARIES cscopelist-am ctags ctags-am distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am recheck tags tags-am \
-	uninstall uninstall-am
+.PHONY: CTAGS GTAGS TAGS all all-am check check-TESTS check-am clean \
+	clean-checkLTLIBRARIES clean-checkPROGRAMS clean-generic \
+	clean-installed_testLTLIBRARIES clean-installed_testPROGRAMS \
+	clean-libtool clean-noinstLTLIBRARIES clean-noinstPROGRAMS \
+	cscopelist-am ctags ctags-am distclean distclean-compile \
+	distclean-generic distclean-libtool distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-installed_testLTLIBRARIES \
+	install-installed_testPROGRAMS install-installed_testSCRIPTS \
+	install-installed_test_metaDATA install-man \
+	install-nobase_installed_testDATA install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	recheck tags tags-am uninstall uninstall-am \
+	uninstall-installed_testLTLIBRARIES \
+	uninstall-installed_testPROGRAMS \
+	uninstall-installed_testSCRIPTS \
+	uninstall-installed_test_metaDATA \
+	uninstall-nobase_installed_testDATA
 
 
-test:
-	@$(MAKE) $(AM_MAKEFLAGS) check;
-
-.PHONY: test
+@ENABLE_INSTALLED_TESTS_TRUE@%.test: %$(EXEEXT) Makefile
+@ENABLE_INSTALLED_TESTS_TRUE@	$(AM_V_GEN) (echo '[Test]' > $@.tmp; \
+@ENABLE_INSTALLED_TESTS_TRUE@	echo 'Type=session' >> $@.tmp; \
+@ENABLE_INSTALLED_TESTS_TRUE@	echo 'Exec=$(installed_testdir)/$(notdir $<) --tap' >> $@.tmp; \
+@ENABLE_INSTALLED_TESTS_TRUE@	echo 'Output=TAP' >> $@.tmp; \
+@ENABLE_INSTALLED_TESTS_TRUE@	mv $@.tmp $@)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

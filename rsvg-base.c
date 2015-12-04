@@ -277,7 +277,7 @@ rsvg_standard_element_start (RsvgHandle * ctx, const char *name, RsvgPropertyBag
     else if (!strcmp (name, "feMergeNode"))
         newnode = rsvg_new_filter_primitive_merge_node ();
     else if (!strcmp (name, "feFuncR"))
-        newnode = rsvg_new_node_component_transfer_function ('r');
+        newnode = rsvg_new_node_component_transfer_function ('r'); /* See rsvg_filter_primitive_component_transfer_render() for where these values are used */
     else if (!strcmp (name, "feFuncG"))
         newnode = rsvg_new_node_component_transfer_function ('g');
     else if (!strcmp (name, "feFuncB"))
@@ -1213,7 +1213,6 @@ rsvg_handle_close_impl (RsvgHandle * handle, GError ** error)
         xmlFreeDoc (xml_doc);
     }
 
-    rsvg_defs_resolve_all (handle->priv->defs);
     handle->priv->finished = TRUE;
     handle->priv->error = NULL;
 
@@ -1235,11 +1234,9 @@ rsvg_drawing_ctx_free (RsvgDrawingCtx * handle)
 	/* the drawsub stack's nodes are owned by the ->defs */
 	g_slist_free (handle->drawsub_stack);
 
-    g_slist_free (handle->ptrs);
+    g_warn_if_fail (handle->acquired_nodes == NULL);
+    g_slist_free (handle->acquired_nodes);
 	
-    if (handle->base_uri)
-        g_free (handle->base_uri);
-
     if (handle->pango_context != NULL)
         g_object_unref (handle->pango_context);
 
@@ -1375,13 +1372,13 @@ rsvg_handle_get_dimensions_sub (RsvgHandle * handle, RsvgDimensionData * dimensi
     memset (dimension_data, 0, sizeof (RsvgDimensionData));
 
     if (id && *id) {
-        sself = (RsvgNode *) rsvg_defs_lookup (handle->priv->defs, id);
+        sself = rsvg_defs_lookup (handle->priv->defs, id);
 
-        if (sself == (RsvgNode *) handle->priv->treebase)
+        if (sself == handle->priv->treebase)
             id = NULL;
     }
     else
-        sself = (RsvgNode *) handle->priv->treebase;
+        sself = handle->priv->treebase;
 
     if (!sself && id)
         return FALSE;
@@ -1422,7 +1419,7 @@ rsvg_handle_get_dimensions_sub (RsvgHandle * handle, RsvgDimensionData * dimensi
         rsvg_state_push (draw);
         cairo_save (cr);
 
-        rsvg_node_draw ((RsvgNode *) handle->priv->treebase, draw, 0);
+        rsvg_node_draw (handle->priv->treebase, draw, 0);
         bbox = RSVG_CAIRO_RENDER (draw->render)->bbox;
 
         cairo_restore (cr);
@@ -1492,10 +1489,10 @@ rsvg_handle_get_position_sub (RsvgHandle * handle, RsvgPositionData * position_d
     memset (position_data, 0, sizeof (*position_data));
     memset (&dimension_data, 0, sizeof (dimension_data));
 
-    node = (RsvgNode *) rsvg_defs_lookup (handle->priv->defs, id);
+    node = rsvg_defs_lookup (handle->priv->defs, id);
     if (!node) {
         return FALSE;
-    } else if (node == (RsvgNode *) handle->priv->treebase) {
+    } else if (node == handle->priv->treebase) {
         /* Root node. */
         position_data->x = 0;
         position_data->y = 0;
@@ -1520,7 +1517,7 @@ rsvg_handle_get_position_sub (RsvgHandle * handle, RsvgPositionData * position_d
     rsvg_state_push (draw);
     cairo_save (cr);
 
-    rsvg_node_draw ((RsvgNode *) handle->priv->treebase, draw, 0);
+    rsvg_node_draw (handle->priv->treebase, draw, 0);
     bbox = RSVG_CAIRO_RENDER (draw->render)->bbox;
 
     cairo_restore (cr);
@@ -1756,18 +1753,11 @@ rsvg_handle_close (RsvgHandle * handle, GError ** error)
           return TRUE;
 
     if (priv->data_input_stream) {
-        GConverter *converter;
-        GInputStream *stream;
         gboolean ret;
 
-        converter = G_CONVERTER (g_zlib_decompressor_new (G_ZLIB_COMPRESSOR_FORMAT_GZIP));
-        stream = g_converter_input_stream_new (priv->data_input_stream, converter);
-        g_object_unref (converter);
+        ret = rsvg_handle_read_stream_sync (handle, priv->data_input_stream, NULL, error);
         g_object_unref (priv->data_input_stream);
         priv->data_input_stream = NULL;
-
-        ret = rsvg_handle_read_stream_sync (handle, stream, NULL, error);
-        g_object_unref (stream);
 
         return ret;
     }
@@ -1807,6 +1797,7 @@ rsvg_handle_read_stream_sync (RsvgHandle   *handle,
     xmlDocPtr doc;
     GError *err = NULL;
     gboolean res = FALSE;
+    const guchar *buf;
 
     g_return_val_if_fail (RSVG_IS_HANDLE (handle), FALSE);
     g_return_val_if_fail (G_IS_INPUT_STREAM (stream), FALSE);
@@ -1814,6 +1805,25 @@ rsvg_handle_read_stream_sync (RsvgHandle   *handle,
     g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
     priv = handle->priv;
+
+    /* detect zipped streams */
+    stream = g_buffered_input_stream_new (stream);
+    if (g_buffered_input_stream_fill (G_BUFFERED_INPUT_STREAM (stream), 2, cancellable, error) != 2) {
+        g_object_unref (stream);
+        return FALSE;
+    }
+    buf = g_buffered_input_stream_peek_buffer (G_BUFFERED_INPUT_STREAM (stream), NULL);
+    if ((buf[0] == 0x1f) && (buf[1] == 0x8b)) {
+        GConverter *converter;
+        GInputStream *conv_stream;
+
+        converter = G_CONVERTER (g_zlib_decompressor_new (G_ZLIB_COMPRESSOR_FORMAT_GZIP));
+        conv_stream = g_converter_input_stream_new (stream, converter);
+        g_object_unref (converter);
+        g_object_unref (stream);
+
+        stream = conv_stream;
+    }
 
     priv->error = &err;
     priv->cancellable = cancellable ? g_object_ref (cancellable) : NULL;
@@ -1859,12 +1869,13 @@ rsvg_handle_read_stream_sync (RsvgHandle   *handle,
 
     xmlFreeDoc (doc);
 
-    rsvg_defs_resolve_all (priv->defs);
     priv->finished = TRUE;
 
     res = TRUE;
 
   out:
+
+    g_object_unref (stream);
 
     priv->error = NULL;
     g_clear_object (&priv->cancellable);
@@ -2016,6 +2027,59 @@ void
 rsvg_push_discrete_layer (RsvgDrawingCtx * ctx)
 {
     ctx->render->push_discrete_layer (ctx);
+}
+
+/*
+ * rsvg_acquire_node:
+ * @ctx: The drawing context in use
+ * @url: The IRI to lookup
+ *
+ * Use this function when looking up urls to other nodes. This
+ * function does proper recursion checking and thereby avoids
+ * infinite loops.
+ *
+ * Nodes acquired by this function must be released using
+ * rsvg_release_node() in reverse acquiring order.
+ *
+ * Returns: The node referenced by @url or %NULL if the @url
+ *          does not reference a node.
+ */
+RsvgNode *
+rsvg_acquire_node (RsvgDrawingCtx * ctx, const char *url)
+{
+  RsvgNode *node;
+
+  node = rsvg_defs_lookup (ctx->defs, url);
+  if (node == NULL)
+    return NULL;
+
+  if (g_slist_find (ctx->acquired_nodes, node))
+    return NULL;
+
+  ctx->acquired_nodes = g_slist_prepend (ctx->acquired_nodes, node);
+
+  return node;
+}
+
+/*
+ * rsvg_release_node:
+ * @ctx: The drawing context the node was acquired from
+ * @node: Node to release
+ *
+ * Releases a node previously acquired via rsvg_acquire_node().
+ *
+ * if @node is %NULL, this function does nothing.
+ */
+void
+rsvg_release_node (RsvgDrawingCtx * ctx, RsvgNode *node)
+{
+  if (node == NULL)
+    return;
+
+  g_return_if_fail (ctx->acquired_nodes != NULL);
+  g_return_if_fail (ctx->acquired_nodes->data == node);
+
+  ctx->acquired_nodes = g_slist_remove (ctx->acquired_nodes, node);
 }
 
 void
@@ -2212,8 +2276,6 @@ _rsvg_handle_allow_load (RsvgHandle *handle,
     /* Not a valid URI */
     if (scheme == NULL)
         goto deny;
-
-    goto allow;
 
     /* Allow loads of data: from any location */
     if (g_str_equal (scheme, "data"))

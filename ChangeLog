@@ -1,3 +1,1416 @@
+commit 513c51f88ed66e7d76718039998658e8b68ba92c
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Dec 1 19:13:09 2015 -0600
+
+    Update NEWS
+
+ NEWS | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+commit 9fc9d3829ba6b0a6e9f49ddc475538c9ffdf0266
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Fri Nov 6 18:46:08 2015 +0100
+
+    tools: Remove test-memory binary
+    
+    g_mem_set_vtable() is no longer supported, so this tool does nothing.
+
+ tools/Makefile.am   |  8 +-------
+ tools/test-memory.c | 35 -----------------------------------
+ 2 files changed, 1 insertion(+), 42 deletions(-)
+
+commit 510940f241324dbcb3e233aade268a307aac1560
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Fri Nov 6 18:41:01 2015 +0100
+
+    rsvg-convert: Use g_printerr()
+
+ rsvg-convert.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+commit d8ed521cc3e7740a1bf04646dd8074f23e5e630c
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Fri Nov 6 00:20:41 2015 +0100
+
+    path: Initialize variable
+
+ rsvg-path.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 0a8bdb0a5348625ed0ab3d6225c09df97149982a
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Fri Nov 6 00:09:17 2015 +0100
+
+    path: Use correct comparison
+    
+    We were doing nothing for i == 2.
+    
+    Also, the code was written in such a way that this error was hard to
+    spot. Why would you start your elseif nesting with the > 2 condition?
+    And most of all: Why would you not use a simple else clause?
+
+ rsvg-path.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+commit 5cb7fb4b2dc5561047e26718151a25c841f5e2cd
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Thu Nov 5 23:01:56 2015 +0100
+
+    Add testcase for recent fix
+    
+    This adds a testcase for the fix in commit
+    1d9e887d42ccd3077a3a867815a5733e91b654bb
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=757286
+
+ tests/fixtures/reftests/nonexisting-filter-ref.png | Bin 0 -> 155 bytes
+ tests/fixtures/reftests/nonexisting-filter.svg     |   3 +++
+ 2 files changed, 3 insertions(+)
+
+commit 34dcd26396a75405bd691f54a00d689fb6f755d8
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Nov 3 15:32:59 2015 -0600
+
+    rsvg-path: Add missing case where reflection point was not set
+    
+    This is from https://bugzilla.gnome.org/show_bug.cgi?id=677068, although I haven't figured
+    out why the rightmost/topmost arrow in https://bugzilla.gnome.org/show_bug.cgi?id=685906 doesn't
+    render yet.
+
+ rsvg-path.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit 1d9e887d42ccd3077a3a867815a5733e91b654bb
+Author: Florian Müllner <fmuellner@gnome.org>
+Date:   Thu Oct 29 09:33:24 2015 +0100
+
+    Fix crash when trying to release a reference we don't own
+    
+    Commit 9fc56102ca changed the condition for creating a new surface,
+    but did not update the condition for freeing it, resulting in a
+    crash when trying to release a reference we don't own.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=757286
+
+ rsvg-cairo-draw.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+commit 238f015fa30d73849e19a6ef41b3c325e615b897
+Author: Matthias Clasen <mclasen@redhat.com>
+Date:   Tue Oct 27 08:37:41 2015 -0400
+
+    Dist the reference images for reftests
+
+ tests/Makefile.am | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit 3f4ca108da2d85a6dc2c617a7cb7ff5787c88799
+Author: Matthias Clasen <mclasen@redhat.com>
+Date:   Tue Oct 27 08:37:27 2015 -0400
+
+    Dist all the test infrastructure
+
+ Makefile.am | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+commit d31ba9c8548f9b848332779f505997b6a5fc4412
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Mon Oct 26 16:57:26 2015 +0100
+
+    tests: Add tests for loading gzip-compressed SVGs
+
+ tests/fixtures/reftests/gzip-compressed-ref.png    | Bin 0 -> 155 bytes
+ tests/fixtures/reftests/gzip-compressed.svg        | Bin 0 -> 131 bytes
+ tests/fixtures/reftests/include-compressed-ref.png | Bin 0 -> 155 bytes
+ tests/fixtures/reftests/include-compressed.svg     |   3 +++
+ 4 files changed, 3 insertions(+)
+
+commit beb10a3a5b0f584205cf4e7334b93ef192ed9361
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Sat Oct 24 21:45:34 2015 +0200
+
+    Make gzipped SVGs work with new_from_gfile()
+    
+    Move the code for decoding gzipped streams into load_from_stream() so
+    that all streaming code can use it.
+
+ rsvg-base.c | 31 +++++++++++++++++++++++--------
+ 1 file changed, 23 insertions(+), 8 deletions(-)
+
+commit 45c4257be73961d31e8d21265dede1cd2e550420
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Thu Oct 22 13:49:33 2015 +0200
+
+    configure: Remove pdiff Makefile
+    
+    Forgot to remove this one when I removed pdiff
+
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit f241a495939f2503b7a026076f02b9f9b8f529b1
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Thu Oct 22 12:40:12 2015 +0200
+
+    drawingctx: Remove unused variable
+
+ rsvg-base.c         | 3 ---
+ rsvg-cairo-render.c | 1 -
+ rsvg-private.h      | 1 -
+ 3 files changed, 5 deletions(-)
+
+commit b7e9ae8ce57a553add0cbd34ba7863b441178097
+Author: Matthias Clasen <mclasen@redhat.com>
+Date:   Tue Oct 20 21:54:52 2015 -0400
+
+    Install the tests
+    
+    Introduce the infrastructure for installed tests from glib, and
+    use it for the tests.
+
+ configure.ac       |   2 +
+ glib-tap.mk        | 135 +++++++++++
+ m4/glibtests.m4    |  28 +++
+ tap-driver.sh      | 652 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tap-test           |   5 +
+ tests/Makefile.am  |  42 ++--
+ tests/test-utils.c |   7 +-
+ 7 files changed, 845 insertions(+), 26 deletions(-)
+
+commit 775178c2d7480895ce1b2bb86477a45e48bd22e4
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Tue Oct 20 18:11:46 2015 +0200
+
+    defs: Do the right thing for duplicate ids
+    
+    When an id (illegally) exists twice in an SVG file, all renderers keep
+    the definition that appears first.
+    Do the same in rsvg.
+
+ rsvg-defs.c                                  |   3 +++
+ tests/fixtures/reftests/duplicate-id-ref.png | Bin 0 -> 155 bytes
+ tests/fixtures/reftests/duplicate-id.svg     |   7 +++++++
+ 3 files changed, 10 insertions(+)
+
+commit 25f271d2e1e5916d0c3f73d20a366873f64fbbc4
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Tue Oct 20 14:30:16 2015 +0200
+
+    tests: Redo rsvg-test to test all svg files
+    
+    .. instead of requiring an rsvg-test.txt file.
+    
+    As a side effect, this gets rid of failing tests.
+
+ tests/rsvg-test.c   | 148 +++++++++++++++++++++++++++++-----------------------
+ tests/rsvg-test.txt |  13 -----
+ 2 files changed, 84 insertions(+), 77 deletions(-)
+
+commit 4e726b5e7a76ac57972328f523df52363dee0fea
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Mon Oct 19 02:18:54 2015 +0200
+
+    tests: Move successful tests
+    
+    Keep them in a reftests directory.
+
+ tests/Makefile.am                           |   2 +
+ tests/fixtures/reftests/bugs/403357-ref.png | Bin 0 -> 1366 bytes
+ tests/fixtures/reftests/bugs/403357.svg     |  48 ++++++++++++++++
+ tests/fixtures/reftests/bugs/476507-ref.png | Bin 0 -> 6018 bytes
+ tests/fixtures/reftests/bugs/476507.svg     |  78 +++++++++++++++++++++++++
+ tests/fixtures/reftests/bugs/548494-ref.png | Bin 0 -> 751 bytes
+ tests/fixtures/reftests/bugs/548494.svg     |   5 ++
+ tests/fixtures/reftests/bugs/563933-ref.png | Bin 0 -> 2526 bytes
+ tests/fixtures/reftests/bugs/563933.svg     |  86 ++++++++++++++++++++++++++++
+ tests/fixtures/reftests/bugs/738367-ref.png | Bin 0 -> 8748 bytes
+ tests/fixtures/reftests/bugs/738367.svg     |   7 +++
+ tests/reftests/bugs/403357-ref.png          | Bin 1366 -> 0 bytes
+ tests/reftests/bugs/403357.svg              |  48 ----------------
+ tests/reftests/bugs/476507-ref.png          | Bin 6018 -> 0 bytes
+ tests/reftests/bugs/476507.svg              |  78 -------------------------
+ tests/reftests/bugs/548494-ref.png          | Bin 751 -> 0 bytes
+ tests/reftests/bugs/548494.svg              |   5 --
+ tests/reftests/bugs/563933-ref.png          | Bin 2526 -> 0 bytes
+ tests/reftests/bugs/563933.svg              |  86 ----------------------------
+ tests/reftests/bugs/738367-ref.png          | Bin 8748 -> 0 bytes
+ tests/reftests/bugs/738367.svg              |   7 ---
+ tests/rsvg-test.txt                         |  10 ++--
+ 22 files changed, 231 insertions(+), 229 deletions(-)
+
+commit f4001bcea4e11903cd7ab700e6239e839c5c8f88
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Mon Oct 19 02:18:54 2015 +0200
+
+    tests: Save test images to /tmp, not into the test dir
+    
+    This is in preparation for installed tests. It's also for uncluttering
+    the test directory.
+
+ tests/rsvg-test.c | 39 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 33 insertions(+), 6 deletions(-)
+
+commit 97c88aa4c94516babd81ccddabbb5a1c9d9cecc0
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Mon Oct 19 02:14:07 2015 +0200
+
+    tests: Move passing tests into reftests/ dir
+
+ tests/bugs/403357-ref.png          | Bin 1366 -> 0 bytes
+ tests/bugs/403357.svg              |  48 ---------------------
+ tests/bugs/476507-ref.png          | Bin 6018 -> 0 bytes
+ tests/bugs/476507.svg              |  78 ---------------------------------
+ tests/bugs/548494-ref.png          | Bin 751 -> 0 bytes
+ tests/bugs/548494.svg              |   5 ---
+ tests/bugs/563933-ref.png          | Bin 2526 -> 0 bytes
+ tests/bugs/563933.svg              |  86 -------------------------------------
+ tests/bugs/738367-ref.png          | Bin 8748 -> 0 bytes
+ tests/bugs/738367.svg              |   7 ---
+ tests/reftests/bugs/403357-ref.png | Bin 0 -> 1366 bytes
+ tests/reftests/bugs/403357.svg     |  48 +++++++++++++++++++++
+ tests/reftests/bugs/476507-ref.png | Bin 0 -> 6018 bytes
+ tests/reftests/bugs/476507.svg     |  78 +++++++++++++++++++++++++++++++++
+ tests/reftests/bugs/548494-ref.png | Bin 0 -> 751 bytes
+ tests/reftests/bugs/548494.svg     |   5 +++
+ tests/reftests/bugs/563933-ref.png | Bin 0 -> 2526 bytes
+ tests/reftests/bugs/563933.svg     |  86 +++++++++++++++++++++++++++++++++++++
+ tests/reftests/bugs/738367-ref.png | Bin 0 -> 8748 bytes
+ tests/reftests/bugs/738367.svg     |   7 +++
+ tests/rsvg-test.c                  |   2 -
+ tests/rsvg-test.txt                |  10 ++---
+ 22 files changed, 229 insertions(+), 231 deletions(-)
+
+commit ff82330685707fcde8406be983b3882501655637
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Mon Oct 19 01:09:33 2015 +0200
+
+    tests: Update reference images for Cairo changes
+
+ tests/bugs/403357-ref.png | Bin 5914 -> 1366 bytes
+ tests/bugs/476507-ref.png | Bin 9606 -> 6018 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+
+commit 3926e99d0e1e5dde91e0ea8451540bd5781e1c6b
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Mon Oct 19 00:10:29 2015 +0200
+
+    tests: Update reference images from inkscape
+    
+    Update those images where Inkscape and librsvg agree on the rendering.
+
+ tests/bugs/548494-ref.png | Bin 2307 -> 751 bytes
+ tests/bugs/563933-ref.png | Bin 38311 -> 2526 bytes
+ tests/bugs/738367-ref.png | Bin 4184 -> 8748 bytes
+ 3 files changed, 0 insertions(+), 0 deletions(-)
+
+commit a22d02041373270ff5ae004854698cc8d5cdcffd
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Mon Oct 19 00:00:29 2015 +0200
+
+    tests: Don't test samples
+    
+    This is a destsuite not a demo showing off.
+
+ tests/rsvg-test.txt             |   3 ---
+ tests/samples/arrows-ref.png    | Bin 22554 -> 0 bytes
+ tests/samples/artwork-ref.png   | Bin 49846 -> 0 bytes
+ tests/samples/butterfly-ref.png | Bin 61360 -> 0 bytes
+ 4 files changed, 3 deletions(-)
+
+commit 79c93aa2006f6491059f66b9ba0eeba05531eeee
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Sun Oct 18 23:59:27 2015 +0200
+
+    tests: Mark pixels in diff where only the alpha channel differs
+
+ tests/rsvg-test.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+commit ed8d12be5c3018d5fd80b2c0a465abf036151dbd
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Sun Oct 18 20:51:05 2015 +0200
+
+    tests: Make styles test not fail to setup
+    
+    Did anybody ever run this test?
+
+ tests/styles.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 0fd2e583c3594a29a7b723e3056034dcaf101dea
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Sun Oct 18 20:45:21 2015 +0200
+
+    tests: Remove pdiff support
+    
+    We can generate ref images that are pixel-perfect. There is no need to
+    use pdiff, it just slows the testsuite down.
+
+ tests/Makefile.am            |   4 -
+ tests/pdiff/CMakeLists.txt   |  55 ------
+ tests/pdiff/Makefile.am      |  21 ---
+ tests/pdiff/README.txt       |  45 -----
+ tests/pdiff/args.c           | 119 -------------
+ tests/pdiff/args.h           |  46 -----
+ tests/pdiff/gpl.txt          | 340 -------------------------------------
+ tests/pdiff/lpyramid.c       | 111 -------------
+ tests/pdiff/lpyramid.h       |  32 ----
+ tests/pdiff/pdiff.c          | 387 -------------------------------------------
+ tests/pdiff/pdiff.h          |  40 -----
+ tests/pdiff/perceptualdiff.c | 115 -------------
+ tests/rsvg-test.c            |  27 +--
+ 13 files changed, 2 insertions(+), 1340 deletions(-)
+
+commit 7bf279e0efbeb2ef5ec8343cbf43b452a848fe08
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Sun Oct 18 20:42:58 2015 +0200
+
+    tests: Don't resize to 480px width
+    
+    Instead, use the width as specified in the SVG.
+
+ tests/Makefile.am |  4 +---
+ tests/rsvg-test.c | 22 ++--------------------
+ 2 files changed, 3 insertions(+), 23 deletions(-)
+
+commit 4cbeea9ca5b8025d0d974b8b3bbb73e1af5e7a1f
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Sun Oct 18 17:15:27 2015 +0200
+
+    tests: Don't force tests to white background
+    
+    We support transparency after all.
+    
+    This breaks the refference images for tests, but because they're all
+    broken anyway I didn't bother regenerating them.
+
+ tests/rsvg-test.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+commit 75ab7b8fcfac803c78ad4d6ee21a4f3d8a3ce189
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Sun Oct 18 02:51:33 2015 +0200
+
+    tests: Remove the svg testsuite
+    
+    Nobody ever took any effort to make it pass.
+    Which might be because the testsuite is not made to pass with using
+    non-free Microsoft fonts...
+
+ tests/rsvg-test.txt                                |  182 ---
+ tests/svg1.1/images/DisplaceChecker.png            |  Bin 2470 -> 0 bytes
+ tests/svg1.1/images/SVG-1.1-monolithic-fixed.dtd   | 1622 --------------------
+ tests/svg1.1/images/animation-add-BE-09.svg        |  201 ---
+ tests/svg1.1/images/animation-extRef-image1.svg    |   18 -
+ tests/svg1.1/images/animation-extRef-image2.svg    |   16 -
+ tests/svg1.1/images/animation-extRef-image3.svg    |   14 -
+ tests/svg1.1/images/bluesquidj.png                 |  Bin 37497 -> 0 bytes
+ tests/svg1.1/images/bullet-small.png               |  Bin 973 -> 0 bytes
+ tests/svg1.1/images/bullet-white.png               |  Bin 971 -> 0 bytes
+ tests/svg1.1/images/bullet.png                     |  Bin 972 -> 0 bytes
+ tests/svg1.1/images/bumpMap.png                    |  Bin 1998 -> 0 bytes
+ tests/svg1.1/images/bumpMap2.png                   |  Bin 657 -> 0 bytes
+ tests/svg1.1/images/changeColor.ICM                |  Bin 740 -> 0 bytes
+ tests/svg1.1/images/colorprof.png                  |  Bin 705 -> 0 bytes
+ tests/svg1.1/images/convolveImage.png              |  Bin 9281 -> 0 bytes
+ tests/svg1.1/images/coords-units-01-f.png          |  Bin 29842 -> 0 bytes
+ tests/svg1.1/images/coords-units-01-f.svg          |  193 ---
+ .../images/copyright-documents-19990405.html       |   89 --
+ tests/svg1.1/images/diagarrow.png                  |  Bin 997 -> 0 bytes
+ tests/svg1.1/images/ext-TestComic.svg              |   21 -
+ tests/svg1.1/images/fillChangeColor.ICM            |  Bin 740 -> 0 bytes
+ tests/svg1.1/images/filters-blend-01-f.svg         |  128 --
+ tests/svg1.1/images/filters-color-01-f.svg         |  121 --
+ tests/svg1.1/images/filters-composite-01-f.svg     |  188 ---
+ tests/svg1.1/images/filters-comptran-01-f.svg      |  132 --
+ .../images/filters-conv-01-f.includeimage.png      |  Bin 9281 -> 0 bytes
+ tests/svg1.1/images/filters-conv-01-f.svg          |  121 --
+ tests/svg1.1/images/filters-diffuse-01-f.svg       |  172 ---
+ tests/svg1.1/images/filters-example-01-f.svg       |  120 --
+ tests/svg1.1/images/gam030.png                     |  Bin 213 -> 0 bytes
+ tests/svg1.1/images/gam030b.png                    |  Bin 1029 -> 0 bytes
+ tests/svg1.1/images/gam045.png                     |  Bin 216 -> 0 bytes
+ tests/svg1.1/images/gam045b.png                    |  Bin 1059 -> 0 bytes
+ tests/svg1.1/images/gam056.png                     |  Bin 216 -> 0 bytes
+ tests/svg1.1/images/gam056b.png                    |  Bin 1059 -> 0 bytes
+ tests/svg1.1/images/gam100.png                     |  Bin 205 -> 0 bytes
+ tests/svg1.1/images/gam100b.png                    |  Bin 1044 -> 0 bytes
+ tests/svg1.1/images/gam200.png                     |  Bin 187 -> 0 bytes
+ tests/svg1.1/images/gam200b.png                    |  Bin 1019 -> 0 bytes
+ tests/svg1.1/images/greentopbutton.jpg             |  Bin 1111 -> 0 bytes
+ tests/svg1.1/images/image.png                      |  Bin 1884 -> 0 bytes
+ tests/svg1.1/images/image1.jpg                     |  Bin 34183 -> 0 bytes
+ tests/svg1.1/images/image1.png                     |  Bin 394416 -> 0 bytes
+ tests/svg1.1/images/image1_b.png                   |  Bin 12586 -> 0 bytes
+ tests/svg1.1/images/image2_b.jpg                   |  Bin 6643 -> 0 bytes
+ tests/svg1.1/images/image2_b.png                   |  Bin 7412 -> 0 bytes
+ tests/svg1.1/images/interact-dom-01-f.svg          |  148 --
+ tests/svg1.1/images/interact-order-02-b-targ.svg   |   62 -
+ tests/svg1.1/images/interact-order-03-b-targ.svg   |   62 -
+ tests/svg1.1/images/leftarrow.png                  |  Bin 124 -> 0 bytes
+ tests/svg1.1/images/linking-uri-01-b.svg           |   88 --
+ tests/svg1.1/images/linking-uri-01-f-1st.png       |  Bin 8183 -> 0 bytes
+ tests/svg1.1/images/linking-uri-01-f-2nd.png       |  Bin 34164 -> 0 bytes
+ tests/svg1.1/images/linking-uri-01-f-3rd.png       |  Bin 34164 -> 0 bytes
+ tests/svg1.1/images/linking-uri-01-f-4th.png       |  Bin 13626 -> 0 bytes
+ tests/svg1.1/images/linking-uri-01-f-start.png     |  Bin 34164 -> 0 bytes
+ tests/svg1.1/images/linking-uri-03-f-1st.png       |  Bin 28465 -> 0 bytes
+ tests/svg1.1/images/linking-uri-03-f-start.png     |  Bin 26549 -> 0 bytes
+ tests/svg1.1/images/linkingCircle-f.svg            |   25 -
+ tests/svg1.1/images/linkingToc-t.svg               |   63 -
+ tests/svg1.1/images/magnify.png                    |  Bin 268 -> 0 bytes
+ tests/svg1.1/images/myimage.jpg                    |  Bin 4402 -> 0 bytes
+ tests/svg1.1/images/nav_bullet.png                 |  Bin 264 -> 0 bytes
+ tests/svg1.1/images/nav_down.png                   |  Bin 252 -> 0 bytes
+ tests/svg1.1/images/nav_downleft.png               |  Bin 170 -> 0 bytes
+ tests/svg1.1/images/nav_downright.png              |  Bin 169 -> 0 bytes
+ tests/svg1.1/images/nav_frame.png                  |  Bin 155 -> 0 bytes
+ tests/svg1.1/images/nav_left.png                   |  Bin 166 -> 0 bytes
+ tests/svg1.1/images/nav_noframe.png                |  Bin 270 -> 0 bytes
+ tests/svg1.1/images/nav_right.png                  |  Bin 168 -> 0 bytes
+ tests/svg1.1/images/nav_svg.png                    |  Bin 155 -> 0 bytes
+ tests/svg1.1/images/nav_up.png                     |  Bin 173 -> 0 bytes
+ tests/svg1.1/images/nav_upleft.png                 |  Bin 172 -> 0 bytes
+ tests/svg1.1/images/nav_upright.png                |  Bin 173 -> 0 bytes
+ tests/svg1.1/images/old-name-2-new-name1.html      | 1178 --------------
+ tests/svg1.1/images/paths-data-01-f.png            |  Bin 36446 -> 0 bytes
+ tests/svg1.1/images/paths-data-01-f.svg            |  169 --
+ tests/svg1.1/images/paths-data-02-f.png            |  Bin 42041 -> 0 bytes
+ tests/svg1.1/images/paths-data-02-f.svg            |  143 --
+ tests/svg1.1/images/paths-data-03-f.png            |  Bin 38026 -> 0 bytes
+ tests/svg1.1/images/paths-data-03-f.svg            |  137 --
+ tests/svg1.1/images/paths-data-04-f.png            |  Bin 30546 -> 0 bytes
+ tests/svg1.1/images/paths-data-04-f.svg            |  171 ---
+ tests/svg1.1/images/rects.svg                      |   11 -
+ tests/svg1.1/images/rects_b.svg                    |    6 -
+ tests/svg1.1/images/rightarrow.png                 |  Bin 963 -> 0 bytes
+ tests/svg1.1/images/rotate20.png                   |  Bin 1434 -> 0 bytes
+ tests/svg1.1/images/shapes-ellipse-01-b.svg        |   59 -
+ tests/svg1.1/images/shapes-ellipse-01-f.png        |  Bin 31126 -> 0 bytes
+ tests/svg1.1/images/shapes-ellipse-01-f.svg        |  111 --
+ tests/svg1.1/images/shapes-rect-01-b.svg           |   60 -
+ tests/svg1.1/images/shapes-rect-01-f.png           |  Bin 26453 -> 0 bytes
+ tests/svg1.1/images/shapes-rect-01-f.svg           |  113 --
+ tests/svg1.1/images/sign.png                       |  Bin 10647 -> 0 bytes
+ tests/svg1.1/images/sphere.png                     |  Bin 5923 -> 0 bytes
+ tests/svg1.1/images/struct-frag-01-B.svg           |   55 -
+ tests/svg1.1/images/struct-image-01.jpg            |  Bin 4751 -> 0 bytes
+ tests/svg1.1/images/struct-image-01.png            |  Bin 63238 -> 0 bytes
+ tests/svg1.1/images/struct-image-02.jpg            |  Bin 3779 -> 0 bytes
+ tests/svg1.1/images/struct-image-02.png            |  Bin 35887 -> 0 bytes
+ tests/svg1.1/images/struct-symbol-01.png           |  Bin 71497 -> 0 bytes
+ tests/svg1.1/images/text-align-01-f.svg            |   95 --
+ tests/svg1.1/images/text-align-02-f.svg            |  146 --
+ tests/svg1.1/images/text-align-03-f.svg            |   96 --
+ tests/svg1.1/images/text-altglyph-01-f.svg         |  202 ---
+ tests/svg1.1/images/text-extTref-BE-18-targ.svg    |   58 -
+ tests/svg1.1/images/text-intro-01-f.svg            |  106 --
+ tests/svg1.1/images/text-tref-01-f.svg             |  160 --
+ tests/svg1.1/images/text-ws-01-f.svg               |  130 --
+ tests/svg1.1/images/toc-sv.svg                     |  114 --
+ tests/svg1.1/images/toc-svcmp.svg                  |  114 --
+ tests/svg1.1/images/uparrow.png                    |  Bin 1232 -> 0 bytes
+ tests/svg1.1/svg/animate-elem-02-t.svg             |   93 --
+ tests/svg1.1/svg/animate-elem-03-t.svg             |   88 --
+ tests/svg1.1/svg/animate-elem-04-t.svg             |   53 -
+ tests/svg1.1/svg/animate-elem-05-t.svg             |   55 -
+ tests/svg1.1/svg/animate-elem-06-t.svg             |   54 -
+ tests/svg1.1/svg/animate-elem-07-t.svg             |   56 -
+ tests/svg1.1/svg/animate-elem-08-t.svg             |   71 -
+ tests/svg1.1/svg/animate-elem-09-t.svg             |   97 --
+ tests/svg1.1/svg/animate-elem-10-t.svg             |   94 --
+ tests/svg1.1/svg/animate-elem-11-t.svg             |   93 --
+ tests/svg1.1/svg/animate-elem-12-t.svg             |   93 --
+ tests/svg1.1/svg/animate-elem-13-t.svg             |   94 --
+ tests/svg1.1/svg/animate-elem-14-t.svg             |   76 -
+ tests/svg1.1/svg/animate-elem-15-t.svg             |   77 -
+ tests/svg1.1/svg/animate-elem-16-t.svg             |   77 -
+ tests/svg1.1/svg/animate-elem-17-t.svg             |   77 -
+ tests/svg1.1/svg/animate-elem-18-t.svg             |   76 -
+ tests/svg1.1/svg/animate-elem-19-t.svg             |   77 -
+ tests/svg1.1/svg/animate-elem-20-t.svg             |   75 -
+ tests/svg1.1/svg/animate-elem-21-t.svg             |   87 --
+ tests/svg1.1/svg/animate-elem-22-b.svg             |   80 -
+ tests/svg1.1/svg/animate-elem-23-t.svg             |   87 --
+ tests/svg1.1/svg/animate-elem-24-t.svg             |  105 --
+ tests/svg1.1/svg/animate-elem-25-t.svg             |   59 -
+ tests/svg1.1/svg/animate-elem-26-t.svg             |   59 -
+ tests/svg1.1/svg/animate-elem-27-t.svg             |   77 -
+ tests/svg1.1/svg/animate-elem-28-t.svg             |   53 -
+ tests/svg1.1/svg/animate-elem-29-b.svg             |   98 --
+ tests/svg1.1/svg/color-prof-01-f.svg               |   66 -
+ tests/svg1.1/svg/color-prop-01-b-ref.png           |  Bin 16438 -> 0 bytes
+ tests/svg1.1/svg/color-prop-01-b.svg               |   64 -
+ tests/svg1.1/svg/color-prop-02-f-ref.png           |  Bin 22794 -> 0 bytes
+ tests/svg1.1/svg/color-prop-02-f.svg               |   98 --
+ tests/svg1.1/svg/color-prop-03-t-ref.png           |  Bin 15547 -> 0 bytes
+ tests/svg1.1/svg/color-prop-03-t.svg               |  101 --
+ tests/svg1.1/svg/coords-trans-01-b-ref.png         |  Bin 13599 -> 0 bytes
+ tests/svg1.1/svg/coords-trans-01-b.svg             |  240 ---
+ tests/svg1.1/svg/coords-trans-02-t-ref.png         |  Bin 11363 -> 0 bytes
+ tests/svg1.1/svg/coords-trans-02-t.svg             |  178 ---
+ tests/svg1.1/svg/coords-trans-03-t-ref.png         |  Bin 10664 -> 0 bytes
+ tests/svg1.1/svg/coords-trans-03-t.svg             |  100 --
+ tests/svg1.1/svg/coords-trans-04-t-ref.png         |  Bin 9697 -> 0 bytes
+ tests/svg1.1/svg/coords-trans-04-t.svg             |   69 -
+ tests/svg1.1/svg/coords-trans-05-t-ref.png         |  Bin 11056 -> 0 bytes
+ tests/svg1.1/svg/coords-trans-05-t.svg             |   89 --
+ tests/svg1.1/svg/coords-trans-06-t-ref.png         |  Bin 11372 -> 0 bytes
+ tests/svg1.1/svg/coords-trans-06-t.svg             |   83 -
+ tests/svg1.1/svg/coords-units-01-b-ref.png         |  Bin 20764 -> 0 bytes
+ tests/svg1.1/svg/coords-units-01-b.svg             |  182 ---
+ tests/svg1.1/svg/coords-units-02-b-ref.png         |  Bin 18759 -> 0 bytes
+ tests/svg1.1/svg/coords-units-02-b.svg             |  145 --
+ tests/svg1.1/svg/coords-units-03-b-ref.png         |  Bin 19573 -> 0 bytes
+ tests/svg1.1/svg/coords-units-03-b.svg             |  163 --
+ tests/svg1.1/svg/coords-viewattr-01-b-ref.png      |  Bin 17521 -> 0 bytes
+ tests/svg1.1/svg/coords-viewattr-01-b.svg          |  123 --
+ tests/svg1.1/svg/coords-viewattr-02-b-ref.png      |  Bin 37699 -> 0 bytes
+ tests/svg1.1/svg/coords-viewattr-02-b.svg          |  699 ---------
+ tests/svg1.1/svg/extend-namespace-01-f.svg         |  167 --
+ tests/svg1.1/svg/filters-blend-01-b.svg            |  106 --
+ tests/svg1.1/svg/filters-color-01-b.svg            |   92 --
+ tests/svg1.1/svg/filters-composite-02-b.svg        |  200 ---
+ tests/svg1.1/svg/filters-comptran-01-b.svg         |  106 --
+ tests/svg1.1/svg/filters-conv-01-f-ref.png         |  Bin 53213 -> 0 bytes
+ tests/svg1.1/svg/filters-conv-01-f.svg             |  109 --
+ tests/svg1.1/svg/filters-diffuse-01-f-ref.png      |  Bin 19475 -> 0 bytes
+ tests/svg1.1/svg/filters-diffuse-01-f.svg          |  161 --
+ tests/svg1.1/svg/filters-displace-01-f-ref.png     |  Bin 56940 -> 0 bytes
+ tests/svg1.1/svg/filters-displace-01-f.svg         |  150 --
+ tests/svg1.1/svg/filters-example-01-b-ref.png      |  Bin 25223 -> 0 bytes
+ tests/svg1.1/svg/filters-example-01-b.svg          |   81 -
+ tests/svg1.1/svg/filters-gauss-01-b.svg            |  101 --
+ tests/svg1.1/svg/filters-image-01-b-ref.png        |  Bin 96829 -> 0 bytes
+ tests/svg1.1/svg/filters-image-01-b.svg            |   47 -
+ tests/svg1.1/svg/filters-light-01-f-ref.png        |  Bin 29388 -> 0 bytes
+ tests/svg1.1/svg/filters-light-01-f.svg            |  173 ---
+ tests/svg1.1/svg/filters-morph-01-f-ref.png        |  Bin 35690 -> 0 bytes
+ tests/svg1.1/svg/filters-morph-01-f.svg            |   87 --
+ tests/svg1.1/svg/filters-offset-01-b-ref.png       |  Bin 13735 -> 0 bytes
+ tests/svg1.1/svg/filters-offset-01-b.svg           |  121 --
+ tests/svg1.1/svg/filters-specular-01-f-ref.png     |  Bin 26258 -> 0 bytes
+ tests/svg1.1/svg/filters-specular-01-f.svg         |  178 ---
+ tests/svg1.1/svg/filters-tile-01-b-ref.png         |  Bin 8683 -> 0 bytes
+ tests/svg1.1/svg/filters-tile-01-b.svg             |   63 -
+ tests/svg1.1/svg/filters-turb-01-f-ref.png         |  Bin 118005 -> 0 bytes
+ tests/svg1.1/svg/filters-turb-01-f.svg             |   86 --
+ tests/svg1.1/svg/fonts-elem-01-t.svg               |  103 --
+ tests/svg1.1/svg/fonts-elem-02-t.svg               |  107 --
+ tests/svg1.1/svg/fonts-elem-03-b.svg               |   98 --
+ tests/svg1.1/svg/fonts-elem-04-b.svg               |   98 --
+ tests/svg1.1/svg/interact-cursor-01-f.svg          |  136 --
+ tests/svg1.1/svg/interact-dom-01-b.svg             |  122 --
+ tests/svg1.1/svg/interact-events-01-b.svg          |  103 --
+ tests/svg1.1/svg/interact-order-01-b.svg           |   83 -
+ tests/svg1.1/svg/interact-order-02-b.svg           |   81 -
+ tests/svg1.1/svg/interact-order-03-b.svg           |   81 -
+ tests/svg1.1/svg/interact-zoom-01-t.svg            |   71 -
+ tests/svg1.1/svg/linking-a-01-b.svg                |   58 -
+ tests/svg1.1/svg/linking-a-02-b.svg                |   59 -
+ tests/svg1.1/svg/linking-a-03-b.svg                |   60 -
+ tests/svg1.1/svg/linking-a-04-t.svg                |  124 --
+ tests/svg1.1/svg/linking-uri-01-b.svg              |  165 --
+ tests/svg1.1/svg/linking-uri-02-b.svg              |  175 ---
+ tests/svg1.1/svg/linking-uri-03-t.svg              |   74 -
+ tests/svg1.1/svg/masking-mask-01-b.svg             |  110 --
+ tests/svg1.1/svg/masking-opacity-01-b-ref.png      |  Bin 43108 -> 0 bytes
+ tests/svg1.1/svg/masking-opacity-01-b.svg          |  112 --
+ tests/svg1.1/svg/masking-path-01-b-ref.png         |  Bin 16028 -> 0 bytes
+ tests/svg1.1/svg/masking-path-01-b.svg             |   85 -
+ tests/svg1.1/svg/masking-path-02-b-ref.png         |  Bin 17408 -> 0 bytes
+ tests/svg1.1/svg/masking-path-02-b.svg             |   79 -
+ tests/svg1.1/svg/masking-path-03-b-ref.png         |  Bin 25428 -> 0 bytes
+ tests/svg1.1/svg/masking-path-03-b.svg             |  110 --
+ tests/svg1.1/svg/masking-path-04-b.svg             |   79 -
+ tests/svg1.1/svg/masking-path-05-f-ref.png         |  Bin 10054 -> 0 bytes
+ tests/svg1.1/svg/masking-path-05-f.svg             |   59 -
+ tests/svg1.1/svg/metadata-example-01-b-ref.png     |  Bin 45527 -> 0 bytes
+ tests/svg1.1/svg/metadata-example-01-b.svg         |  174 ---
+ tests/svg1.1/svg/painting-fill-01-t-ref.png        |  Bin 13458 -> 0 bytes
+ tests/svg1.1/svg/painting-fill-01-t.svg            |   80 -
+ tests/svg1.1/svg/painting-fill-02-t-ref.png        |  Bin 17101 -> 0 bytes
+ tests/svg1.1/svg/painting-fill-02-t.svg            |   80 -
+ tests/svg1.1/svg/painting-fill-03-t-ref.png        |  Bin 16998 -> 0 bytes
+ tests/svg1.1/svg/painting-fill-03-t.svg            |   77 -
+ tests/svg1.1/svg/painting-fill-04-t-ref.png        |  Bin 6954 -> 0 bytes
+ tests/svg1.1/svg/painting-fill-04-t.svg            |   57 -
+ tests/svg1.1/svg/painting-marker-01-f-ref.png      |  Bin 12320 -> 0 bytes
+ tests/svg1.1/svg/painting-marker-01-f.svg          |  145 --
+ tests/svg1.1/svg/painting-marker-02-f-ref.png      |  Bin 12398 -> 0 bytes
+ tests/svg1.1/svg/painting-marker-02-f.svg          |  237 ---
+ tests/svg1.1/svg/painting-render-01-b.svg          |  154 --
+ tests/svg1.1/svg/painting-stroke-01-t-ref.png      |  Bin 17386 -> 0 bytes
+ tests/svg1.1/svg/painting-stroke-01-t.svg          |   55 -
+ tests/svg1.1/svg/painting-stroke-02-t-ref.png      |  Bin 20922 -> 0 bytes
+ tests/svg1.1/svg/painting-stroke-02-t.svg          |   56 -
+ tests/svg1.1/svg/painting-stroke-03-t-ref.png      |  Bin 20776 -> 0 bytes
+ tests/svg1.1/svg/painting-stroke-03-t.svg          |   57 -
+ tests/svg1.1/svg/painting-stroke-04-t-ref.png      |  Bin 19508 -> 0 bytes
+ tests/svg1.1/svg/painting-stroke-04-t.svg          |   71 -
+ tests/svg1.1/svg/paths-data-01-t-ref.png           |  Bin 34183 -> 0 bytes
+ tests/svg1.1/svg/paths-data-01-t.svg               |  158 --
+ tests/svg1.1/svg/paths-data-02-t-ref.png           |  Bin 38229 -> 0 bytes
+ tests/svg1.1/svg/paths-data-02-t.svg               |  132 --
+ tests/svg1.1/svg/paths-data-03-f.svg               |  105 --
+ tests/svg1.1/svg/paths-data-04-t-ref.png           |  Bin 24255 -> 0 bytes
+ tests/svg1.1/svg/paths-data-04-t.svg               |   92 --
+ tests/svg1.1/svg/paths-data-05-t-ref.png           |  Bin 23251 -> 0 bytes
+ tests/svg1.1/svg/paths-data-05-t.svg               |   89 --
+ tests/svg1.1/svg/paths-data-06-t-ref.png           |  Bin 9972 -> 0 bytes
+ tests/svg1.1/svg/paths-data-06-t.svg               |   72 -
+ tests/svg1.1/svg/paths-data-07-t-ref.png           |  Bin 9450 -> 0 bytes
+ tests/svg1.1/svg/paths-data-07-t.svg               |   72 -
+ tests/svg1.1/svg/pservers-grad-01-b-ref.png        |  Bin 13537 -> 0 bytes
+ tests/svg1.1/svg/pservers-grad-01-b.svg            |   59 -
+ tests/svg1.1/svg/pservers-grad-02-b-ref.png        |  Bin 26362 -> 0 bytes
+ tests/svg1.1/svg/pservers-grad-02-b.svg            |   77 -
+ tests/svg1.1/svg/pservers-grad-03-b-ref.png        |  Bin 13644 -> 0 bytes
+ tests/svg1.1/svg/pservers-grad-03-b.svg            |   63 -
+ tests/svg1.1/svg/pservers-grad-04-b-ref.png        |  Bin 27081 -> 0 bytes
+ tests/svg1.1/svg/pservers-grad-04-b.svg            |   77 -
+ tests/svg1.1/svg/pservers-grad-05-b-ref.png        |  Bin 51946 -> 0 bytes
+ tests/svg1.1/svg/pservers-grad-05-b.svg            |  104 --
+ tests/svg1.1/svg/pservers-grad-06-b-ref.png        |  Bin 28441 -> 0 bytes
+ tests/svg1.1/svg/pservers-grad-06-b.svg            |  104 --
+ tests/svg1.1/svg/pservers-grad-07-b-ref.png        |  Bin 14677 -> 0 bytes
+ tests/svg1.1/svg/pservers-grad-07-b.svg            |   74 -
+ tests/svg1.1/svg/pservers-grad-08-b.svg            |  102 --
+ tests/svg1.1/svg/pservers-grad-09-b-ref.png        |  Bin 18813 -> 0 bytes
+ tests/svg1.1/svg/pservers-grad-09-b.svg            |  117 --
+ tests/svg1.1/svg/pservers-grad-10-b.svg            |   90 --
+ tests/svg1.1/svg/pservers-grad-11-b.svg            |  100 --
+ tests/svg1.1/svg/pservers-grad-12-b-ref.png        |  Bin 24820 -> 0 bytes
+ tests/svg1.1/svg/pservers-grad-12-b.svg            |  110 --
+ tests/svg1.1/svg/pservers-pattern-01-b-ref.png     |  Bin 23830 -> 0 bytes
+ tests/svg1.1/svg/pservers-pattern-01-b.svg         |  114 --
+ tests/svg1.1/svg/render-elems-01-t-ref.png         |  Bin 10475 -> 0 bytes
+ tests/svg1.1/svg/render-elems-01-t.svg             |   54 -
+ tests/svg1.1/svg/render-elems-02-t-ref.png         |  Bin 11793 -> 0 bytes
+ tests/svg1.1/svg/render-elems-02-t.svg             |   75 -
+ tests/svg1.1/svg/render-elems-03-t-ref.png         |  Bin 11985 -> 0 bytes
+ tests/svg1.1/svg/render-elems-03-t.svg             |   57 -
+ tests/svg1.1/svg/render-elems-06-t.svg             |   75 -
+ tests/svg1.1/svg/render-elems-07-t.svg             |   76 -
+ tests/svg1.1/svg/render-elems-08-t.svg             |   78 -
+ tests/svg1.1/svg/render-groups-01-b.svg            |   93 --
+ tests/svg1.1/svg/render-groups-03-t.svg            |  117 --
+ tests/svg1.1/svg/script-handle-01-b.svg            |   83 -
+ tests/svg1.1/svg/script-handle-02-b.svg            |  108 --
+ tests/svg1.1/svg/script-handle-03-b.svg            |  108 --
+ tests/svg1.1/svg/script-handle-04-b.svg            |  108 --
+ tests/svg1.1/svg/shapes-circle-01-t-ref.png        |  Bin 19709 -> 0 bytes
+ tests/svg1.1/svg/shapes-circle-01-t.svg            |   56 -
+ tests/svg1.1/svg/shapes-ellipse-01-t-ref.png       |  Bin 22199 -> 0 bytes
+ tests/svg1.1/svg/shapes-ellipse-01-t.svg           |   72 -
+ tests/svg1.1/svg/shapes-line-01-t-ref.png          |  Bin 14774 -> 0 bytes
+ tests/svg1.1/svg/shapes-line-01-t.svg              |   80 -
+ tests/svg1.1/svg/shapes-polygon-01-t-ref.png       |  Bin 18287 -> 0 bytes
+ tests/svg1.1/svg/shapes-polygon-01-t.svg           |   73 -
+ tests/svg1.1/svg/shapes-polyline-01-t-ref.png      |  Bin 17934 -> 0 bytes
+ tests/svg1.1/svg/shapes-polyline-01-t.svg          |   84 -
+ tests/svg1.1/svg/shapes-rect-01-t-ref.png          |  Bin 13088 -> 0 bytes
+ tests/svg1.1/svg/shapes-rect-01-t.svg              |   72 -
+ tests/svg1.1/svg/struct-cond-01-t-ref.png          |  Bin 6820 -> 0 bytes
+ tests/svg1.1/svg/struct-cond-01-t.svg              |   75 -
+ tests/svg1.1/svg/struct-cond-02-t.svg              |  574 -------
+ tests/svg1.1/svg/struct-defs-01-t-ref.png          |  Bin 6806 -> 0 bytes
+ tests/svg1.1/svg/struct-defs-01-t.svg              |   85 -
+ tests/svg1.1/svg/struct-dom-01-b.svg               |  154 --
+ tests/svg1.1/svg/struct-dom-02-b.svg               |  104 --
+ tests/svg1.1/svg/struct-dom-03-b.svg               |  102 --
+ tests/svg1.1/svg/struct-dom-04-b.svg               |  121 --
+ tests/svg1.1/svg/struct-dom-05-b.svg               |  119 --
+ tests/svg1.1/svg/struct-dom-06-b.svg               |   89 --
+ tests/svg1.1/svg/struct-frag-01-t.svg              |   40 -
+ tests/svg1.1/svg/struct-group-01-t-ref.png         |  Bin 8386 -> 0 bytes
+ tests/svg1.1/svg/struct-group-01-t.svg             |   71 -
+ tests/svg1.1/svg/struct-group-02-b-ref.png         |  Bin 6617 -> 0 bytes
+ tests/svg1.1/svg/struct-group-02-b.svg             |   67 -
+ tests/svg1.1/svg/struct-image-01-t-ref.png         |  Bin 116585 -> 0 bytes
+ tests/svg1.1/svg/struct-image-01-t.svg             |   65 -
+ tests/svg1.1/svg/struct-image-02-b.svg             |  108 --
+ tests/svg1.1/svg/struct-image-03-t.svg             |   54 -
+ tests/svg1.1/svg/struct-image-04-t-ref.png         |  Bin 82653 -> 0 bytes
+ tests/svg1.1/svg/struct-image-04-t.svg             |  126 --
+ tests/svg1.1/svg/struct-image-05-b-ref.png         |  Bin 6216 -> 0 bytes
+ tests/svg1.1/svg/struct-image-05-b.svg             |   51 -
+ tests/svg1.1/svg/struct-symbol-01-b-ref.png        |  Bin 55504 -> 0 bytes
+ tests/svg1.1/svg/struct-symbol-01-b.svg            |   95 --
+ tests/svg1.1/svg/styling-css-01-b-ref.png          |  Bin 18495 -> 0 bytes
+ tests/svg1.1/svg/styling-css-01-b.svg              |   91 --
+ tests/svg1.1/svg/styling-css-02-b.svg              |   89 --
+ tests/svg1.1/svg/styling-css-03-b.svg              |  109 --
+ tests/svg1.1/svg/styling-inherit-01-b-ref.png      |  Bin 29866 -> 0 bytes
+ tests/svg1.1/svg/styling-inherit-01-b.svg          |   59 -
+ tests/svg1.1/svg/styling-pres-01-t-ref.png         |  Bin 6669 -> 0 bytes
+ tests/svg1.1/svg/styling-pres-01-t.svg             |   38 -
+ tests/svg1.1/svg/text-align-01-b-ref.png           |  Bin 23297 -> 0 bytes
+ tests/svg1.1/svg/text-align-01-b.svg               |   76 -
+ tests/svg1.1/svg/text-align-02-b.svg               |   65 -
+ tests/svg1.1/svg/text-align-03-b-ref.png           |  Bin 19309 -> 0 bytes
+ tests/svg1.1/svg/text-align-03-b.svg               |   70 -
+ tests/svg1.1/svg/text-align-04-b.svg               |   82 -
+ tests/svg1.1/svg/text-align-05-b.svg               |   72 -
+ tests/svg1.1/svg/text-align-06-b.svg               |   63 -
+ tests/svg1.1/svg/text-altglyph-01-b.svg            |  130 --
+ tests/svg1.1/svg/text-deco-01-b.svg                |   64 -
+ tests/svg1.1/svg/text-fonts-01-t.svg               |   98 --
+ tests/svg1.1/svg/text-fonts-02-t-ref.png           |  Bin 25190 -> 0 bytes
+ tests/svg1.1/svg/text-fonts-02-t.svg               |   73 -
+ tests/svg1.1/svg/text-intro-01-t.svg               |   69 -
+ tests/svg1.1/svg/text-intro-02-b.svg               |   95 --
+ tests/svg1.1/svg/text-intro-03-b.svg               |   74 -
+ tests/svg1.1/svg/text-intro-04-t.svg               |   68 -
+ tests/svg1.1/svg/text-path-01-b.svg                |   83 -
+ tests/svg1.1/svg/text-spacing-01-b.svg             |   54 -
+ tests/svg1.1/svg/text-text-01-b.svg                |  210 ---
+ tests/svg1.1/svg/text-text-03-b.svg                |   69 -
+ tests/svg1.1/svg/text-tref-01-b.svg                |   81 -
+ tests/svg1.1/svg/text-tselect-01-b.svg             |   72 -
+ tests/svg1.1/svg/text-tspan-01-b.svg               |   88 --
+ tests/svg1.1/svg/text-ws-01-t-ref.png              |  Bin 43095 -> 0 bytes
+ tests/svg1.1/svg/text-ws-01-t.svg                  |   99 --
+ tests/svg1.1/svg/text-ws-02-t.svg                  |  104 --
+ tests/svg1.2/comp-op-porterduff-ref.png            |  Bin 29629 -> 0 bytes
+ tests/svg1.2/comp-op-porterduff.svg                |  298 ----
+ 377 files changed, 25627 deletions(-)
+
+commit 4f88cfdca5d0a4302d9db84ad42745d0717bbcae
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Sun Oct 18 02:10:51 2015 +0200
+
+    tests: Mark XFAIL tests as g_test_incomplete()
+    
+    ... instead of as success.
+
+ tests/rsvg-test.c | 24 ++++++++----------------
+ 1 file changed, 8 insertions(+), 16 deletions(-)
+
+commit 3e0eeb518acb02314106be37e4d1b432cded2ed1
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Sun Oct 18 02:06:41 2015 +0200
+
+    tests: Use gtester printing functionality
+    
+    ... and don't duplicate output that gtester already prints.
+
+ tests/Makefile.am |  2 --
+ tests/rsvg-test.c | 69 ++++++++++---------------------------------------------
+ 2 files changed, 12 insertions(+), 59 deletions(-)
+
+commit c2ed98e974ec6aece3750451f8c06596c31c06de
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Sun Oct 18 01:57:22 2015 +0200
+
+    tests: Port rsvg-test to gtest
+
+ tests/rsvg-test.c | 53 ++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 32 insertions(+), 21 deletions(-)
+
+commit 66cfd22ebae52f3d6588fac3b5c9359207420ff6
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Thu Oct 15 02:12:46 2015 +0200
+
+    rsvg-test: Don't output HTML
+    
+    This is the first step towards porting to gtester.
+
+ tests/Makefile.am |  3 +--
+ tests/rsvg-test.c | 33 ---------------------------------
+ 2 files changed, 1 insertion(+), 35 deletions(-)
+
+commit 67b38692afd2e0a5ef27099555882592d4d78648
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 14 19:52:42 2015 +0200
+
+    tests: Add a bunch of cycling reference svgs
+    
+    ... and make sure they don't crash when loading.
+
+ tests/fixtures/crash/marker-cycles.svg           | 3 +++
+ tests/fixtures/crash/mask-cycles.svg             | 6 ++++++
+ tests/fixtures/crash/pattern-fallback-cycles.svg | 9 +++++++++
+ 3 files changed, 18 insertions(+)
+
+commit 7e949cfc2d72f0f7453f56caa9f4af10e18ee263
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 14 19:25:27 2015 +0200
+
+    tests: Make lib dependencies not use absolute deps
+    
+    This confuses automake and it will not generate dependencies correctly
+
+ tests/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 9561652435e93c7b791fe7ca1708ce1196fae820
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 14 20:22:22 2015 +0200
+
+    tests: Make crash test accept commandline args
+    
+    Again, copied from gdk-pixbuf
+
+ tests/crash.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
+
+commit 9d97124e34425b569ec861813ea2ddb7acad4e93
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 14 19:16:15 2015 +0200
+
+    tests: Run crash tests on all files in directory
+    
+    Instead of manually hardcoding them.
+    Code copied from gdk-pixbuf.
+
+ tests/Makefile.am  |  2 +-
+ tests/crash.c      | 34 ++++++++---------------
+ tests/test-utils.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/test-utils.h | 11 ++++++--
+ 4 files changed, 101 insertions(+), 26 deletions(-)
+
+commit d0486eb82546616c6f6e965bcb3e3557e4cc8264
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 20:02:17 2015 +0200
+
+    test: Use guint32 instead of uint32_t
+
+ tests/rsvg-test.c | 35 +++++++----------------------------
+ 1 file changed, 7 insertions(+), 28 deletions(-)
+
+commit e210e12bc342e811a61343a47b2991fe57c7c746
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 19:48:23 2015 +0200
+
+    state: Remove unused adobe blend mode support
+    
+    There's no need to keep a variable around when nobody ever looks at it.
+
+ rsvg-styles.c | 29 -----------------------------
+ rsvg-styles.h |  1 -
+ 2 files changed, 30 deletions(-)
+
+commit f53b4c61abf4f98b557daed6d4166771ea4ef72c
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 12:54:51 2015 +0200
+
+    base: Remove old cycle detection code
+    
+    The old code kept track of which nodes had already been drawn. Which
+    worked for all nodes that actually were drawn, but not for nodes that
+    were used as masks, paint server fallbacks or similar.
+    
+    But now that we have generic code that does work everywhere, this old
+    code is no longer needed.
+
+ rsvg-base.c         |  1 -
+ rsvg-cairo-render.c |  1 -
+ rsvg-private.h      |  1 -
+ rsvg-structure.c    | 17 -----------------
+ 4 files changed, 20 deletions(-)
+
+commit ad459d919bf277b0b2eb8d5bb8fecf8ac9877c47
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 12:33:32 2015 +0200
+
+    defs: Remove rsvg_defs_add_resolver()
+    
+    Now that all references are looked up lazily, we don't need to keep
+    track of things that are not resolved yet.
+
+ rsvg-base.c |  2 --
+ rsvg-defs.c | 48 ------------------------------------------------
+ rsvg-defs.h |  4 ----
+ 3 files changed, 54 deletions(-)
+
+commit 7fc0fb6023931cca829fda2e265e047c73fa9134
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 12:31:07 2015 +0200
+
+    use: Resolve link lazily
+    
+    And that really concludes conversion of everything to
+    rsvg_acquire_node().
+    For real this time!
+
+ rsvg-structure.c | 26 ++++++++++++++++++++------
+ rsvg-structure.h |  2 +-
+ 2 files changed, 21 insertions(+), 7 deletions(-)
+
+commit 3ae509be6a1b14b93a0839dc241d54a7ca3a1b25
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 12:24:14 2015 +0200
+
+    tref: Look up links lazily
+
+ rsvg-text.c | 49 ++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 40 insertions(+), 9 deletions(-)
+
+commit 6df53732f8ecfdc99b705b7e9a94442c267145f0
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 12:13:21 2015 +0200
+
+    marker: Resolve lazily
+    
+    And that concludes our rework of reference cylce detection. All code
+    that references other objects via IRIs will now call rsvg_acquire_node()
+    which itself avoids giving out the same node a second time until
+    rsvg_release_node() has been called.
+    
+    This also means that rsvg_defs_lookup() is only used in two places now:
+    (1) by rsvg_acquire_node()
+    (2) by public API that allows operating on objects by id.
+
+ rsvg-marker.c | 41 +++++++++++++++++------------------------
+ rsvg-marker.h |  5 -----
+ rsvg-styles.c | 41 ++++++++++++++++++++++++++++-------------
+ rsvg-styles.h |  6 +++---
+ 4 files changed, 48 insertions(+), 45 deletions(-)
+
+commit 9fc56102ca1861e3868fd6dcbcc3cc0f3c240f3e
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 10:37:22 2015 +0200
+
+    state: Resolve filters lazily
+    
+    We're almost there resolving everything lazily...
+
+ rsvg-cairo-draw.c | 17 +++++++++++------
+ rsvg-filter.c     | 27 ---------------------------
+ rsvg-filter.h     |  2 --
+ rsvg-styles.c     | 12 ++++++++----
+ rsvg-styles.h     |  2 +-
+ 5 files changed, 20 insertions(+), 40 deletions(-)
+
+commit 1c68e4f298ffe8d2ae2a0a38c5f9c329791d1a39
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 10:29:07 2015 +0200
+
+    paint-server: Store URL instead of resolved node
+    
+    This way, we resolve lazily only upon use and thereby can make use of
+    our amazing new cycle detection technology.
+
+ rsvg-cairo-draw.c   | 21 +++++++++++++--------
+ rsvg-paint-server.c | 50 +++++++-------------------------------------------
+ rsvg-paint-server.h | 11 +++--------
+ rsvg-styles.c       |  6 +++---
+ 4 files changed, 26 insertions(+), 62 deletions(-)
+
+commit f85f5dea28172480bf0a273319e8c8c73945d427
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 10:20:23 2015 +0200
+
+    paint-server: Remove unused argument from function
+
+ rsvg-paint-server.c | 3 +--
+ rsvg-paint-server.h | 2 +-
+ rsvg-styles.c       | 6 +++---
+ 3 files changed, 5 insertions(+), 6 deletions(-)
+
+commit 4db31c6f2945a9627e0611797646af87093edb8e
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 10:18:42 2015 +0200
+
+    paint-server: Remove nonexistent functions from header
+
+ rsvg-paint-server.h | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+commit 1104491df8f6475bb7cc52c8f85f9130f278b737
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 10:12:21 2015 +0200
+
+    paint-server: Simplify fallback code
+    
+    Now that we have proper cycle detection in the drawing context, we
+    should use it.
+
+ rsvg-paint-server.c | 109 +++++++++++++---------------------------------------
+ 1 file changed, 27 insertions(+), 82 deletions(-)
+
+commit a51919f7e1ca9c535390a746fbf6e28c8402dc61
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 08:45:37 2015 +0200
+
+    rsvg: Add rsvg_acquire_node()
+    
+    This function does proper recursion checks when looking up resources
+    from URLs and thereby helps avoiding infinite loops when cyclic
+    references span multiple types of elements.
+
+ rsvg-base.c         | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ rsvg-cairo-draw.c   | 15 +++++++++++----
+ rsvg-cairo-render.c |  1 +
+ rsvg-filter.c       |  9 +++++++--
+ rsvg-private.h      |  5 +++++
+ 5 files changed, 79 insertions(+), 6 deletions(-)
+
+commit 6cfaab12c70cd4a34c4730837f1ecdf792593c90
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 07:57:39 2015 +0200
+
+    state: Look up clip path lazily
+
+ rsvg-cairo-draw.c | 56 +++++++++++++++++++++++++++++++++----------------------
+ rsvg-mask.c       | 17 -----------------
+ rsvg-mask.h       |  2 --
+ rsvg-styles.c     | 10 +++++++---
+ rsvg-styles.h     |  2 +-
+ 5 files changed, 42 insertions(+), 45 deletions(-)
+
+commit d1c9191949747f6dcfd207831d15dd4ba00e31f2
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 05:31:08 2015 +0200
+
+    state: Store mask as reference
+    
+    Instead of immediately looking up the mask, store the reference and look
+    it up on use.
+
+ rsvg-cairo-draw.c |  6 +++++-
+ rsvg-mask.c       | 17 -----------------
+ rsvg-mask.h       |  2 --
+ rsvg-styles.c     | 12 ++++++++----
+ rsvg-styles.h     |  2 +-
+ 5 files changed, 14 insertions(+), 25 deletions(-)
+
+commit a6466fa562e69bcaaafc466d92681d1103a5ffd3
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 02:02:05 2015 +0200
+
+    paint-server: Resolve references when rendering
+    
+    Do not resolve them while parsing or building the document tree.
+    
+    The reason for this will become apparent in a few commits.
+
+ rsvg-cairo-draw.c   |  6 ++--
+ rsvg-paint-server.c | 88 ++++++++++++++++++++++++++++++++++-------------------
+ rsvg-paint-server.h | 15 +++++----
+ 3 files changed, 69 insertions(+), 40 deletions(-)
+
+commit 0d6c6d9a1a8aa3fc1e7f1aae21a10445d7483d1a
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Wed Oct 7 01:43:35 2015 +0200
+
+    paint-server: Don't fix fallback on reference
+    
+    Patterns just like gradients should only fix their fallbacks when they
+    are actually rendered.
+
+ rsvg-paint-server.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit 5140c501d84f32a5070435d82e1b1039b1b7c71b
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Tue Oct 6 21:00:09 2015 +0200
+
+    Remove a bunch of unneeded casts
+
+ rsvg-base.c | 14 +++++++-------
+ rsvg-defs.c |  4 ++--
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+commit 0b2b1424caeb3fa928689d9ed956edddb0e3e7ec
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 21 17:21:02 2015 -0500
+
+    bgo#630732 - Fix out-of-bounds read in feComponentTransfer with tableValues
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=630732
+
+ rsvg-filter.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+commit caa75003d09f4bc6016e791cac943e1525b0d4bb
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 21 16:27:35 2015 -0500
+
+    Update NEWS
+
+ NEWS | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit 2aca7d4ac08d696bf25cac909464a5b1621fbbaa
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 21 16:27:08 2015 -0500
+
+    Post release version bump
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit f0bce7adc1cd5d77d0317ef07b75c738c20041aa
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 21 16:19:58 2015 -0500
+
+    bgo#700911 - Make sure the feComponentTransfer functions are actually used
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=700911
+
+ rsvg-base.c   | 2 +-
+ rsvg-filter.c | 7 ++++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+commit 16b829d817fed70966f42fb069cdb5c33e036837
+Author: Matthias Clasen <mclasen@redhat.com>
+Date:   Tue Oct 20 21:59:15 2015 -0400
+
+    Fix a typo
+    
+    It is miscellaneous, not miscellaenous.
+
+ configure.ac | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit 1c420d7961befc69a558184cea399d7f4fc8ee8d
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 7 12:44:07 2015 -0500
+
+    Update NEWS for 2.40.11
+
+ NEWS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+commit 655d8b06ed8129ca2673c1406a1358771d2b24c9
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 7 11:47:34 2015 -0500
+
+    rsvg-filter: Use g_new() instead of g_malloc()
+
+ rsvg-filter.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 2729084d11d52294b2fab04f275e6009de7af3e9
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Fri Sep 25 23:54:03 2015 +0800
+
+    MSVC Builds: Use DOS/Windows Line Endings for .sln
+    
+    This is required for the .sln files to be detected correctly by Windows.
+
+ build/win32/vs10/librsvg.sln | 132 +++++++++++++++++------------------
+ build/win32/vs9/librsvg.sln  | 162 +++++++++++++++++++++----------------------
+ 2 files changed, 147 insertions(+), 147 deletions(-)
+
+commit fa3ff32811383770c4f55f7d0bb2844b2383c35f
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Wed Aug 12 21:48:45 2015 +0800
+
+    Build: Add MSVC Project Files
+    
+    Allow librsvg to be built directly with Visual Studio via the use of
+    project files, like what is done now for GTK+ etc.  Note that the
+    projects for the main librsvg DLL and rsvg-convert, as well as the
+    property sheets to copy the build results and headers are generated from
+    templates, which is done during 'make dist', to ease future maintenance,
+    which is done via the common autotools module.
+    
+    The other common autotools module is then used to create the 2012/2013/
+    2015 projects from the 2010 projects, as they are largely similar in
+    format.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=753555
+
+ Makefile.am                                        |  27 ++-
+ build/Makefile.am                                  |   1 +
+ build/win32/Makefile.am                            |   6 +
+ build/win32/vs10/Makefile.am                       |  32 +++
+ build/win32/vs10/README.txt                        |  74 +++++++
+ build/win32/vs10/libpixbufloader-svg.vcxproj       | 179 +++++++++++++++++
+ .../win32/vs10/libpixbufloader-svg.vcxproj.filters |  20 ++
+ build/win32/vs10/librsvg.sln                       |  66 +++++++
+ build/win32/vs10/rsvg-build-defines.props          |  53 +++++
+ build/win32/vs10/rsvg-convert.vcxproj.filtersin    |  20 ++
+ build/win32/vs10/rsvg-convert.vcxprojin            | 174 ++++++++++++++++
+ build/win32/vs10/rsvg-gen-srcs.props               |  25 +++
+ build/win32/vs10/rsvg-install.propsin              |  38 ++++
+ build/win32/vs10/rsvg-install.vcxproj              | 113 +++++++++++
+ build/win32/vs10/rsvg-version-paths.props          |  57 ++++++
+ build/win32/vs10/rsvg-view-3.vcxproj               | 177 +++++++++++++++++
+ build/win32/vs10/rsvg-view-3.vcxproj.filters       |  20 ++
+ build/win32/vs10/rsvg.vcxproj.filtersin            |  24 +++
+ build/win32/vs10/rsvg.vcxprojin                    | 219 +++++++++++++++++++++
+ build/win32/vs11/Makefile.am                       |  24 +++
+ build/win32/vs12/Makefile.am                       |  24 +++
+ build/win32/vs14/Makefile.am                       |  24 +++
+ build/win32/vs9/Makefile.am                        |  26 +++
+ build/win32/vs9/README.txt                         |  74 +++++++
+ build/win32/vs9/libpixbufloader-svg.vcproj         | 170 ++++++++++++++++
+ build/win32/vs9/librsvg.sln                        |  81 ++++++++
+ build/win32/vs9/rsvg-build-defines.vsprops         |  50 +++++
+ build/win32/vs9/rsvg-convert.vcprojin              | 167 ++++++++++++++++
+ build/win32/vs9/rsvg-gen-srcs.vsprops              |  19 ++
+ build/win32/vs9/rsvg-install.vcproj                |  74 +++++++
+ build/win32/vs9/rsvg-install.vspropsin             |  32 +++
+ build/win32/vs9/rsvg-version-paths.vsprops         |  53 +++++
+ build/win32/vs9/rsvg-view-3.vcproj                 | 170 ++++++++++++++++
+ build/win32/vs9/rsvg.vcprojin                      | 198 +++++++++++++++++++
+ configure.ac                                       |   7 +
+ 35 files changed, 2517 insertions(+), 1 deletion(-)
+
+commit 01b4398abc27003aa4ba35e99344d6f14b3a954c
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Fri Sep 25 16:45:32 2015 +0800
+
+    Build: Common Autotools Module for MSVC 2012/2013/2015
+    
+    This adds a common autotools module that will create the MSVC 2012/2013/
+    2015 projects from the 2010 ones, as the project file formats are largely
+    similar.  This is run during 'make dist', which will copy the files
+    and change the items in there as necessary.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=753555
+
+ build/Makefile-newvs.am | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+commit e00205c2f4395496c0eb2089f863b0f0fd091e1e
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Fri Sep 25 16:41:14 2015 +0800
+
+    Add Common Autotools Module for MSVC Projects
+    
+    This adds a common autotools module that can be used by various projects to
+    generate the Visual Studio projects as needed, and if necessary, generate
+    the headers listings to "install" for that project, based on items passed
+    in to this.  This is modelled on the Makefile.introspection autotools file
+    that is used by many GNOME projects to generate the introspection files.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=753555
+
+ build/Makefile.msvcproj | 107 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 107 insertions(+)
+
+commit b9e55dedc78712e3cd25ba1258c338b269baaee1
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Wed Aug 12 21:55:38 2015 +0800
+
+    Build: Add rsvg.symbols File to Export Public Symbols
+    
+    This adds a rsvg.symbols file that can be preprocessed to create the
+    .def file for exporting the symbols (functions) from the librsvg DLL.
+    
+    I do understand that there is a maintenance overhead with this, and
+    this is the former way that symbol exporting was done in GLib and
+    GTK+, but this is done as we are now in a stable release series,
+    where we can use a __declspec(dllexport) (a.k.a visibility-based
+    export mechanism) if we want in the next dev cycle.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=753555
+
+ Makefile.am  |  3 ++-
+ rsvg.symbols | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+), 1 deletion(-)
+
+commit 8c90a816821061643260adeb9533e41046dc7555
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Wed Aug 12 18:36:47 2015 +0800
+
+    Windows Builds: Add a Pre-Configured config.h Template
+    
+    This adds a config.h.win32.in template that is processed during autogen/
+    configure, in which the processed config.h.win32 can be later dist'ed so
+    that Visual Studio project files can make use of this for building librsvg,
+    since Visual Studio builds by themselves do not use autotools.
+    
+    Also add in the autotools build files so that this is processed, and this
+    and the processed config.h.win32 is dist'ed.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=753555
+
+ Makefile.am       |  4 ++-
+ config.h.win32.in | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac      |  1 +
+ 3 files changed, 98 insertions(+), 1 deletion(-)
+
+commit 885938629be08e21b6ce3b3fbdf45a288cc6c21f
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Wed Aug 12 18:07:21 2015 +0800
+
+    librsvg-features.h.in: Fix Public Variable Declaration
+    
+    ... on Windows, as public variables need to be decorated for export and
+    import so that they can be linked to and referred to properly, when
+    building librsvg as a DLL.  This is the same thing that is done in GLib.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=753555
+
+ librsvg-features.h.in | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
+
+commit 741b8d9e41520e0d6717ace0a36c4ca4a768b97b
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Wed Aug 12 18:04:36 2015 +0800
+
+    rsvg-filter.c: Avoid VLA Usage
+    
+    In order to support building under Visual Studio and other C89 compilers,
+    we need to avoid using VLAs, especially that VLAs are:
+    
+    -Most probably not going to be supported under any Visual Studio
+    -It is now optional under C11, and there are concerns regarding its
+     implementations in other C99-capable compilers.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=753555
+
+ rsvg-filter.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+commit 9957956c423d2eeac6b3300cb0fc223a34e70f12
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Aug 11 07:42:22 2015 -0500
+
+    rsvg-cairo-draw: Take 'invisible' objects into account for bounding boxes
+    
+    Bounding boxes were computed only for objects that have a fill or a stroke.  However,
+    for symbolic icons (e.g. adwaita-icon-theme/src/symbolic/gnome-stencils.svg) we can have
+    fill-less and stroke-less rectangles that are just used to center the actual icons on
+    the area they are allocated.  In that case we need to compute the full bounding box
+    for the allocated area, i.e. the fill-less/stroke-less rectangles.
+    
+    This should not affect 'normal' SVGs where all objects have a fill or a stroke.
+
+ rsvg-cairo-draw.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+commit fecfcce44a959daff80a4e0f9ced83d7cdcb5903
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Aug 10 04:04:01 2015 -0500
+
+    bgo#520654 - Support --export-id in rsvg-convert(1)
+    
+    This option lets you pass an SVG object ID to render, instead of the default, which
+    is to render everything in the SVG.
+    
+    The --export-id and -i options intentionally have the same name as in Inkscape.
+    
+    In addition, this get rid of a deprecated call to rsvg_handle_set_size_callback()
+
+ rsvg-cairo-render.c |  4 ++--
+ rsvg-convert.c      | 64 ++++++++++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 51 insertions(+), 17 deletions(-)
+
+commit 424c87ac2ee4cd0417ed89a1a95d7cc79b2f6b44
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Sat Aug 8 03:47:00 2015 -0500
+
+    Update librsvg.doap to not have sourceforge references (!)
+
+ librsvg.doap | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+commit 4a0d0baf8fd0ec9e5236bdca5c1efff6d536bfd8
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Sat Aug 8 03:29:16 2015 -0500
+
+    Post release version bump
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 commit 25d5f8b7076535fecb972d6454807ba56452991a
 Author: Federico Mena Quintero <federico@gnome.org>
 Date:   Sat Aug 8 03:22:05 2015 -0500

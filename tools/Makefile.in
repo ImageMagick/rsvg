@@ -80,17 +80,17 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @BUILD_MISC_TOOLS_TRUE@noinst_PROGRAMS = rsvg-dimensions$(EXEEXT) \
-@BUILD_MISC_TOOLS_TRUE@	test-performance$(EXEEXT) \
-@BUILD_MISC_TOOLS_TRUE@	test-memory$(EXEEXT)
+@BUILD_MISC_TOOLS_TRUE@	test-performance$(EXEEXT)
 subdir = tools
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/gtk-doc.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/vapigen.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/glibtests.m4 \
+	$(top_srcdir)/m4/gtk-doc.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/vapigen.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -116,11 +116,6 @@ rsvg_dimensions_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(rsvg_dimensions_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am_test_memory_OBJECTS = test-memory.$(OBJEXT)
-test_memory_OBJECTS = $(am_test_memory_OBJECTS)
-test_memory_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(test_memory_LDFLAGS) $(LDFLAGS) -o $@
 am_test_performance_OBJECTS = test-performance.$(OBJEXT)
 test_performance_OBJECTS = $(am_test_performance_OBJECTS)
 test_performance_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
@@ -162,10 +157,9 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(librsvg_tools_main_la_SOURCES) $(rsvg_dimensions_SOURCES) \
-	$(test_memory_SOURCES) $(test_performance_SOURCES)
-DIST_SOURCES = $(librsvg_tools_main_la_SOURCES) \
-	$(rsvg_dimensions_SOURCES) $(test_memory_SOURCES) \
 	$(test_performance_SOURCES)
+DIST_SOURCES = $(librsvg_tools_main_la_SOURCES) \
+	$(rsvg_dimensions_SOURCES) $(test_performance_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -345,6 +339,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+installed_test_metadir = @installed_test_metadir@
+installed_testdir = @installed_testdir@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
@@ -397,10 +393,6 @@ rsvg_dimensions_SOURCES = rsvg-dimensions.c
 rsvg_dimensions_LDFLAGS = 
 rsvg_dimensions_DEPENDENCIES = $(DEPS)
 rsvg_dimensions_LDADD = $(LDADDS) $(LIBM)
-test_memory_SOURCES = test-memory.c
-test_memory_LDFLAGS = 
-test_memory_DEPENDENCIES = $(DEPS)
-test_memory_LDADD = librsvg_tools_main.la $(LDADDS) $(LIBM)
 all: all-am
 
 .SUFFIXES:
@@ -463,10 +455,6 @@ rsvg-dimensions$(EXEEXT): $(rsvg_dimensions_OBJECTS) $(rsvg_dimensions_DEPENDENC
 	@rm -f rsvg-dimensions$(EXEEXT)
 	$(AM_V_CCLD)$(rsvg_dimensions_LINK) $(rsvg_dimensions_OBJECTS) $(rsvg_dimensions_LDADD) $(LIBS)
 
-test-memory$(EXEEXT): $(test_memory_OBJECTS) $(test_memory_DEPENDENCIES) $(EXTRA_test_memory_DEPENDENCIES) 
-	@rm -f test-memory$(EXEEXT)
-	$(AM_V_CCLD)$(test_memory_LINK) $(test_memory_OBJECTS) $(test_memory_LDADD) $(LIBS)
-
 test-performance$(EXEEXT): $(test_performance_OBJECTS) $(test_performance_DEPENDENCIES) $(EXTRA_test_performance_DEPENDENCIES) 
 	@rm -f test-performance$(EXEEXT)
 	$(AM_V_CCLD)$(test_performance_LINK) $(test_performance_OBJECTS) $(test_performance_LDADD) $(LIBS)
@@ -479,7 +467,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsvg-dimensions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsvg-tools-main.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-memory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-performance.Po@am__quote@
 
 .c.o:

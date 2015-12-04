@@ -720,33 +720,6 @@ rsvg_filter_get_in (GString * name, RsvgFilterContext * ctx)
     return rsvg_filter_get_result (name, ctx).surface;
 }
 
-/**
- * rsvg_filter_parse:
- * @defs: a pointer to the hash of definitions
- * @str: a string with the name of the filter to be looked up
- *
- * Looks up an allready created filter.
- *
- * Returns: (nullable): a pointer to the filter that the name refers to, or %NULL
- * if none was found
- **/
-RsvgFilter *
-rsvg_filter_parse (const RsvgDefs * defs, const char *str)
-{
-    char *name;
-
-    name = rsvg_get_url_string (str);
-    if (name) {
-        RsvgNode *val;
-        val = rsvg_defs_lookup (defs, name);
-        g_free (name);
-
-        if (val && RSVG_NODE_TYPE (val) == RSVG_NODE_TYPE_FILTER)
-            return (RsvgFilter *) val;
-    }
-    return NULL;
-}
-
 static void
 rsvg_filter_set_args (RsvgNode * self, RsvgHandle * ctx, RsvgPropertyBag * atts)
 {
@@ -1332,12 +1305,13 @@ box_blur_line (gint box_width, gint even_offset,
                gint len, gint bpp)
 {
     gint  i;
-    gint  lead;   /* This marks the leading edge of the kernel              */
-    gint  output; /* This marks the center of the kernel                    */
-    gint  trail;  /* This marks the pixel BEHIND the last 1 in the
-                     kernel; it's the pixel to remove from the accumulator. */
-    gint  *ac;    /* Accumulator for each channel                           */
+    gint  lead;    /* This marks the leading edge of the kernel              */
+    gint  output;  /* This marks the center of the kernel                    */
+    gint  trail;   /* This marks the pixel BEHIND the last 1 in the
+                      kernel; it's the pixel to remove from the accumulator. */
+    gint  *ac;     /* Accumulator for each channel                           */
 
+    ac = g_new (gint, bpp);
 
     /* The algorithm differs for even and odd-sized kernels.
      * With the output at the center,
@@ -1349,7 +1323,6 @@ box_blur_line (gint box_width, gint even_offset,
      * of these arrays.
      */
     lead = 0;
-    ac = g_new (gint, bpp);
 
     if (box_width % 2 != 0) {
         /* Odd-width kernel */
@@ -1453,6 +1426,7 @@ box_blur_line (gint box_width, gint even_offset,
         output++;
         trail++;
     }
+
     g_free (ac);
 }
 
@@ -2549,14 +2523,17 @@ table_component_transfer_func (gint C, RsvgNodeComponentTransferFunc * user_data
 {
     guint k;
     gint vk, vk1, distancefromlast;
+    guint num_values;
 
     if (!user_data->nbTableValues)
         return C;
 
-    k = (C * (user_data->nbTableValues - 1)) / 255;
+    num_values = user_data->nbTableValues;
 
-    vk = user_data->tableValues[k];
-    vk1 = user_data->tableValues[k + 1];
+    k = (C * (num_values - 1)) / 255;
+
+    vk = user_data->tableValues[CLAMP (k, 0, num_values - 1)];
+    vk1 = user_data->tableValues[CLAMP (k + 1, 0, num_values - 1)];
 
     distancefromlast = (C * (user_data->nbTableValues - 1)) - k * 255;
 
@@ -2573,7 +2550,7 @@ discrete_component_transfer_func (gint C, RsvgNodeComponentTransferFunc * user_d
 
     k = (C * user_data->nbTableValues) / 255;
 
-    return user_data->tableValues[k];
+    return user_data->tableValues[CLAMP (k, 0, user_data->nbTableValues)];
 }
 
 static gint
@@ -2620,12 +2597,12 @@ rsvg_filter_primitive_component_transfer_render (RsvgFilterPrimitive *
     boundarys = rsvg_filter_primitive_get_bounds (self, ctx);
 
     for (c = 0; c < 4; c++) {
-        char channel = "RGBA"[c];
+        char channel = "rgba"[c]; /* see rsvg_standard_element_start() for where these chars come from */
         for (i = 0; i < self->super.children->len; i++) {
             RsvgNode *child_node;
 
             child_node = (RsvgNode *) g_ptr_array_index (self->super.children, i);
-            if (RSVG_NODE_TYPE (child_node) == RSVG_NODE_TYPE_FILTER_PRIMITIVE_COMPONENT_TRANSFER) {
+            if (RSVG_NODE_TYPE (child_node) == RSVG_NODE_TYPE_COMPONENT_TRANFER_FUNCTION) {
                 RsvgNodeComponentTransferFunc *temp = (RsvgNodeComponentTransferFunc *) child_node;
 
                 if (temp->channel == channel) {
@@ -2802,12 +2779,13 @@ rsvg_new_node_component_transfer_function (char channel)
 {
     RsvgNodeComponentTransferFunc *filter;
 
-    filter = g_new (RsvgNodeComponentTransferFunc, 1);
+    filter = g_new0 (RsvgNodeComponentTransferFunc, 1);
     _rsvg_node_init (&filter->super, RSVG_NODE_TYPE_COMPONENT_TRANFER_FUNCTION);
     filter->super.free = rsvg_component_transfer_function_free;
     filter->super.set_atts = rsvg_node_component_transfer_function_set_atts;
     filter->function = identity_component_transfer_func;
     filter->nbTableValues = 0;
+    filter->channel = channel;
     return (RsvgNode *) filter;
 }
 
@@ -3923,6 +3901,7 @@ rsvg_filter_primitive_image_render_in (RsvgFilterPrimitive * self, RsvgFilterCon
     RsvgDrawingCtx *ctx;
     RsvgFilterPrimitiveImage *upself;
     RsvgNode *drawable;
+    cairo_surface_t *result;
 
     ctx = context->ctx;
 
@@ -3931,13 +3910,17 @@ rsvg_filter_primitive_image_render_in (RsvgFilterPrimitive * self, RsvgFilterCon
     if (!upself->href)
         return NULL;
 
-    drawable = rsvg_defs_lookup (ctx->defs, upself->href->str);
+    drawable = rsvg_acquire_node (ctx, upself->href->str);
     if (!drawable)
         return NULL;
 
     rsvg_current_state (ctx)->affine = context->paffine;
 
-    return rsvg_get_surface_of_node (ctx, drawable, context->width, context->height);
+    result = rsvg_get_surface_of_node (ctx, drawable, context->width, context->height);
+
+    rsvg_release_node (ctx, drawable);
+
+    return result;
 }
 
 static cairo_surface_t *

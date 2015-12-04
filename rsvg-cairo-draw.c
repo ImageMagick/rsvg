@@ -78,7 +78,7 @@ _set_source_rsvg_linear_gradient (RsvgDrawingCtx * ctx,
     RsvgLinearGradient statlinear;
     statlinear = *linear;
     linear = &statlinear;
-    rsvg_linear_gradient_fix_fallback (linear);
+    rsvg_linear_gradient_fix_fallback (ctx, linear);
 
     if (linear->has_current_color)
         current_color_rgb = linear->current_color;
@@ -122,7 +122,7 @@ _set_source_rsvg_radial_gradient (RsvgDrawingCtx * ctx,
     RsvgRadialGradient statradial;
     statradial = *radial;
     radial = &statradial;
-    rsvg_radial_gradient_fix_fallback (radial);
+    rsvg_radial_gradient_fix_fallback (ctx, radial);
 
     if (radial->has_current_color)
         current_color_rgb = radial->current_color;
@@ -192,7 +192,7 @@ _set_source_rsvg_pattern (RsvgDrawingCtx * ctx,
     int pw, ph;
 
     rsvg_pattern = &local_pattern;
-    rsvg_pattern_fix_fallback (rsvg_pattern);
+    rsvg_pattern_fix_fallback (ctx, rsvg_pattern);
     cr_render = render->cr;
 
     if (rsvg_pattern->obj_bbox)
@@ -330,18 +330,23 @@ _set_source_rsvg_paint_server (RsvgDrawingCtx * ctx,
                                RsvgPaintServer * ps,
                                guint8 opacity, RsvgBbox bbox, guint32 current_colour)
 {
+    RsvgNode *node;
+
     switch (ps->type) {
-    case RSVG_PAINT_SERVER_LIN_GRAD:
-        _set_source_rsvg_linear_gradient (ctx, ps->core.lingrad, current_color_rgb, opacity, bbox);
-        break;
-    case RSVG_PAINT_SERVER_RAD_GRAD:
-        _set_source_rsvg_radial_gradient (ctx, ps->core.radgrad, current_color_rgb, opacity, bbox);
+    case RSVG_PAINT_SERVER_IRI:
+        node = rsvg_acquire_node (ctx, ps->core.iri);
+        if (node == NULL)
+            break;
+        else if (RSVG_NODE_TYPE (node) == RSVG_NODE_TYPE_LINEAR_GRADIENT)
+            _set_source_rsvg_linear_gradient (ctx, (RsvgLinearGradient *) node, current_color_rgb, opacity, bbox);
+        else if (RSVG_NODE_TYPE (node) == RSVG_NODE_TYPE_RADIAL_GRADIENT)
+            _set_source_rsvg_radial_gradient (ctx, (RsvgRadialGradient *) node, current_color_rgb, opacity, bbox);
+        else if (RSVG_NODE_TYPE (node) == RSVG_NODE_TYPE_PATTERN)
+            _set_source_rsvg_pattern (ctx, (RsvgPattern *) node, opacity, bbox);
+        rsvg_release_node (ctx, node);
         break;
     case RSVG_PAINT_SERVER_SOLID:
         _set_source_rsvg_solid_colour (ctx, ps->core.colour, opacity, current_colour);
-        break;
-    case RSVG_PAINT_SERVER_PATTERN:
-        _set_source_rsvg_pattern (ctx, ps->core.pattern, opacity, bbox);
         break;
     }
 }
@@ -457,11 +462,8 @@ rsvg_cairo_render_path (RsvgDrawingCtx * ctx, const cairo_path_t *path)
     RsvgBbox bbox;
     double backup_tolerance;
 
-    if (state->fill == NULL && state->stroke == NULL)
-        return;
-
     need_tmpbuf = ((state->fill != NULL) && (state->stroke != NULL) && state->opacity != 0xff)
-        || state->clip_path_ref || state->mask || state->filter
+        || state->clip_path || state->mask || state->filter
         || (state->comp_op != CAIRO_OPERATOR_OVER);
 
     if (need_tmpbuf)
@@ -490,7 +492,15 @@ rsvg_cairo_render_path (RsvgDrawingCtx * ctx, const cairo_path_t *path)
        _rendering_ time speedups, are these rather expensive operations
        really needed here? */
 
-    if (state->fill != NULL) {
+    /* Bounding box for fill
+     *
+     * Unlike the case for stroke, for fills we always compute the bounding box.
+     * In GNOME we have SVGs for symbolic icons where each icon has a bounding
+     * rectangle with no fill and no stroke, and inside it there are the actual
+     * paths for the icon's shape.  We need to be able to compute the bounding
+     * rectangle's extents, even when it has no fill nor stroke.
+     */
+    {
         RsvgBbox fb;
         rsvg_bbox_init (&fb, &state->affine);
         cairo_fill_extents (cr, &fb.rect.x, &fb.rect.y, &fb.rect.width, &fb.rect.height);
@@ -499,6 +509,8 @@ rsvg_cairo_render_path (RsvgDrawingCtx * ctx, const cairo_path_t *path)
         fb.virgin = 0;
         rsvg_bbox_insert (&bbox, &fb);
     }
+
+    /* Bounding box for stroke */
     if (state->stroke != NULL) {
         RsvgBbox sb;
         rsvg_bbox_init (&sb, &state->affine);
@@ -548,6 +560,8 @@ rsvg_cairo_render_path (RsvgDrawingCtx * ctx, const cairo_path_t *path)
 
         cairo_stroke (cr);
     }
+
+    cairo_new_path (cr); /* clear the path in case stroke == fill == NULL; otherwise we leave it around from computing the bounding box */
 
     if (need_tmpbuf)
         rsvg_cairo_pop_discrete_layer (ctx);
@@ -708,18 +722,6 @@ rsvg_cairo_generate_mask (cairo_t * cr, RsvgMask * self, RsvgDrawingCtx * ctx, R
 }
 
 static void
-rsvg_cairo_push_early_clips (RsvgDrawingCtx * ctx)
-{
-    RsvgCairoRender *render = RSVG_CAIRO_RENDER (ctx->render);
-  
-    cairo_save (render->cr);
-    if (rsvg_current_state (ctx)->clip_path_ref)
-        if (((RsvgClipPath *) rsvg_current_state (ctx)->clip_path_ref)->units == userSpaceOnUse)
-            rsvg_cairo_clip (ctx, rsvg_current_state (ctx)->clip_path_ref, NULL);
-
-}
-
-static void
 rsvg_cairo_push_render_stack (RsvgDrawingCtx * ctx)
 {
     /* XXX: Untested, probably needs help wrt filters */
@@ -731,9 +733,29 @@ rsvg_cairo_push_render_stack (RsvgDrawingCtx * ctx)
     RsvgState *state = rsvg_current_state (ctx);
     gboolean lateclip = FALSE;
 
-    if (rsvg_current_state (ctx)->clip_path_ref)
-        if (((RsvgClipPath *) rsvg_current_state (ctx)->clip_path_ref)->units == objectBoundingBox)
-            lateclip = TRUE;
+    if (rsvg_current_state (ctx)->clip_path) {
+        RsvgNode *node;
+        node = rsvg_acquire_node (ctx, rsvg_current_state (ctx)->clip_path);
+        if (node && RSVG_NODE_TYPE (node) == RSVG_NODE_TYPE_CLIP_PATH) {
+            RsvgClipPath *clip_path = (RsvgClipPath *) node;
+
+            switch (clip_path->units) {
+            case userSpaceOnUse:
+                rsvg_cairo_clip (ctx, clip_path, NULL);
+                break;
+            case objectBoundingBox:
+                lateclip = TRUE;
+                break;
+
+            default:
+                g_assert_not_reached ();
+                break;
+            }
+
+        }
+        
+        rsvg_release_node (ctx, node);
+    }
 
     if (state->opacity == 0xFF
         && !state->filter && !state->mask && !lateclip && (state->comp_op == CAIRO_OPERATOR_OVER)
@@ -774,7 +796,9 @@ rsvg_cairo_push_render_stack (RsvgDrawingCtx * ctx)
 void
 rsvg_cairo_push_discrete_layer (RsvgDrawingCtx * ctx)
 {
-    rsvg_cairo_push_early_clips (ctx);
+    RsvgCairoRender *render = RSVG_CAIRO_RENDER (ctx->render);
+
+    cairo_save (render->cr);
     rsvg_cairo_push_render_stack (ctx);
 }
 
@@ -783,31 +807,43 @@ rsvg_cairo_pop_render_stack (RsvgDrawingCtx * ctx)
 {
     RsvgCairoRender *render = RSVG_CAIRO_RENDER (ctx->render);
     cairo_t *child_cr = render->cr;
-    gboolean lateclip = FALSE;
+    RsvgClipPath *lateclip = NULL;
     cairo_surface_t *surface = NULL;
     RsvgState *state = rsvg_current_state (ctx);
-    gboolean nest;
+    gboolean nest, needs_destroy = FALSE;
 
-    if (rsvg_current_state (ctx)->clip_path_ref)
-        if (((RsvgClipPath *) rsvg_current_state (ctx)->clip_path_ref)->units == objectBoundingBox)
-            lateclip = TRUE;
+    if (rsvg_current_state (ctx)->clip_path) {
+        RsvgNode *node;
+        node = rsvg_acquire_node (ctx, rsvg_current_state (ctx)->clip_path);
+        if (node && RSVG_NODE_TYPE (node) == RSVG_NODE_TYPE_CLIP_PATH
+            && ((RsvgClipPath *) node)->units == objectBoundingBox)
+            lateclip = (RsvgClipPath *) node;
+        else
+            rsvg_release_node (ctx, node);
+    }
 
     if (state->opacity == 0xFF
         && !state->filter && !state->mask && !lateclip && (state->comp_op == CAIRO_OPERATOR_OVER)
         && (state->enable_background == RSVG_ENABLE_BACKGROUND_ACCUMULATE))
         return;
 
+    surface = cairo_get_target (child_cr);
+
     if (state->filter) {
+        RsvgNode *filter;
         cairo_surface_t *output;
 
-        output = render->surfaces_stack->data;
-        render->surfaces_stack = g_list_delete_link (render->surfaces_stack, render->surfaces_stack);
+        filter = rsvg_acquire_node (ctx, state->filter);
+        if (filter && RSVG_NODE_TYPE (filter) == RSVG_NODE_TYPE_FILTER) {
+            output = render->surfaces_stack->data;
+            render->surfaces_stack = g_list_delete_link (render->surfaces_stack, render->surfaces_stack);
 
-        surface = rsvg_filter_render (state->filter, output, ctx, &render->bbox, "2103");
+            needs_destroy = TRUE;
+            surface = rsvg_filter_render ((RsvgFilter *) filter, output, ctx, &render->bbox, "2103");
+            /* Don't destroy the output surface, it's owned by child_cr */
+        }
 
-        /* Don't destroy the output surface, it's owned by child_cr */
-    } else {
-        surface = cairo_get_target (child_cr);
+        rsvg_release_node (ctx, filter);
     }
 
     render->cr = (cairo_t *) render->cr_stack->data;
@@ -819,13 +855,20 @@ rsvg_cairo_pop_render_stack (RsvgDrawingCtx * ctx)
                               nest ? 0 : render->offset_x,
                               nest ? 0 : render->offset_y);
 
-    if (lateclip)
-        rsvg_cairo_clip (ctx, rsvg_current_state (ctx)->clip_path_ref, &render->bbox);
+    if (lateclip) {
+        rsvg_cairo_clip (ctx, lateclip, &render->bbox);
+        rsvg_release_node (ctx, (RsvgNode *) lateclip);
+    }
 
     cairo_set_operator (render->cr, state->comp_op);
 
     if (state->mask) {
-        rsvg_cairo_generate_mask (render->cr, state->mask, ctx, &render->bbox);
+        RsvgNode *mask;
+
+        mask = rsvg_acquire_node (ctx, state->mask);
+        if (mask && RSVG_NODE_TYPE (mask) == RSVG_NODE_TYPE_MASK)
+          rsvg_cairo_generate_mask (render->cr, (RsvgMask *) mask, ctx, &render->bbox);
+        rsvg_release_node (ctx, mask);
     } else if (state->opacity != 0xFF)
         cairo_paint_with_alpha (render->cr, (double) state->opacity / 255.0);
     else
@@ -840,7 +883,7 @@ rsvg_cairo_pop_render_stack (RsvgDrawingCtx * ctx)
     g_free (render->bb_stack->data);
     render->bb_stack = g_list_delete_link (render->bb_stack, render->bb_stack);
 
-    if (state->filter) {
+    if (needs_destroy) {
         cairo_surface_destroy (surface);
     }
 }

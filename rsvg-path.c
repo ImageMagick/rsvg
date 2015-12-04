@@ -331,7 +331,7 @@ rsvg_path_builder_arc (RsvgPathBuilder *builder,
 
     for (i = 0; i < n_segs; i++)
         rsvg_path_arc_segment (builder, cx, cy,
-			                   theta1 + i * delta_theta / n_segs,
+                               theta1 + i * delta_theta / n_segs,
                                theta1 + (i + 1) * delta_theta / n_segs,
                                rx, ry, x_axis_rotation);
 }
@@ -346,14 +346,14 @@ rsvg_parse_path_default_xy (RSVGParsePathCtx * ctx, int n_params)
 
     if (ctx->rel) {
         for (i = ctx->param; i < n_params; i++) {
-            if (i > 2)
-                ctx->params[i] = ctx->params[i - 2];
+            /* we shouldn't get 0 here (usually ctx->param > 0 as
+               precondition) */
+            if (i == 0)
+                ctx->params[i] = ctx->cp.point.x;
             else if (i == 1)
                 ctx->params[i] = ctx->cp.point.y;
-            else if (i == 0)
-                /* we shouldn't get here (usually ctx->param > 0 as
-                   precondition) */
-                ctx->params[i] = ctx->cp.point.x;
+            else
+                ctx->params[i] = ctx->params[i - 2];
         }
     } else {
         for (i = ctx->param; i < n_params; i++)
@@ -375,7 +375,7 @@ rsvg_parse_path_do_cmd (RSVGParsePathCtx * ctx, gboolean final)
             ctx->cp.point.x = ctx->rp.point.x = ctx->params[0];
             ctx->cp.point.y = ctx->rp.point.y = ctx->params[1];
             ctx->param = 0;
-	    ctx->cmd = 'l'; /* implicit linetos after a moveto */
+            ctx->cmd = 'l'; /* implicit linetos after a moveto */
         }
         break;
     case 'l':
@@ -540,8 +540,8 @@ rsvg_parse_path_do_cmd (RSVGParsePathCtx * ctx, gboolean final)
                                    sweep_flag,
                                    x2, y2);
 
-            ctx->cp.point.x = x2;
-            ctx->cp.point.y = y2;
+            ctx->rp.point.x = ctx->cp.point.x = x2;
+            ctx->rp.point.y = ctx->cp.point.y = y2;
 
             ctx->param = 0;
         }
@@ -742,6 +742,8 @@ rsvg_parse_path (const char *path_str)
 
     ctx.cp.point.x = 0.0;
     ctx.cp.point.y = 0.0;
+    ctx.rp.point.x = 0.0;
+    ctx.rp.point.y = 0.0;
     ctx.cmd = 0;
     ctx.param = 0;
 

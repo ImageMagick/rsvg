@@ -1,44 +1,43 @@
-SUBDIRS=pdiff .
+include $(top_srcdir)/glib-tap.mk
 
-TESTS = 		\
+test_programs = \
 	rsvg-test	\
 	crash		\
 	styles
 
-noinst_LTLIBRARIES = 			\
-	libtest-utils.la
+rsvg_test_SOURCES = \
+	rsvg-test.c	\
+	test-utils.c	\
+	test-utils.h
+
+crash_SOURCES = \
+	crash.c		\
+	test-utils.c	\
+	test-utils.h
+
+styles_SOURCES = \
+	styles.c	\
+	test-utils.c	\
+	test-utils.h
 
 LDADD = $(top_builddir)/librsvg-@RSVG_API_MAJOR_VERSION@.la		\
-	$(top_builddir)/tests/libtest-utils.la	\
-	$(top_builddir)/tests/pdiff/libpdiff.la \
-	$(LIBRSVG_LIBS)
+	$(LIBRSVG_LIBS)							\
+	$(LIBM)
 
 INCLUDES = -I$(srcdir) 							\
 	   -I$(top_srcdir)						\
-	   -I$(srcdir)/pdiff						\
 	   -DTEST_DATA_DIR="\"$(srcdir)\""				\
 	   -DTEST_SRC_DIR="\"$(PWD)\""					\
 	   -DTOP_SRC_DIR="\"$(top_srcdir)\""				\
 	  $(LIBRSVG_CFLAGS)
 
-EXTRA_PROGRAMS = $(TESTS)
-
-CLEANFILES = $(TESTS)
-
-DISTCLEANFILES = rsvg-test.html			\
-		 rsvg-test.log
-
-libtest_utils_la_SOURCES = 				\
-	test-utils.c	   				\
-	test-utils.h					\
-	$(top_srcdir)/rsvg-size-callback.c		\
-	$(top_srcdir)/rsvg-size-callback.h
-
-libtest_utils_la_LIBADD = \
-	$(LIBM)
-
-EXTRA_DIST =						\
-	fixtures/crash/bug620238.svg			\
+dist_installed_test_data =				\
+	$(wildcard $(srcdir)/fixtures/crash/*.svg) 	\
+	$(wildcard $(srcdir)/fixtures/crash/*.png) 	\
+	$(wildcard $(srcdir)/fixtures/reftests/*.svg) 	\
+	$(wildcard $(srcdir)/fixtures/reftests/*.png) 	\
+	$(wildcard $(srcdir)/fixtures/reftests/bugs*.svg) 	\
+	$(wildcard $(srcdir)/fixtures/reftests/bugs*.png) 	\
 	fixtures/dimensions/bug564527.svg		\
 	fixtures/dimensions/bug614018.svg		\
 	fixtures/dimensions/bug612951.svg		\
@@ -55,8 +54,3 @@ EXTRA_DIST =						\
 	fixtures/styles/bug614643.svg			\
 	fixtures/styles/bug418823.svg			\
 	fixtures/styles/order.svg
-
-test:
-	@$(MAKE) $(AM_MAKEFLAGS) check;
-
-.PHONY: test

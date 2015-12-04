@@ -37,7 +37,7 @@
 #include "rsvg-mask.h"
 #include "rsvg-marker.h"
 
-#include <libcroco.h>
+#include <libcroco/libcroco.h>
 
 #define RSVG_DEFAULT_FONT "Times New Roman"
 
@@ -118,8 +118,7 @@ rsvg_state_init (RsvgState * state)
     cairo_matrix_init_identity (&state->personal_affine);
     state->mask = NULL;
     state->opacity = 0xff;
-    state->adobe_blend = 0;
-    state->fill = rsvg_paint_server_parse (NULL, NULL, "#000", 0);
+    state->fill = rsvg_paint_server_parse (NULL, "#000");
     state->fill_opacity = 0xff;
     state->stroke_opacity = 0xff;
     state->stroke_width = _rsvg_css_parse_length ("1");
@@ -149,7 +148,7 @@ rsvg_state_init (RsvgState * state)
     state->visible = TRUE;
     state->cond_true = TRUE;
     state->filter = NULL;
-    state->clip_path_ref = NULL;
+    state->clip_path = NULL;
     state->startMarker = NULL;
     state->middleMarker = NULL;
     state->endMarker = NULL;
@@ -221,8 +220,14 @@ rsvg_state_clone (RsvgState * dst, const RsvgState * src)
 
     *dst = *src;
     dst->parent = parent;
+    dst->filter = g_strdup (src->filter);
+    dst->mask = g_strdup (src->mask);
+    dst->clip_path = g_strdup (src->clip_path);
     dst->font_family = g_strdup (src->font_family);
     dst->lang = g_strdup (src->lang);
+    dst->startMarker = g_strdup (src->startMarker);
+    dst->middleMarker = g_strdup (src->middleMarker);
+    dst->endMarker = g_strdup (src->endMarker);
     rsvg_paint_server_ref (dst->fill);
     rsvg_paint_server_ref (dst->stroke);
 
@@ -312,16 +317,22 @@ rsvg_state_inherit_run (RsvgState * dst, const RsvgState * src,
         dst->text_anchor = src->text_anchor;
     if (function (dst->has_letter_spacing, src->has_letter_spacing))
         dst->letter_spacing = src->letter_spacing;
-    if (function (dst->has_startMarker, src->has_startMarker))
-        dst->startMarker = src->startMarker;
-    if (function (dst->has_middleMarker, src->has_middleMarker))
-        dst->middleMarker = src->middleMarker;
-    if (function (dst->has_endMarker, src->has_endMarker))
-        dst->endMarker = src->endMarker;
-	if (function (dst->has_shape_rendering_type, src->has_shape_rendering_type))
-		dst->shape_rendering_type = src->shape_rendering_type;
-	if (function (dst->has_text_rendering_type, src->has_text_rendering_type))
-		dst->text_rendering_type = src->text_rendering_type;
+    if (function (dst->has_startMarker, src->has_startMarker)) {
+        g_free (dst->startMarker);
+        dst->startMarker = g_strdup (src->startMarker);
+    }
+    if (function (dst->has_middleMarker, src->has_middleMarker)) {
+        g_free (dst->middleMarker);
+        dst->middleMarker = g_strdup (src->middleMarker);
+    }
+    if (function (dst->has_endMarker, src->has_endMarker)) {
+        g_free (dst->endMarker);
+        dst->endMarker = g_strdup (src->endMarker);
+    }
+    if (function (dst->has_shape_rendering_type, src->has_shape_rendering_type))
+            dst->shape_rendering_type = src->shape_rendering_type;
+    if (function (dst->has_text_rendering_type, src->has_text_rendering_type))
+            dst->text_rendering_type = src->text_rendering_type;
 
     if (function (dst->has_font_family, src->has_font_family)) {
         g_free (dst->font_family);      /* font_family is always set to something */
@@ -355,12 +366,14 @@ rsvg_state_inherit_run (RsvgState * dst, const RsvgState * src,
     }
 
     if (inherituninheritables) {
-        dst->clip_path_ref = src->clip_path_ref;
-        dst->mask = src->mask;
+        g_free (dst->clip_path);
+        dst->clip_path = g_strdup (src->clip_path);
+        g_free (dst->mask);
+        dst->mask = g_strdup (src->mask);
+        g_free (dst->filter);
+        dst->filter = g_strdup (src->filter);
         dst->enable_background = src->enable_background;
-        dst->adobe_blend = src->adobe_blend;
         dst->opacity = src->opacity;
-        dst->filter = src->filter;
         dst->comp_op = src->comp_op;
     }
 }
@@ -444,8 +457,14 @@ rsvg_state_inherit (RsvgState * dst, const RsvgState * src)
 void
 rsvg_state_finalize (RsvgState * state)
 {
+    g_free (state->filter);
+    g_free (state->mask);
+    g_free (state->clip_path);
     g_free (state->font_family);
     g_free (state->lang);
+    g_free (state->startMarker);
+    g_free (state->middleMarker);
+    g_free (state->endMarker);
     rsvg_paint_server_unref (state->fill);
     rsvg_paint_server_unref (state->stroke);
 
@@ -488,39 +507,15 @@ rsvg_parse_style_pair (RsvgHandle * ctx,
     else if (g_str_equal (name, "flood-opacity")) {
         state->flood_opacity = rsvg_css_parse_opacity (value);
         state->has_flood_opacity = TRUE;
-    } else if (g_str_equal (name, "filter"))
-        state->filter = rsvg_filter_parse (ctx->priv->defs, value);
-    else if (g_str_equal (name, "a:adobe-blending-mode")) {
-        if (g_str_equal (value, "normal"))
-            state->adobe_blend = 0;
-        else if (g_str_equal (value, "multiply"))
-            state->adobe_blend = 1;
-        else if (g_str_equal (value, "screen"))
-            state->adobe_blend = 2;
-        else if (g_str_equal (value, "darken"))
-            state->adobe_blend = 3;
-        else if (g_str_equal (value, "lighten"))
-            state->adobe_blend = 4;
-        else if (g_str_equal (value, "softlight"))
-            state->adobe_blend = 5;
-        else if (g_str_equal (value, "hardlight"))
-            state->adobe_blend = 6;
-        else if (g_str_equal (value, "colordodge"))
-            state->adobe_blend = 7;
-        else if (g_str_equal (value, "colorburn"))
-            state->adobe_blend = 8;
-        else if (g_str_equal (value, "overlay"))
-            state->adobe_blend = 9;
-        else if (g_str_equal (value, "exclusion"))
-            state->adobe_blend = 10;
-        else if (g_str_equal (value, "difference"))
-            state->adobe_blend = 11;
-        else
-            state->adobe_blend = 0;
-    } else if (g_str_equal (name, "mask"))
-        state->mask = rsvg_mask_parse (ctx->priv->defs, value);
-    else if (g_str_equal (name, "clip-path")) {
-        state->clip_path_ref = rsvg_clip_path_parse (ctx->priv->defs, value);
+    } else if (g_str_equal (name, "filter")) {
+        g_free (state->filter);
+        state->filter = rsvg_get_url_string (value);
+    } else if (g_str_equal (name, "mask")) {
+        g_free (state->mask);
+        state->mask = rsvg_get_url_string (value);
+    } else if (g_str_equal (name, "clip-path")) {
+        g_free (state->clip_path);
+        state->clip_path = rsvg_get_url_string (value);
     } else if (g_str_equal (name, "overflow")) {
         if (!g_str_equal (value, "inherit")) {
             state->overflow = rsvg_css_parse_overflow (value, &state->has_overflow);
@@ -608,7 +603,7 @@ rsvg_parse_style_pair (RsvgHandle * ctx,
     } else if (g_str_equal (name, "fill")) {
         RsvgPaintServer *fill = state->fill;
         state->fill =
-            rsvg_paint_server_parse (&state->has_fill_server, ctx->priv->defs, value, 0);
+            rsvg_paint_server_parse (&state->has_fill_server, value);
         rsvg_paint_server_unref (fill);
     } else if (g_str_equal (name, "fill-opacity")) {
         state->fill_opacity = rsvg_css_parse_opacity (value);
@@ -633,7 +628,7 @@ rsvg_parse_style_pair (RsvgHandle * ctx,
         RsvgPaintServer *stroke = state->stroke;
 
         state->stroke =
-            rsvg_paint_server_parse (&state->has_stroke_server, ctx->priv->defs, value, 0);
+            rsvg_paint_server_parse (&state->has_stroke_server, value);
 
         rsvg_paint_server_unref (stroke);
     } else if (g_str_equal (name, "stroke-width")) {
@@ -761,13 +756,16 @@ rsvg_parse_style_pair (RsvgHandle * ctx,
             state->stop_opacity = rsvg_css_parse_opacity (value);
         }
     } else if (g_str_equal (name, "marker-start")) {
-        state->startMarker = rsvg_marker_parse (ctx->priv->defs, value);
+        g_free (state->startMarker);
+        state->startMarker = rsvg_get_url_string (value);
         state->has_startMarker = TRUE;
     } else if (g_str_equal (name, "marker-mid")) {
-        state->middleMarker = rsvg_marker_parse (ctx->priv->defs, value);
+        g_free (state->middleMarker);
+        state->middleMarker = rsvg_get_url_string (value);
         state->has_middleMarker = TRUE;
     } else if (g_str_equal (name, "marker-end")) {
-        state->endMarker = rsvg_marker_parse (ctx->priv->defs, value);
+        g_free (state->endMarker);
+        state->endMarker = rsvg_get_url_string (value);
         state->has_endMarker = TRUE;
     } else if (g_str_equal (name, "stroke-miterlimit")) {
         state->has_miter_limit = TRUE;

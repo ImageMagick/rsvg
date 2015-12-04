@@ -79,10 +79,9 @@ struct _RsvgState {
     cairo_matrix_t affine;
     cairo_matrix_t personal_affine;
 
-    RsvgFilter *filter;
-    void *mask;
-    void *clip_path_ref;
-    guint8 adobe_blend;         /* 0..11 */
+    char *filter;
+    char *mask;
+    char *clip_path;
     guint8 opacity;             /* 0..255 */
 
     RsvgPaintServer *fill;
@@ -167,9 +166,9 @@ struct _RsvgState {
     guchar flood_opacity;
     gboolean has_flood_opacity;
 
-    RsvgNode *startMarker;
-    RsvgNode *middleMarker;
-    RsvgNode *endMarker;
+    char *startMarker;
+    char *middleMarker;
+    char *endMarker;
     gboolean has_startMarker;
     gboolean has_middleMarker;
     gboolean has_endMarker;

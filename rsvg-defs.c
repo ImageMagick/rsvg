@@ -35,15 +35,7 @@ struct _RsvgDefs {
     GHashTable *hash;
     GPtrArray *unnamed;
     GHashTable *externs;
-    GSList *toresolve;
     RsvgHandle *ctx;
-};
-
-typedef struct _RsvgResolutionPending RsvgResolutionPending;
-
-struct _RsvgResolutionPending {
-    RsvgNode **tochange;
-    char *name;
 };
 
 RsvgDefs *
@@ -55,7 +47,6 @@ rsvg_defs_new (RsvgHandle *handle)
     result->externs =
         g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_object_unref);
     result->unnamed = g_ptr_array_new ();
-    result->toresolve = NULL;
     result->ctx = handle; /* no need to take a ref here */
 
     return result;
@@ -106,7 +97,7 @@ rsvg_defs_extern_lookup (const RsvgDefs * defs, const char *filename, const char
     }
 
     if (file != NULL)
-        return (RsvgNode *) g_hash_table_lookup (file->priv->defs->hash, name);
+        return g_hash_table_lookup (file->priv->defs->hash, name);
     else
         return NULL;
 }
@@ -120,7 +111,7 @@ rsvg_defs_lookup (const RsvgDefs * defs, const char *name)
         return NULL;
     }
     if (hashpos == name) {
-        return (RsvgNode *) g_hash_table_lookup (defs->hash, name + 1);
+        return g_hash_table_lookup (defs->hash, name + 1);
     } else {
         gchar **splitbits;
         RsvgNode *toreturn;
@@ -144,6 +135,9 @@ rsvg_defs_set (RsvgDefs * defs, const char *name, RsvgNode * val)
 void
 rsvg_defs_register_name (RsvgDefs * defs, const char *name, RsvgNode * val)
 {
+    if (g_hash_table_lookup (defs->hash, name))
+        return;
+
     g_hash_table_insert (defs->hash, g_strdup (name), val);
 }
 
@@ -151,20 +145,6 @@ void
 rsvg_defs_register_memory (RsvgDefs * defs, RsvgNode * val)
 {
     g_ptr_array_add (defs->unnamed, val);
-}
-
-static void
-rsvg_defs_free_toresolve (RsvgDefs *defs)
-{
-    GSList *l;
-
-    for (l = defs->toresolve; l ; l = l ->next) {
-        RsvgResolutionPending *data = l->data;
-
-        g_free (data->name);
-        g_free (data);
-    }
-    g_slist_free (defs->toresolve);
 }
 
 void
@@ -180,32 +160,7 @@ rsvg_defs_free (RsvgDefs * defs)
     g_ptr_array_free (defs->unnamed, TRUE);
 
     g_hash_table_destroy (defs->externs);
-    rsvg_defs_free_toresolve (defs);
 
     g_free (defs);
 }
 
-void
-rsvg_defs_add_resolver (RsvgDefs * defs, RsvgNode ** tochange, const gchar * name)
-{
-    RsvgResolutionPending *data;
-    data = g_new (RsvgResolutionPending, 1);
-    data->tochange = tochange;
-    data->name = g_strdup (name);
-    defs->toresolve = g_slist_prepend (defs->toresolve, data);
-}
-
-void
-rsvg_defs_resolve_all (RsvgDefs * defs)
-{
-    GSList *l;
-
-    for (l = defs->toresolve; l ; l = l ->next) {
-        RsvgResolutionPending *data = l->data;
-
-        *(data->tochange) = rsvg_defs_lookup (defs, data->name);
-    }
-
-    rsvg_defs_free_toresolve (defs);
-    defs->toresolve = NULL;
-}

@@ -1,4 +1,4 @@
-SUBDIRS = . gdk-pixbuf-loader tests tools doc
+SUBDIRS = . gdk-pixbuf-loader tests tools doc build
 
 NULL =
 BUILT_SOURCES =
@@ -165,7 +165,13 @@ EXTRA_DIST =				\
 	librsvg-zip.in 			\
 	gtk-doc.make			\
 	Rsvg-2.0-custom.vala		\
-	Rsvg-2.0.metadata
+	Rsvg-2.0.metadata		\
+	config.h.win32.in		\
+	config.h.win32			\
+	rsvg.symbols			\
+	glib-tap.mk			\
+	tap-driver.sh			\
+	tap-test
 
 CLEANFILES = \
 	$(enum_sources) \
@@ -265,6 +271,31 @@ CLEANFILES += $(VAPIGEN_VAPIS)
 endif # ENABLE_VAPIGEN
 
 endif # HAVE_INTROSPECTION
+
+# ------------------- MSVC Build Items ----------------
+
+MSVCPROJS = rsvg rsvg-convert
+
+rsvg_FILES = $(librsvg_@RSVG_API_MAJOR_VERSION@_la_SOURCES)
+rsvg_EXCLUDES = dummy
+rsvg_HEADERS_DIR = $(librsvgincdir)
+rsvg_HEADERS_INST = $(librsvginc_HEADERS)
+
+rsvg_HEADERS_EXCLUDES = dummy
+
+rsvg_convert_FILES = $(rsvg_convert_SOURCES)
+rsvg_convert_EXCLUDES = dummy
+
+include $(top_srcdir)/build/Makefile.msvcproj
+
+# autotools: Why must we do this instead of dist-hook?
+MSVCPROJ_GENERATED = \
+	$(top_builddir)/build/win32/vs9/rsvg.vcproj		\
+	$(top_builddir)/build/win32/vs9/rsvg-convert.vcproj
+
+$(MSVCPROJ_GENERATED): $(top_builddir)/build/win32/vs9/rsvg.headers
+
+EXTRA_DIST += $(MSVCPROJ_GENERATED)
 
 # ChangeLog generation
 
