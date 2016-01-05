@@ -1561,6 +1561,7 @@ MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)
 	};
 	static const gchar *mime_types[] = {
 		"image/jpeg",
+		"image/jpg",
 		NULL
 	};
 	static const gchar *extensions[] = {
