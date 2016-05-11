@@ -1,3 +1,36 @@
+Version 2.40.15
+- Apologies for the lack of 2.40.14.  I mistakenly tagged the
+  repository before updating the NEWS file.
+- librsvg now uses the Contributor Covenant Code of Conduct, 
+  version 1.4, to which all contributors and maintainers are expected
+  to abide. Please see the code_of_conduct.md file for details.
+- Chun-wei Fan fixed builds on Visual Studio pre-2012.
+- Fixed bgo#759084 - Don't crash when filters don't actually exist
+  Fix by Benjamin Otte.
+- Javier Jardón updated our autogen.sh to use modern autotools.
+- Fixed bgo#761728 - Memory leak in the PrimitiveComponentTransfer
+  filter.  Fix by Ron Hopper.
+
+Version 2.40.13
+- Chun-wei Fan and Paolo Borelli fixed the Windows build.
+- Menner added basic support for the "baseline-shift" attribute in
+  text objects.  We support "sub", "super", and plain "baseline", so
+  you can at least have subscripts and superscripts for formulas and
+  such.  There is no support for percentages or explicit lengths yet.
+  bgo#340047.
+- Menner fixed some duplicate logic when rendering paths, which would
+  try to decide whether to create intermediate surfaces.  Now we have
+  a single place where this is done.  This fixes inconsistent text
+  spacing in some situations.  bgo#749415.
+- Rewrote the markers engine, for bgo#685906 and bgo#760180 - Our
+  machinery for rendering SVG markers (like arrowheads and such)
+  didn't handle several cases correctly.  Curves with coincident
+  control points produced incorrect orientations for the markers, as
+  did multiple contiguous zero-length segments.  We follow the spec
+  for this now and handle things correctly.  Also, markers didn't
+  render in the correct position if they had the viewBox attribute
+  set.
+
 Version 2.40.12
 - Benjamin Otte did *great* work in refactoring the test harness to
   use Glib's gtest infrastructure, instead of using home-grown

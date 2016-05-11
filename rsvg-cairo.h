@@ -34,7 +34,6 @@
 
 G_BEGIN_DECLS 
 
-RSVG_EXPORT
 gboolean    rsvg_handle_render_cairo     (RsvgHandle * handle, cairo_t * cr);
 gboolean    rsvg_handle_render_cairo_sub (RsvgHandle * handle, cairo_t * cr, const char *id);
 

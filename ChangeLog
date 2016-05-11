@@ -1,3 +1,369 @@
+commit f4296d2b385fd7bf5b369a8ba249fb4c0fb87da8
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Mar 30 19:48:56 2016 -0600
+
+    RsvgFilterPrimitive: use a single destructor for most subclasses
+    
+    Instead of duplicating code to free the superclass all over the place,
+    use a single function.
+    
+    Also, remove a bit of the 'upself' idiom - it's unreadable.
+
+ rsvg-filter.c | 287 +++++++++++++++++++++++-----------------------------------
+ 1 file changed, 111 insertions(+), 176 deletions(-)
+
+commit 76ad48b8210168869cedb1419b1e49dcf2e064a1
+Author: Ron Hopper <ron@boxcast.com>
+Date:   Mon Feb 8 15:21:08 2016 -0500
+
+    RsvgFilterPrimitiveComponentTransfer: add destructor; fix memory leak
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=761728
+
+ rsvg-filter.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+commit 03c5bfcfee7736b1c29255f489053a0bd90ce714
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Feb 10 19:12:30 2016 -0600
+
+    s/propegate/propagate
+
+ gdk-pixbuf-loader/io-svg.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+commit 5dc85eb2a13f92ba3be32669e7f6e9178b1d643c
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Feb 10 19:05:40 2016 -0600
+
+    Bump version to 2.40.14
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit fcbb915d8594a246cace478095a9124aa0df60f1
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Feb 10 19:00:37 2016 -0600
+
+    Update the Contributor Covenant to version 1.4
+
+ code_of_conduct.md | 80 +++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 52 insertions(+), 28 deletions(-)
+
+commit 6eabff9d11d9111a9565ae4cdeed841157308737
+Author: Javier Jardón <jjardon@gnome.org>
+Date:   Mon Feb 8 13:15:25 2016 +0000
+
+    autogen.sh: Replace deprecated gnome-autogen.sh with standard autotools
+    
+    See https://wiki.gnome.org/Projects/GnomeCommon/Migration
+
+ autogen.sh | 61 +++++++++++++++++++++++++++++--------------------------------
+ 1 file changed, 29 insertions(+), 32 deletions(-)
+
+commit 7948f3b862a8c43c68de0951927e3a3402a580f9
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Jan 29 19:19:52 2016 -0600
+
+    Add a code of conduct, the Contributor Covenant 1.3.0
+    
+    http://contributor-covenant.org
+
+ README             |  2 ++
+ code_of_conduct.md | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+)
+
+commit d937c691678803ceda6be701587d997ccd03a1da
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Fri Jan 29 12:49:55 2016 +0100
+
+    Don't crash when filters don't exist
+    
+    We put a new surface on the stack if a filter existed by name but we
+    didn't pop it if the name didn't resolve to a real filter.
+    
+    New test: crash/bug759084.svg
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=759084
+
+ rsvg-cairo-draw.c                  | 6 +++---
+ tests/fixtures/crash/bug759084.svg | 9 +++++++++
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+commit 91e50fe393a25eeff7c5e4430d5666362bce0283
+Author: Benjamin Otte <otte@redhat.com>
+Date:   Thu Dec 10 22:59:30 2015 +0100
+
+    filter: Remove unused variables
+
+ rsvg-filter.c | 30 ------------------------------
+ 1 file changed, 30 deletions(-)
+
+commit 2ae18d05e654b1130fa7397b316d270be1707450
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Thu Jan 21 18:13:54 2016 +0800
+
+    Visual Studio builds: Fix pre-Visual Studio 2012 builds
+    
+    A recent commit made use of the C99 function isnan(), which is not
+    supported directly in pre-2013 Visual Studio.  Earlier Visual Studio
+    however does provide _isnan() which does what we will need, so add a
+    fallback math.h in build/win32/vs9 that defines isnan() and includes the
+    stock math.h, and make the projects include this math.h.
+    
+    This header is copied to the build/win32/vs[10|11] during 'make dist', as
+    Visual Studio 2010 and 2012 will need this as well.
+
+ build/win32/vs10/Makefile.am               |  6 ++++-
+ build/win32/vs10/rsvg-build-defines.props  |  2 +-
+ build/win32/vs11/Makefile.am               |  6 ++++-
+ build/win32/vs9/Makefile.am                |  1 +
+ build/win32/vs9/math.h                     | 39 ++++++++++++++++++++++++++++++
+ build/win32/vs9/rsvg-build-defines.vsprops |  2 +-
+ 6 files changed, 52 insertions(+), 4 deletions(-)
+
+commit a12e7b90e7b9fa6a6a325f39fb409722b06a6735
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Thu Jan 7 19:37:34 2016 -0600
+
+    Update NEWS
+
+ NEWS | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+commit 954e40e52363fe5bcfbb7e9c28dfcc05aa1affa3
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Thu Jan 7 19:27:22 2016 -0600
+
+    Regenerate reference images which were failing; they are OK now
+
+ tests/fixtures/reftests/bugs/340047-ref.png | Bin 4855 -> 4706 bytes
+ tests/fixtures/reftests/bugs/749415-ref.png | Bin 22441 -> 19572 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+
+commit 63371906c63d74bfb1f1ca6b10237d3b563bb55a
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Thu Jan 7 19:15:38 2016 -0600
+
+    bgo#760180: handle the viewBox of markers correctly
+    
+    One of the SVG test suite's images has a marker with a viewBox that doesn't actually start at (0, 0).
+    This was rendered incorrectly.
+    
+    I'm not sure why this specific use of rsvg_preserve_aspect_ratio() is not the same as the others
+    in librsvg, but it certainly produced incorrect results.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=760180
+
+ rsvg-marker.c                               |  13 +--
+ tests/fixtures/reftests/bugs/760180-ref.png | Bin 0 -> 8120 bytes
+ tests/fixtures/reftests/bugs/760180.svg     | 159 ++++++++++++++++++++++++++++
+ 3 files changed, 161 insertions(+), 11 deletions(-)
+
+commit 0e2c78cb95a72e7378638a6bb6b647e5c7a7c8c1
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Thu Jan 7 17:24:42 2016 -0600
+
+    rsvg-marker: Use the correct default marker size as specified in the spec
+    
+    The spec uses 3 as the default markerWidth and markerHeight:
+    http://www.w3.org/TR/SVG/painting.html#MarkerWidthAttribute
+
+ rsvg-marker.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 92b16618981031f4599d429192ad0b99337a680d
+Author: Paolo Borelli <pborelli@gnome.org>
+Date:   Thu Jan 7 23:56:56 2016 +0100
+
+    MSVC builds: Fix install with CopyDir != GlibEtcInstallRoot
+    
+    We should create CopyDir since that is where we copy the files
+
+ build/win32/vs10/rsvg-install.propsin  | 4 ++--
+ build/win32/vs9/rsvg-install.vspropsin | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+commit bb0a86f9daa7a8504d6c52a08e9b604b9af80f25
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Jan 6 14:34:32 2016 -0600
+
+    Update NEWS
+
+ NEWS | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+commit cb7fd6b635a519e968ea67ec529651fe774abe26
+Author: Menner <mik@gmx.org>
+Date:   Sat Jan 2 09:35:52 2016 +0100
+
+    bgo#749415: Don't duplicate logic for deciding when to push discrete layers
+    
+    rsvg_cairo_render_path() tried to avoid calling
+    rsvg_cairo_push/pop_discrete_layer(), but the logic to decide whether
+    to actually create an intermediate surface is best left in those
+    functions.  With the duplicate/incorrect logic, text had incorrect
+    spacing as a result.
+    
+    Also, remove an extra-old comment from when those functions were first
+    implemented.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=749415
+
+ rsvg-cairo-draw.c                           |  23 +++--------------
+ tests/fixtures/reftests/bugs/749415-ref.png | Bin 0 -> 22441 bytes
+ tests/fixtures/reftests/bugs/749415.svg     |  38 ++++++++++++++++++++++++++++
+ 3 files changed, 42 insertions(+), 19 deletions(-)
+
+commit 41345523c756297b0b88dbcfeedc38e5f5c86c18
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Jan 5 19:40:39 2016 -0600
+
+    Update NEWS
+
+ NEWS | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+commit 5dc9e603227296766ee05b9fab6812b5e6b4d535
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Jan 5 19:40:32 2016 -0600
+
+    Remove leftover from the unsupported a:adobe-blending-mode
+
+ rsvg-styles.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit e804fb1adcf564ce4bae661cc595a8d4df55efd3
+Author: Menner <mik@gmx.org>
+Date:   Sat Jan 2 09:42:53 2016 +0100
+
+    bgo#340047 - Add support for the "baseline-shift" text attribute
+    
+    This commit adds support for the baseline-shift attribute for tags
+    "sub/super/baseline".  We don't support percentages of the font size
+    or explicit lengths yet.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=340047
+
+ rsvg-css.c                                  |  24 +++++++++++++++-
+ rsvg-private.h                              |   2 ++
+ rsvg-styles.c                               |  21 ++++++++++++++
+ rsvg-styles.h                               |   2 ++
+ rsvg-text.c                                 |  16 +++++++----
+ tests/fixtures/reftests/bugs/340047-ref.png | Bin 0 -> 4855 bytes
+ tests/fixtures/reftests/bugs/340047.svg     |  43 ++++++++++++++++++++++++++++
+ 7 files changed, 101 insertions(+), 7 deletions(-)
+
+commit 1fc06fe6def169920f4032e348040c38be320fb1
+Author: Menner <mik@gmx.org>
+Date:   Tue Jan 5 13:50:17 2016 -0600
+
+    rsvg-marker: Don't try to render NULL markers
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=685906#c7
+
+ rsvg-marker.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit b945b6f5dbee693ac82d1b94f8f5a0ec37d00ee5
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Tue Dec 15 14:00:44 2015 +0800
+
+    MSVC 2008 builds: include gio-win32-2.0 in the include paths
+    
+    This is a follow-up commit for commit 7ebe28c for Visual Studio 2008
+    builds, for the same reason as that commit.
+
+ build/win32/vs9/rsvg-build-defines.vsprops | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 00744676387ce7914bff33f43ce5f04960219925
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Tue Dec 15 13:55:49 2015 +0800
+
+    MSVC builds: Fix pixbuf loaders cache generation
+    
+    Use $(GlibEtcInstallRoot)\bin\gdk-pixbuf-query-loaders instead of
+    $(CopyDir)\bin\gdk-pixbuf-query-loaders to fix the "installation" when
+    CopyDir != GlibEtcInstallRoot.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=759438
+
+ build/win32/vs10/rsvg-install.propsin  | 2 +-
+ build/win32/vs9/rsvg-install.vspropsin | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit 7ebe28c3be9ba8227cebd407511dcec92d34c39e
+Author: Paolo Borelli <pborelli@gnome.org>
+Date:   Sat Dec 12 17:33:46 2015 +0100
+
+    win32: add gio-win32-2.0 to the include paths
+    
+    rsvg-convert uses the win32 gio streams
+
+ build/win32/vs10/rsvg-build-defines.props | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 3ef996ce17903642187326e20fc5dea48a3c6206
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 7 20:15:30 2015 -0600
+
+    test/bugs: add reference image for #685906
+
+ tests/bugs/685906-ref.png | Bin 0 -> 2955 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 0cfdd27ecb5023b65865d6458d9a810f48f08eb2
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 7 20:11:43 2015 -0600
+
+    bgo#685906 - Marker angles are wrong when control points of a curve are coincident
+    
+    This is a rewrite of the code to draw markers at path vertices.  The previous code did a single pass
+    over the cairo_path_t data, and it tried to figure out the appropriate marker type for each vertex
+    (start marker, middle, or end).  However, it had trouble with coincident points in curveto
+    commands, and with zero-length path segments.  The SVG spec is verbose but clear on the behavior
+    for those cases.
+    
+    The code now does two passes:
+    
+    1. Take the cairo_path_t data, which is an array of moveto/lineto/curveto/closepath commands, and
+    turn it into a sequence of segments.  Each segment either has four control points, *or* it has
+    a single point and the segment is degenerate.
+    
+    2. Walk that list of segments, and draw the appropriate markers for them.
+    
+    Having the list of segments makes it easy to implement the algorithm from the SVG spec,
+    in which the directionality of special vertices (like those at the ends of zero-length segments)
+    needs to be determined.
+    
+    This code is careful to not do division by zero or to get NaNs in the middle of the computation,
+    which would get Cairo into an error state, preventing further drawing of markers within
+    the path.
+    
+    Fixes https://bugzilla.gnome.org/show_bug.cgi?id=685906
+
+ rsvg-marker.c | 524 ++++++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 414 insertions(+), 110 deletions(-)
+
+commit 7621ae4f61901c349af7cfe5ae3790b417227bf6
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Dec 1 18:58:15 2015 -0600
+
+    Tests: add bug test for #685906
+
+ tests/bugs/685906.svg | 313 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 313 insertions(+)
+
+commit 3c58d0816d1ebacdd840ba5c60c3cbdfe2eb87c0
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Dec 1 19:18:19 2015 -0600
+
+    Post release version bump
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 commit 513c51f88ed66e7d76718039998658e8b68ba92c
 Author: Federico Mena Quintero <federico@gnome.org>
 Date:   Tue Dec 1 19:13:09 2015 -0600
