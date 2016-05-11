@@ -14,6 +14,68 @@
 
 @SET_MAKE@
 
+# Author: Fan, Chun-wei
+# Common Autotools file used to generate Visual Studio 2008+
+# Projects from their templates
+
+# This autotools file, from GLib, can be used in other projects
+# that have Visual Studio build support, and is copied into
+# $(srcroot)/build/.
+
+# * Input variables:
+#
+#   MSVCPROJS - List of Projects that should be generated
+#
+# * Simple tutorial
+#
+# Add this to Makefile.am where your library/program is built:
+#   include $(top_srcdir)/build/Makefile.msvcproj
+#   MSVCPROJS = YourProject (can be multiple projects in a single srcdir)
+#   YourProject_FILES = $(libyourlib_1_0_SOURCES)
+#   YourProject_EXCLUDES = ... # list of sources to exclude, separated by '|', wildcards allowed; use random unsed value if none
+#   YourProject_HEADERS_DIR = $(libyourlibincludedir)
+#   YourProject_HEADERS_INST = $(libyourlib_1_0_HEADERS)
+#   YourProject_HEADERS_EXCLUDES = ... # <list of headers to exclude from installation, separated by '|', wildcards allowed; use random unsed value if none>
+#
+#   dist-hook: \ # (or add to it if it is already there, note the vs9 items will also call the vs10 items in the process)
+#   	$(top_builddir)/build/win32/vs9/YourProject.vcproj	\
+#   	$(top_builddir)/build/win32/vs9/YourProject.headers
+
+# Private functions
+
+# Author: Fan, Chun-wei
+# Common autotools file for constructing the g-ir-scanner and
+# g-ir-compiler command lines for Visual Studio builds.
+
+# This is copied from $(srcroot)/build from the gobject-introspection
+# project, which may be included in projects that support both
+# Visual Studio builds and introspection.
+
+# * Input variables:
+#
+#   MSVC_INTROSPECT_GIRS - List of .gir's that should be built
+#                          in the NMake Makefiles
+#
+# * Simple tutorial
+#
+# Add this to Makefile.am where your library/program is built:
+#   (Either YourLib_1_0_gir_MSVC_LIBS or YourLib_1_0_gir_MSVC_PROGRAM
+#    is required unless --headers-only is specified in
+#    YourLib_1_0_gir__MSVC_SCANNERFLAGS)
+#
+#   include $(top_srcdir)/build/Makefile.msvc-introspection
+#   MSVC_INTROSPECT_GIRS = YourLib-1.0.gir
+#   YourLib_1_0_gir_NAMESPACE = YourLib # This is optional
+#   YourLib_1_0_gir_VERSION = 1.0 # This is optional
+#   YourLib_1_0_gir_MSVC_LIBS = yourlib-1.0
+#   YourLib_1_0_gir_MSVC_FILES = $(libyourlib_1_0_SOURCES)
+#   YourLib_1_0_gir_MSVC_PROGRAM = YourProgram
+#   YourLib_1_0_gir_MSVC_PACKAGES = (Dependent .pc files)
+#   YourLib_1_0_gir_MSVC_INCLUDE_GIRS = (Dependent external .gir's)
+#   YourLiv_1_0_gir_MSVC_EXPORT_PACKAGES = (Packages exported by this .gir)
+
+# Private functions
+
 
 
 
@@ -349,16 +411,6 @@ libpixbufloader_jpeg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(LDFLAGS) -o $@
 @BUILD_DYNAMIC_MODULES_TRUE@@BUILD_GDIPLUS_LOADERS_FALSE@@HAVE_JPEG_TRUE@@INCLUDE_JPEG_FALSE@am_libpixbufloader_jpeg_la_rpath = -rpath \
 @BUILD_DYNAMIC_MODULES_TRUE@@BUILD_GDIPLUS_LOADERS_FALSE@@HAVE_JPEG_TRUE@@INCLUDE_JPEG_FALSE@	$(loaderdir)
-libpixbufloader_pcx_la_DEPENDENCIES = $(am__DEPENDENCIES_3)
-am_libpixbufloader_pcx_la_OBJECTS = io-pcx.lo
-libpixbufloader_pcx_la_OBJECTS = $(am_libpixbufloader_pcx_la_OBJECTS)
-libpixbufloader_pcx_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libpixbufloader_pcx_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-@BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_PCX_FALSE@am_libpixbufloader_pcx_la_rpath =  \
-@BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_PCX_FALSE@	-rpath \
-@BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_PCX_FALSE@	$(loaderdir)
 libpixbufloader_png_la_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(am__DEPENDENCIES_3)
 am_libpixbufloader_png_la_OBJECTS = io-png.lo
@@ -390,18 +442,9 @@ libpixbufloader_qtif_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 @BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_QTIF_FALSE@am_libpixbufloader_qtif_la_rpath =  \
 @BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_QTIF_FALSE@	-rpath \
 @BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_QTIF_FALSE@	$(loaderdir)
-libpixbufloader_ras_la_DEPENDENCIES = $(am__DEPENDENCIES_3)
-am_libpixbufloader_ras_la_OBJECTS = io-ras.lo
-libpixbufloader_ras_la_OBJECTS = $(am_libpixbufloader_ras_la_OBJECTS)
-libpixbufloader_ras_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libpixbufloader_ras_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-@BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_RAS_FALSE@am_libpixbufloader_ras_la_rpath =  \
-@BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_RAS_FALSE@	-rpath \
-@BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_RAS_FALSE@	$(loaderdir)
 libpixbufloader_tga_la_DEPENDENCIES = $(am__DEPENDENCIES_3)
-am_libpixbufloader_tga_la_OBJECTS = io-tga.lo
+am_libpixbufloader_tga_la_OBJECTS = io-tga.lo \
+	gdk-pixbuf-buffer-queue.lo
 libpixbufloader_tga_la_OBJECTS = $(am_libpixbufloader_tga_la_OBJECTS)
 libpixbufloader_tga_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
@@ -421,17 +464,6 @@ libpixbufloader_tiff_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(LDFLAGS) -o $@
 @BUILD_DYNAMIC_MODULES_TRUE@@BUILD_GDIPLUS_LOADERS_FALSE@@HAVE_TIFF_TRUE@@INCLUDE_TIFF_FALSE@am_libpixbufloader_tiff_la_rpath = -rpath \
 @BUILD_DYNAMIC_MODULES_TRUE@@BUILD_GDIPLUS_LOADERS_FALSE@@HAVE_TIFF_TRUE@@INCLUDE_TIFF_FALSE@	$(loaderdir)
-libpixbufloader_wbmp_la_DEPENDENCIES = $(am__DEPENDENCIES_3)
-am_libpixbufloader_wbmp_la_OBJECTS = io-wbmp.lo
-libpixbufloader_wbmp_la_OBJECTS =  \
-	$(am_libpixbufloader_wbmp_la_OBJECTS)
-libpixbufloader_wbmp_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libpixbufloader_wbmp_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-@BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_WBMP_FALSE@am_libpixbufloader_wbmp_la_rpath =  \
-@BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_WBMP_FALSE@	-rpath \
-@BUILD_DYNAMIC_MODULES_TRUE@@INCLUDE_WBMP_FALSE@	$(loaderdir)
 libpixbufloader_xbm_la_DEPENDENCIES = $(am__DEPENDENCIES_3)
 am_libpixbufloader_xbm_la_OBJECTS = io-xbm.lo
 libpixbufloader_xbm_la_OBJECTS = $(am_libpixbufloader_xbm_la_OBJECTS)
@@ -536,11 +568,6 @@ am_libstatic_pixbufloader_jpeg_la_OBJECTS = io-jpeg.lo
 libstatic_pixbufloader_jpeg_la_OBJECTS =  \
 	$(am_libstatic_pixbufloader_jpeg_la_OBJECTS)
 @BUILD_GDIPLUS_LOADERS_FALSE@@HAVE_JPEG_TRUE@@INCLUDE_JPEG_TRUE@am_libstatic_pixbufloader_jpeg_la_rpath =
-libstatic_pixbufloader_pcx_la_LIBADD =
-am_libstatic_pixbufloader_pcx_la_OBJECTS = io-pcx.lo
-libstatic_pixbufloader_pcx_la_OBJECTS =  \
-	$(am_libstatic_pixbufloader_pcx_la_OBJECTS)
-@INCLUDE_PCX_TRUE@am_libstatic_pixbufloader_pcx_la_rpath =
 libstatic_pixbufloader_pixdata_la_LIBADD =
 am_libstatic_pixbufloader_pixdata_la_OBJECTS = io-pixdata.lo
 libstatic_pixbufloader_pixdata_la_OBJECTS =  \
@@ -560,13 +587,9 @@ am_libstatic_pixbufloader_qtif_la_OBJECTS = io-qtif.lo
 libstatic_pixbufloader_qtif_la_OBJECTS =  \
 	$(am_libstatic_pixbufloader_qtif_la_OBJECTS)
 @INCLUDE_QTIF_TRUE@am_libstatic_pixbufloader_qtif_la_rpath =
-libstatic_pixbufloader_ras_la_LIBADD =
-am_libstatic_pixbufloader_ras_la_OBJECTS = io-ras.lo
-libstatic_pixbufloader_ras_la_OBJECTS =  \
-	$(am_libstatic_pixbufloader_ras_la_OBJECTS)
-@INCLUDE_RAS_TRUE@am_libstatic_pixbufloader_ras_la_rpath =
 libstatic_pixbufloader_tga_la_LIBADD =
-am_libstatic_pixbufloader_tga_la_OBJECTS = io-tga.lo
+am_libstatic_pixbufloader_tga_la_OBJECTS = io-tga.lo \
+	gdk-pixbuf-buffer-queue.lo
 libstatic_pixbufloader_tga_la_OBJECTS =  \
 	$(am_libstatic_pixbufloader_tga_la_OBJECTS)
 @INCLUDE_TGA_TRUE@am_libstatic_pixbufloader_tga_la_rpath =
@@ -575,11 +598,6 @@ am_libstatic_pixbufloader_tiff_la_OBJECTS = io-tiff.lo
 libstatic_pixbufloader_tiff_la_OBJECTS =  \
 	$(am_libstatic_pixbufloader_tiff_la_OBJECTS)
 @BUILD_GDIPLUS_LOADERS_FALSE@@HAVE_TIFF_TRUE@@INCLUDE_TIFF_TRUE@am_libstatic_pixbufloader_tiff_la_rpath =
-libstatic_pixbufloader_wbmp_la_LIBADD =
-am_libstatic_pixbufloader_wbmp_la_OBJECTS = io-wbmp.lo
-libstatic_pixbufloader_wbmp_la_OBJECTS =  \
-	$(am_libstatic_pixbufloader_wbmp_la_OBJECTS)
-@INCLUDE_WBMP_TRUE@am_libstatic_pixbufloader_wbmp_la_rpath =
 libstatic_pixbufloader_xbm_la_LIBADD =
 am_libstatic_pixbufloader_xbm_la_OBJECTS = io-xbm.lo
 libstatic_pixbufloader_xbm_la_OBJECTS =  \
@@ -652,14 +670,11 @@ SOURCES = $(libgdk_pixbuf_2_0_la_SOURCES) \
 	$(libpixbufloader_ico_la_SOURCES) \
 	$(libpixbufloader_jasper_la_SOURCES) \
 	$(libpixbufloader_jpeg_la_SOURCES) \
-	$(libpixbufloader_pcx_la_SOURCES) \
 	$(libpixbufloader_png_la_SOURCES) \
 	$(libpixbufloader_pnm_la_SOURCES) \
 	$(libpixbufloader_qtif_la_SOURCES) \
-	$(libpixbufloader_ras_la_SOURCES) \
 	$(libpixbufloader_tga_la_SOURCES) \
 	$(libpixbufloader_tiff_la_SOURCES) \
-	$(libpixbufloader_wbmp_la_SOURCES) \
 	$(libpixbufloader_xbm_la_SOURCES) \
 	$(libpixbufloader_xpm_la_SOURCES) \
 	$(libstatic_pixbufloader_ani_la_SOURCES) \
@@ -676,15 +691,12 @@ SOURCES = $(libgdk_pixbuf_2_0_la_SOURCES) \
 	$(libstatic_pixbufloader_ico_la_SOURCES) \
 	$(libstatic_pixbufloader_jasper_la_SOURCES) \
 	$(libstatic_pixbufloader_jpeg_la_SOURCES) \
-	$(libstatic_pixbufloader_pcx_la_SOURCES) \
 	$(libstatic_pixbufloader_pixdata_la_SOURCES) \
 	$(libstatic_pixbufloader_png_la_SOURCES) \
 	$(libstatic_pixbufloader_pnm_la_SOURCES) \
 	$(libstatic_pixbufloader_qtif_la_SOURCES) \
-	$(libstatic_pixbufloader_ras_la_SOURCES) \
 	$(libstatic_pixbufloader_tga_la_SOURCES) \
 	$(libstatic_pixbufloader_tiff_la_SOURCES) \
-	$(libstatic_pixbufloader_wbmp_la_SOURCES) \
 	$(libstatic_pixbufloader_xbm_la_SOURCES) \
 	$(libstatic_pixbufloader_xpm_la_SOURCES) \
 	$(gdk_pixbuf_csource_SOURCES) $(gdk_pixbuf_pixdata_SOURCES) \
@@ -704,14 +716,11 @@ DIST_SOURCES = $(libgdk_pixbuf_2_0_la_SOURCES) \
 	$(libpixbufloader_ico_la_SOURCES) \
 	$(libpixbufloader_jasper_la_SOURCES) \
 	$(libpixbufloader_jpeg_la_SOURCES) \
-	$(libpixbufloader_pcx_la_SOURCES) \
 	$(libpixbufloader_png_la_SOURCES) \
 	$(libpixbufloader_pnm_la_SOURCES) \
 	$(libpixbufloader_qtif_la_SOURCES) \
-	$(libpixbufloader_ras_la_SOURCES) \
 	$(libpixbufloader_tga_la_SOURCES) \
 	$(libpixbufloader_tiff_la_SOURCES) \
-	$(libpixbufloader_wbmp_la_SOURCES) \
 	$(libpixbufloader_xbm_la_SOURCES) \
 	$(libpixbufloader_xpm_la_SOURCES) \
 	$(libstatic_pixbufloader_ani_la_SOURCES) \
@@ -728,15 +737,12 @@ DIST_SOURCES = $(libgdk_pixbuf_2_0_la_SOURCES) \
 	$(libstatic_pixbufloader_ico_la_SOURCES) \
 	$(libstatic_pixbufloader_jasper_la_SOURCES) \
 	$(libstatic_pixbufloader_jpeg_la_SOURCES) \
-	$(libstatic_pixbufloader_pcx_la_SOURCES) \
 	$(libstatic_pixbufloader_pixdata_la_SOURCES) \
 	$(libstatic_pixbufloader_png_la_SOURCES) \
 	$(libstatic_pixbufloader_pnm_la_SOURCES) \
 	$(libstatic_pixbufloader_qtif_la_SOURCES) \
-	$(libstatic_pixbufloader_ras_la_SOURCES) \
 	$(libstatic_pixbufloader_tga_la_SOURCES) \
 	$(libstatic_pixbufloader_tiff_la_SOURCES) \
-	$(libstatic_pixbufloader_wbmp_la_SOURCES) \
 	$(libstatic_pixbufloader_xbm_la_SOURCES) \
 	$(libstatic_pixbufloader_xpm_la_SOURCES) \
 	$(gdk_pixbuf_csource_SOURCES) $(gdk_pixbuf_pixdata_SOURCES) \
@@ -962,7 +968,9 @@ TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(srcdir)/gdk-pixbuf-features.h.in $(srcdir)/gdk_pixbuf.rc.in \
-	$(top_srcdir)/depcomp $(top_srcdir)/test-driver
+	$(top_srcdir)/build/Makefile.msvc-introspection \
+	$(top_srcdir)/build/Makefile.msvcproj $(top_srcdir)/depcomp \
+	$(top_srcdir)/test-driver
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -1224,14 +1232,6 @@ libpixbufloader_bmp_la_LDFLAGS = -avoid-version -module $(no_undefined)
 libpixbufloader_bmp_la_LIBADD = $(module_libs)
 
 #
-# The WBMP loader
-#
-libstatic_pixbufloader_wbmp_la_SOURCES = io-wbmp.c
-libpixbufloader_wbmp_la_SOURCES = io-wbmp.c
-libpixbufloader_wbmp_la_LDFLAGS = -avoid-version -module $(no_undefined)
-libpixbufloader_wbmp_la_LIBADD = $(module_libs)
-
-#
 # The GdkPixdata loader, always built in
 #
 libstatic_pixbufloader_pixdata_la_SOURCES = io-pixdata.c
@@ -1277,14 +1277,6 @@ libpixbufloader_pnm_la_LDFLAGS = -avoid-version -module $(no_undefined)
 libpixbufloader_pnm_la_LIBADD = $(module_libs)
 
 #
-# The RAS loader
-#
-libstatic_pixbufloader_ras_la_SOURCES = io-ras.c
-libpixbufloader_ras_la_SOURCES = io-ras.c
-libpixbufloader_ras_la_LDFLAGS = -avoid-version -module $(no_undefined)
-libpixbufloader_ras_la_LIBADD = $(module_libs)
-
-#
 # The TIFF loader
 #
 libstatic_pixbufloader_tiff_la_SOURCES = io-tiff.c
@@ -1311,8 +1303,8 @@ libpixbufloader_xbm_la_LIBADD = $(module_libs)
 #
 # The TGA loader
 #
-libstatic_pixbufloader_tga_la_SOURCES = io-tga.c
-libpixbufloader_tga_la_SOURCES = io-tga.c
+libstatic_pixbufloader_tga_la_SOURCES = io-tga.c gdk-pixbuf-buffer-queue.c
+libpixbufloader_tga_la_SOURCES = io-tga.c gdk-pixbuf-buffer-queue.c
 libpixbufloader_tga_la_LDFLAGS = -avoid-version -module $(no_undefined)
 libpixbufloader_tga_la_LIBADD = $(module_libs)
 
@@ -1323,14 +1315,6 @@ libstatic_pixbufloader_icns_la_SOURCES = io-icns.c
 libpixbufloader_icns_la_SOURCES = io-icns.c
 libpixbufloader_icns_la_LDFLAGS = -avoid-version -module $(no_undefined)
 libpixbufloader_icns_la_LIBADD = $(module_libs)
-
-#
-# The PCX loader
-#
-libstatic_pixbufloader_pcx_la_SOURCES = io-pcx.c
-libpixbufloader_pcx_la_SOURCES = io-pcx.c
-libpixbufloader_pcx_la_LDFLAGS = -avoid-version -module $(no_undefined)
-libpixbufloader_pcx_la_LIBADD = $(module_libs)
 
 #
 # The JPEG2000 loader
@@ -1493,22 +1477,16 @@ libpixbufloader_qtif_la_LIBADD = $(module_libs)
 # End of loaders not built if building GDI+ loader
 @HAVE_PNG_TRUE@@INCLUDE_PNG_TRUE@STATIC_PNG_LIB = libstatic-pixbufloader-png.la
 @HAVE_PNG_TRUE@@INCLUDE_PNG_FALSE@PNG_LIB = libpixbufloader-png.la
-@INCLUDE_WBMP_TRUE@STATIC_WBMP_LIB = libstatic-pixbufloader-wbmp.la
-@INCLUDE_WBMP_FALSE@WBMP_LIB = libpixbufloader-wbmp.la
 @INCLUDE_ANI_TRUE@STATIC_ANI_LIB = libstatic-pixbufloader-ani.la
 @INCLUDE_ANI_FALSE@ANI_LIB = libpixbufloader-ani.la
 @INCLUDE_PNM_TRUE@STATIC_PNM_LIB = libstatic-pixbufloader-pnm.la
 @INCLUDE_PNM_FALSE@PNM_LIB = libpixbufloader-pnm.la
-@INCLUDE_RAS_TRUE@STATIC_RAS_LIB = libstatic-pixbufloader-ras.la
-@INCLUDE_RAS_FALSE@RAS_LIB = libpixbufloader-ras.la
 @INCLUDE_XPM_TRUE@STATIC_XPM_LIB = libstatic-pixbufloader-xpm.la
 @INCLUDE_XPM_FALSE@XPM_LIB = libpixbufloader-xpm.la
 @INCLUDE_XBM_TRUE@STATIC_XBM_LIB = libstatic-pixbufloader-xbm.la
 @INCLUDE_XBM_FALSE@XBM_LIB = libpixbufloader-xbm.la
 @INCLUDE_TGA_TRUE@STATIC_TGA_LIB = libstatic-pixbufloader-tga.la
 @INCLUDE_TGA_FALSE@TGA_LIB = libpixbufloader-tga.la
-@INCLUDE_PCX_TRUE@STATIC_PCX_LIB = libstatic-pixbufloader-pcx.la
-@INCLUDE_PCX_FALSE@PCX_LIB = libpixbufloader-pcx.la
 @INCLUDE_ICNS_TRUE@STATIC_ICNS_LIB = libstatic-pixbufloader-icns.la
 @INCLUDE_ICNS_FALSE@ICNS_LIB = libpixbufloader-icns.la
 @HAVE_JASPER_TRUE@@INCLUDE_JASPER_TRUE@STATIC_JASPER_LIB = libstatic-pixbufloader-jasper.la
@@ -1521,19 +1499,16 @@ STATIC_PIXDATA_LIB = libstatic-pixbufloader-pixdata.la
 @BUILD_DYNAMIC_MODULES_TRUE@loader_LTLIBRARIES = \
 @BUILD_DYNAMIC_MODULES_TRUE@	$(PNG_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(BMP_LIB)	\
-@BUILD_DYNAMIC_MODULES_TRUE@	$(WBMP_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(GIF_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(ICO_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(ANI_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(JPEG_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(PNM_LIB)	\
-@BUILD_DYNAMIC_MODULES_TRUE@	$(RAS_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(TIFF_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(XPM_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(XBM_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(TGA_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(ICNS_LIB)	\
-@BUILD_DYNAMIC_MODULES_TRUE@	$(PCX_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(JASPER_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(QTIF_LIB)	\
 @BUILD_DYNAMIC_MODULES_TRUE@	$(GDIPLUS_LIBS)
@@ -1542,19 +1517,16 @@ noinst_LTLIBRARIES = \
 	$(STATIC_PIXDATA_LIB)	\
 	$(STATIC_PNG_LIB)	\
 	$(STATIC_BMP_LIB)	\
-	$(STATIC_WBMP_LIB)	\
 	$(STATIC_GIF_LIB)	\
 	$(STATIC_ICO_LIB)	\
 	$(STATIC_ANI_LIB)	\
 	$(STATIC_JPEG_LIB)	\
 	$(STATIC_PNM_LIB)	\
-	$(STATIC_RAS_LIB)	\
 	$(STATIC_TIFF_LIB)	\
 	$(STATIC_XPM_LIB)	\
 	$(STATIC_XBM_LIB)	\
 	$(STATIC_TGA_LIB)	\
 	$(STATIC_ICNS_LIB)	\
-	$(STATIC_PCX_LIB)	\
 	$(STATIC_JASPER_LIB)	\
 	$(STATIC_QTIF_LIB)	\
 	$(STATIC_GDIPLUS_LIBS)
@@ -1635,6 +1607,7 @@ libgdk_pixbufinclude_HEADERS = \
 
 noinst_HEADERS = \
 	gdk-pixbuf-private.h	\
+	gdk-pixbuf-buffer-queue-private.h \
 	gdk-pixbuf-scaled-anim.h \
 	xpm-color-table.h
 
@@ -1664,6 +1637,38 @@ EXTRA_DIST = \
 	gen-color-table.pl			\
 	gdiplus.def
 
+
+# ---------- MSVC Items ------------------
+MSVCPROJS = gdk-pixbuf
+gdk_pixbuf_FILES = \
+	$(libgdk_pixbuf_2_0_la_SOURCES)		\
+	$(libstatic_pixbufloader_ani_la_SOURCES)	\
+	$(libstatic_pixbufloader_icns_la_SOURCES)	\
+	$(libstatic_pixbufloader_pixdata_la_SOURCES)	\
+	$(libstatic_pixbufloader_pnm_la_SOURCES)	\
+	$(libstatic_pixbufloader_png_la_SOURCES)	\
+	$(libstatic_pixbufloader_qtif_la_SOURCES)	\
+	$(libstatic_pixbufloader_tga_la_SOURCES)	\
+	$(libstatic_pixbufloader_xpm_la_SOURCES)	\
+	$(libstatic_pixbufloader_xbm_la_SOURCES)
+
+gdk_pixbuf_EXCLUDES = gdkpdummy
+gdk_pixbuf_HEADERS_DIR = $(libgdk_pixbufincludedir)
+gdk_pixbuf_HEADERS_INST = $(libgdk_pixbufinclude_HEADERS)
+gdk_pixbuf_HEADERS_EXCLUDES = gdkpdummy
+_proj_name = $(subst /,_,$(subst -,_,$(subst .,_,$(1))))
+_proj_path_raw := $(subst $(abs_top_srcdir),,$(abs_srcdir))
+_proj_path = $(subst /,\\,$(_proj_path_raw))
+_proj_subdir_int = $(subst \\\\,\\,\\$(_proj_path)\\)
+_proj_subdir = $(subst \\.\\,\\,$(_proj_subdir_int))
+_proj_files_raw = $(subst /,\\,$($(_proj_name)_FILES))
+_proj_files = $(subst $(srcdir)\\,,$(subst $(builddir)\\,,$(subst $(top_builddir)\\$(_proj_path)\\,\\,$(_proj_files_raw))))
+_proj_filters = $($(_proj_name)_EXCLUDES)
+_proj_headers_raw = $(subst /,\\,$($(_proj_name)_HEADERS_INST))
+_proj_headers = $(subst $(srcdir)\\,,$(subst $(builddir)\\,,$(subst $(top_builddir)\\$(_proj_path)\\,\\,$(_proj_headers_raw))))
+_proj_headers_excludes = $($(_proj_name)_HEADERS_EXCLUDES)
+_headers_dest_posix = $(subst $(includedir),,$($(_proj_name)_HEADERS_DIR))
+_headers_destdir = $(subst /,\\,$(_headers_dest_posix))
 @HAVE_INTROSPECTION_TRUE@GdkPixbuf_2_0_gir_SCANNERFLAGS = --warn-all --identifier-prefix=Gdk --c-include="gdk-pixbuf/gdk-pixbuf.h"
 @HAVE_INTROSPECTION_TRUE@GdkPixbuf_2_0_gir_EXPORT_PACKAGES = gdk-pixbuf-2.0
 @HAVE_INTROSPECTION_TRUE@GdkPixbuf_2_0_gir_INCLUDES = GModule-2.0 Gio-2.0
@@ -1683,6 +1688,52 @@ EXTRA_DIST = \
 @HAVE_INTROSPECTION_TRUE@gir_DATA = $(INTROSPECTION_GIRS)
 @HAVE_INTROSPECTION_TRUE@typelibsdir = $(libdir)/girepository-1.0
 @HAVE_INTROSPECTION_TRUE@typelibs_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
+
+# --- MSVC Introspection Items ---
+@HAVE_INTROSPECTION_TRUE@MSVC_INTROSPECT_GIRS = GdkPixbuf-2.0.gir
+@HAVE_INTROSPECTION_FALSE@MSVC_INTROSPECTION_INTERMEDIATE_ITEMS = 
+@HAVE_INTROSPECTION_TRUE@MSVC_INTROSPECTION_INTERMEDIATE_ITEMS = \
+@HAVE_INTROSPECTION_TRUE@	$(top_builddir)/build/win32/GdkPixbuf-2.0.gir.msvc.introspect	\
+@HAVE_INTROSPECTION_TRUE@	$(top_builddir)/build/win32/GdkPixbuf_2_0_gir_list
+
+@HAVE_INTROSPECTION_TRUE@GdkPixbuf_2_0_gir_MSVC_INCLUDE_GIRS = $(GdkPixbuf_2_0_gir_INCLUDES)
+@HAVE_INTROSPECTION_TRUE@GdkPixbuf_2_0_gir_MSVC_EXPORT_PACKAGES = $(GdkPixbuf_2_0_gir_EXPORT_PACKAGES)
+@HAVE_INTROSPECTION_TRUE@GdkPixbuf_2_0_gir_MSVC_LIBS = gdk_pixbuf-2.0
+@HAVE_INTROSPECTION_TRUE@GdkPixbuf_2_0_gir_MSVC_FILES = $(GdkPixbuf_2_0_gir_FILES)
+@HAVE_INTROSPECTION_TRUE@GdkPixbuf_2_0_gir_MSVC_CFLAGS = \
+@HAVE_INTROSPECTION_TRUE@	-DGDK_PIXBUF_COMPILATION	\
+@HAVE_INTROSPECTION_TRUE@	-I../..				\
+@HAVE_INTROSPECTION_TRUE@	-I../../gdk-pixbuf
+
+@HAVE_INTROSPECTION_TRUE@GdkPixbuf_2_0_gir_MSVC_SCANNERFLAGS = $(GdkPixbuf_2_0_gir_SCANNERFLAGS)
+@HAVE_INTROSPECTION_TRUE@_gir_name = $(subst /,_,$(subst -,_,$(subst .,_,$(1))))
+
+# Namespace and Version is either fetched from the gir filename
+# or the _NAMESPACE/_VERSION variable combo
+@HAVE_INTROSPECTION_TRUE@_gir_namespace_msvc = $(or $($(_gir_name)_NAMESPACE),$(firstword $(subst -, ,$(notdir $(1)))))
+@HAVE_INTROSPECTION_TRUE@_gir_version_msvc = $(or $($(_gir_name)_VERSION),$(lastword $(subst -, ,$(1:.gir=))))
+@HAVE_INTROSPECTION_TRUE@_typelib_basename_msvc = $(_gir_namespace_msvc)'-'$(_gir_version_msvc)
+
+# _PROGRAM is an optional variable which needs its own --program argument
+@HAVE_INTROSPECTION_TRUE@_gir_program_msvc = $(if $($(_gir_name)_MSVC_PROGRAM),--program=$($(_gir_name)_MSVC_PROGRAM))
+
+# Deduce the sub-folder from $(srcroot) where the sources reside in
+@HAVE_INTROSPECTION_TRUE@_gir_source_path_raw_msvc := $(subst $(abs_top_srcdir),,$(abs_srcdir))
+@HAVE_INTROSPECTION_TRUE@_gir_source_path_msvc = $(subst /,\\,$(_gir_source_path_raw_msvc))
+@HAVE_INTROSPECTION_TRUE@_gir_source_subdir_int_msvc = $(subst \\\\,\\,\\$(_gir_source_path_msvc)\\)
+@HAVE_INTROSPECTION_TRUE@_gir_source_subdir_msvc = $(subst \\.\\,\\,$(_gir_source_subdir_int_msvc))
+@HAVE_INTROSPECTION_TRUE@_gir_files_raw_msvc = $(subst /,\\,$($(_gir_name)_MSVC_FILES))
+@HAVE_INTROSPECTION_TRUE@_gir_files_msvc = $(subst $(srcdir)\\,,$(subst $(builddir)\\,,$(subst $(top_builddir)\\$(_gir_source_path_msvc)\\,\\,$(_gir_files_raw_msvc))))
+
+# Create a list of items for:
+# - Libraries
+# - Packages
+# - GIRs to include
+# - packages to export
+@HAVE_INTROSPECTION_TRUE@_gir_libraries_msvc = $(foreach lib,$($(_gir_name)_MSVC_LIBS),--library=$(lib))
+@HAVE_INTROSPECTION_TRUE@_gir_packages_msvc = $(foreach pkg,$($(_gir_name)_MSVC_PACKAGES),--pkg=$(pkg))
+@HAVE_INTROSPECTION_TRUE@_gir_includes_msvc = $(foreach include,$($(_gir_name)_MSVC_INCLUDE_GIRS),--include=$(include))
+@HAVE_INTROSPECTION_TRUE@_gir_export_packages_msvc = $(foreach pkg,$($(_gir_name)_MSVC_EXPORT_PACKAGES),--pkg-export=$(pkg))
 @CROSS_COMPILING_FALSE@RUN_QUERY_LOADER_TEST = test -z "$(DESTDIR)"
 @CROSS_COMPILING_TRUE@RUN_QUERY_LOADER_TEST = false
 all: $(BUILT_SOURCES)
@@ -1690,7 +1741,7 @@ all: $(BUILT_SOURCES)
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .log .o .obj .test .test$(EXEEXT) .trs
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/build/Makefile.msvcproj $(top_srcdir)/build/Makefile.msvc-introspection $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -1710,6 +1761,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
+$(top_srcdir)/build/Makefile.msvcproj $(top_srcdir)/build/Makefile.msvc-introspection $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
@@ -1850,9 +1902,6 @@ libpixbufloader-jasper.la: $(libpixbufloader_jasper_la_OBJECTS) $(libpixbufloade
 libpixbufloader-jpeg.la: $(libpixbufloader_jpeg_la_OBJECTS) $(libpixbufloader_jpeg_la_DEPENDENCIES) $(EXTRA_libpixbufloader_jpeg_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libpixbufloader_jpeg_la_LINK) $(am_libpixbufloader_jpeg_la_rpath) $(libpixbufloader_jpeg_la_OBJECTS) $(libpixbufloader_jpeg_la_LIBADD) $(LIBS)
 
-libpixbufloader-pcx.la: $(libpixbufloader_pcx_la_OBJECTS) $(libpixbufloader_pcx_la_DEPENDENCIES) $(EXTRA_libpixbufloader_pcx_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libpixbufloader_pcx_la_LINK) $(am_libpixbufloader_pcx_la_rpath) $(libpixbufloader_pcx_la_OBJECTS) $(libpixbufloader_pcx_la_LIBADD) $(LIBS)
-
 libpixbufloader-png.la: $(libpixbufloader_png_la_OBJECTS) $(libpixbufloader_png_la_DEPENDENCIES) $(EXTRA_libpixbufloader_png_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libpixbufloader_png_la_LINK) $(am_libpixbufloader_png_la_rpath) $(libpixbufloader_png_la_OBJECTS) $(libpixbufloader_png_la_LIBADD) $(LIBS)
 
@@ -1862,17 +1911,11 @@ libpixbufloader-pnm.la: $(libpixbufloader_pnm_la_OBJECTS) $(libpixbufloader_pnm_
 libpixbufloader-qtif.la: $(libpixbufloader_qtif_la_OBJECTS) $(libpixbufloader_qtif_la_DEPENDENCIES) $(EXTRA_libpixbufloader_qtif_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libpixbufloader_qtif_la_LINK) $(am_libpixbufloader_qtif_la_rpath) $(libpixbufloader_qtif_la_OBJECTS) $(libpixbufloader_qtif_la_LIBADD) $(LIBS)
 
-libpixbufloader-ras.la: $(libpixbufloader_ras_la_OBJECTS) $(libpixbufloader_ras_la_DEPENDENCIES) $(EXTRA_libpixbufloader_ras_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libpixbufloader_ras_la_LINK) $(am_libpixbufloader_ras_la_rpath) $(libpixbufloader_ras_la_OBJECTS) $(libpixbufloader_ras_la_LIBADD) $(LIBS)
-
 libpixbufloader-tga.la: $(libpixbufloader_tga_la_OBJECTS) $(libpixbufloader_tga_la_DEPENDENCIES) $(EXTRA_libpixbufloader_tga_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libpixbufloader_tga_la_LINK) $(am_libpixbufloader_tga_la_rpath) $(libpixbufloader_tga_la_OBJECTS) $(libpixbufloader_tga_la_LIBADD) $(LIBS)
 
 libpixbufloader-tiff.la: $(libpixbufloader_tiff_la_OBJECTS) $(libpixbufloader_tiff_la_DEPENDENCIES) $(EXTRA_libpixbufloader_tiff_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libpixbufloader_tiff_la_LINK) $(am_libpixbufloader_tiff_la_rpath) $(libpixbufloader_tiff_la_OBJECTS) $(libpixbufloader_tiff_la_LIBADD) $(LIBS)
-
-libpixbufloader-wbmp.la: $(libpixbufloader_wbmp_la_OBJECTS) $(libpixbufloader_wbmp_la_DEPENDENCIES) $(EXTRA_libpixbufloader_wbmp_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libpixbufloader_wbmp_la_LINK) $(am_libpixbufloader_wbmp_la_rpath) $(libpixbufloader_wbmp_la_OBJECTS) $(libpixbufloader_wbmp_la_LIBADD) $(LIBS)
 
 libpixbufloader-xbm.la: $(libpixbufloader_xbm_la_OBJECTS) $(libpixbufloader_xbm_la_DEPENDENCIES) $(EXTRA_libpixbufloader_xbm_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libpixbufloader_xbm_la_LINK) $(am_libpixbufloader_xbm_la_rpath) $(libpixbufloader_xbm_la_OBJECTS) $(libpixbufloader_xbm_la_LIBADD) $(LIBS)
@@ -1922,9 +1965,6 @@ libstatic-pixbufloader-jasper.la: $(libstatic_pixbufloader_jasper_la_OBJECTS) $(
 libstatic-pixbufloader-jpeg.la: $(libstatic_pixbufloader_jpeg_la_OBJECTS) $(libstatic_pixbufloader_jpeg_la_DEPENDENCIES) $(EXTRA_libstatic_pixbufloader_jpeg_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK) $(am_libstatic_pixbufloader_jpeg_la_rpath) $(libstatic_pixbufloader_jpeg_la_OBJECTS) $(libstatic_pixbufloader_jpeg_la_LIBADD) $(LIBS)
 
-libstatic-pixbufloader-pcx.la: $(libstatic_pixbufloader_pcx_la_OBJECTS) $(libstatic_pixbufloader_pcx_la_DEPENDENCIES) $(EXTRA_libstatic_pixbufloader_pcx_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) $(am_libstatic_pixbufloader_pcx_la_rpath) $(libstatic_pixbufloader_pcx_la_OBJECTS) $(libstatic_pixbufloader_pcx_la_LIBADD) $(LIBS)
-
 libstatic-pixbufloader-pixdata.la: $(libstatic_pixbufloader_pixdata_la_OBJECTS) $(libstatic_pixbufloader_pixdata_la_DEPENDENCIES) $(EXTRA_libstatic_pixbufloader_pixdata_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK)  $(libstatic_pixbufloader_pixdata_la_OBJECTS) $(libstatic_pixbufloader_pixdata_la_LIBADD) $(LIBS)
 
@@ -1937,17 +1977,11 @@ libstatic-pixbufloader-pnm.la: $(libstatic_pixbufloader_pnm_la_OBJECTS) $(libsta
 libstatic-pixbufloader-qtif.la: $(libstatic_pixbufloader_qtif_la_OBJECTS) $(libstatic_pixbufloader_qtif_la_DEPENDENCIES) $(EXTRA_libstatic_pixbufloader_qtif_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK) $(am_libstatic_pixbufloader_qtif_la_rpath) $(libstatic_pixbufloader_qtif_la_OBJECTS) $(libstatic_pixbufloader_qtif_la_LIBADD) $(LIBS)
 
-libstatic-pixbufloader-ras.la: $(libstatic_pixbufloader_ras_la_OBJECTS) $(libstatic_pixbufloader_ras_la_DEPENDENCIES) $(EXTRA_libstatic_pixbufloader_ras_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) $(am_libstatic_pixbufloader_ras_la_rpath) $(libstatic_pixbufloader_ras_la_OBJECTS) $(libstatic_pixbufloader_ras_la_LIBADD) $(LIBS)
-
 libstatic-pixbufloader-tga.la: $(libstatic_pixbufloader_tga_la_OBJECTS) $(libstatic_pixbufloader_tga_la_DEPENDENCIES) $(EXTRA_libstatic_pixbufloader_tga_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK) $(am_libstatic_pixbufloader_tga_la_rpath) $(libstatic_pixbufloader_tga_la_OBJECTS) $(libstatic_pixbufloader_tga_la_LIBADD) $(LIBS)
 
 libstatic-pixbufloader-tiff.la: $(libstatic_pixbufloader_tiff_la_OBJECTS) $(libstatic_pixbufloader_tiff_la_DEPENDENCIES) $(EXTRA_libstatic_pixbufloader_tiff_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK) $(am_libstatic_pixbufloader_tiff_la_rpath) $(libstatic_pixbufloader_tiff_la_OBJECTS) $(libstatic_pixbufloader_tiff_la_LIBADD) $(LIBS)
-
-libstatic-pixbufloader-wbmp.la: $(libstatic_pixbufloader_wbmp_la_OBJECTS) $(libstatic_pixbufloader_wbmp_la_DEPENDENCIES) $(EXTRA_libstatic_pixbufloader_wbmp_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) $(am_libstatic_pixbufloader_wbmp_la_rpath) $(libstatic_pixbufloader_wbmp_la_OBJECTS) $(libstatic_pixbufloader_wbmp_la_LIBADD) $(LIBS)
 
 libstatic-pixbufloader-xbm.la: $(libstatic_pixbufloader_xbm_la_OBJECTS) $(libstatic_pixbufloader_xbm_la_DEPENDENCIES) $(EXTRA_libstatic_pixbufloader_xbm_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK) $(am_libstatic_pixbufloader_xbm_la_rpath) $(libstatic_pixbufloader_xbm_la_OBJECTS) $(libstatic_pixbufloader_xbm_la_LIBADD) $(LIBS)
@@ -2036,6 +2070,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdk-pixbuf-animation.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdk-pixbuf-buffer-queue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdk-pixbuf-csource.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdk-pixbuf-data.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdk-pixbuf-enum-types.Plo@am__quote@
@@ -2066,15 +2101,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-ico.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-jasper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-jpeg.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-pcx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-pixdata.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-png.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-pnm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-qtif.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-ras.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-tga.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-tiff.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-wbmp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-xbm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io-xpm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/queryloaders.Po@am__quote@
@@ -2727,39 +2759,130 @@ distclean-local:
 	  rm -f $(MAINTAINERCLEANFILES); \
 	fi
 
-dist-hook: ../build/win32/vs9/gdk-pixbuf.vcproj ../build/win32/vs10/gdk-pixbuf.vcxproj ../build/win32/vs10/gdk-pixbuf.vcxproj.filters
+#
+# Creates Visual Studio 2008/2010 projects from items passed in from autotools files
+# $(1) - Base Name of the MSVC project files (outputs)
+#
 
-../build/win32/vs9/gdk-pixbuf.vcproj: ../build/win32/vs9/gdk-pixbuf.vcprojin
-	for F in $(libgdk_pixbuf_2_0_la_SOURCES); do \
-		case $$F in \
-		*.c) echo '   <File RelativePath="..\..\..\gdk-pixbuf\'$$F'" />' \
-		     ;; \
-		esac; \
-	done >libgdkpixbuf.sourcefiles
-	$(CPP) -P - <$(top_srcdir)/build/win32/vs9/gdk-pixbuf.vcprojin >$@
-	rm libgdkpixbuf.sourcefiles
+define msvcproj-builder
 
-../build/win32/vs10/gdk-pixbuf.vcxproj: ../build/win32/vs10/gdk-pixbuf.vcxprojin
-	for F in $(libgdk_pixbuf_2_0_la_SOURCES); do \
-		case $$F in \
-		*.c) echo '    <ClCompile Include="..\..\..\gdk-pixbuf\'$$F'" />' \
-		     ;; \
-		esac; \
-	done >libgdkpixbuf.vs10.sourcefiles
-	$(CPP) -P - <$(top_srcdir)/build/win32/vs10/gdk-pixbuf.vcxprojin >$@
-	rm libgdkpixbuf.vs10.sourcefiles
+$(top_builddir)/build/win32/vs10/$(1).vcxproj: $(top_builddir)/build/win32/vs9/$(1).vcproj
+$(top_builddir)/build/win32/vs10/$(1).vcxproj.filters: $(top_builddir)/build/win32/vs9/$(1).vcproj
+$(1).sourcefiles: $(top_builddir)/build/win32/vs9/$(1).vcproj
+$(1).vs10.sourcefiles: $(top_builddir)/build/win32/vs9/$(1).vcproj
+$(1).vs10.sourcefiles.filters: $(top_builddir)/build/win32/vs9/$(1).vcproj
 
-../build/win32/vs10/gdk-pixbuf.vcxproj.filters: ../build/win32/vs10/gdk-pixbuf.vcxproj.filtersin
-	for F in $(libgdk_pixbuf_2_0_la_SOURCES); do \
-		case $$F in \
-		*.c) echo '    <ClCompile Include="..\..\..\gdk-pixbuf\'$$F'"><Filter>Source Files</Filter></ClCompile>' \
-		     ;; \
-		esac; \
-	done >libgdkpixbuf.vs10.sourcefiles.filters
-	$(CPP) -P - <$(top_srcdir)/build/win32/vs10/gdk-pixbuf.vcxproj.filtersin >$@
-	rm libgdkpixbuf.vs10.sourcefiles.filters
+$(top_builddir)/build/win32/vs9/$(1).vcproj:
+	-$(RM) $(top_builddir)/build/win32/vs9/$(1).vcproj
+	-$(RM) $(top_builddir)/build/win32/vs10/$(1).vcxproj
+	-$(RM) $(top_builddir)/build/win32/vs10/$(1).vcxproj.filters
+
+	for F in $(_proj_files); do \
+		case $$$$F in \
+		$(_proj_filters)) \
+			;; \
+		*.c|*.cpp|*.cc|*.cxx) \
+			echo '   <File RelativePath="..\..\..'$(_proj_subdir)$$$$F'" />' >>$(1).sourcefiles && \
+			echo '   <ClCompile Include="..\..\..'$(_proj_subdir)$$$$F'" />' >>$(1).vs10.sourcefiles && \
+			echo '   <ClCompile Include="..\..\..'$(_proj_subdir)$$$$F'"><Filter>Source Files</Filter></ClCompile>' >>$(1).vs10.sourcefiles.filters \
+			;; \
+		esac;	\
+	done
+
+	$(CPP) -P - <$(top_srcdir)/build/win32/vs9/$(1).vcprojin >$(top_builddir)/build/win32/vs9/$(1).vcproj
+	$(CPP) -P - <$(top_srcdir)/build/win32/vs10/$(1).vcxprojin >$(top_builddir)/build/win32/vs10/$(1).vcxproj
+	$(CPP) -P - <$(top_srcdir)/build/win32/vs10/$(1).vcxproj.filtersin >$(top_builddir)/build/win32/vs10/$(1).vcxproj.filters
+	$(RM) $(1).sourcefiles
+	$(RM) $(1).vs10.sourcefiles
+	$(RM) $(1).vs10.sourcefiles.filters
+
+$(top_builddir)/build/win32/vs10/$(1).vs10.headers: $(top_builddir)/build/win32/vs9/$(1).headers
+
+$(top_builddir)/build/win32/vs9/$(1).headers:
+	-$(RM) $(top_builddir)/build/win32/vs9/$(1).headers
+	-$(RM) $(top_builddir)/build/win32/vs10/$(1).vs10.headers
+
+	for F in $(_proj_headers); do \
+		case $$$$F in \
+		$(_proj_headers_excludes)) \
+			;; \
+		*.h|*.hpp|*.hh|*.hxx) \
+			echo 'copy ..\..\..'$(_proj_subdir)$$$$F' $$$$(CopyDir)\include'$(_headers_destdir)'\'$$$$F'&#x0D;&#x0A;' >>$(top_builddir)/build/win32/vs9/$(1).headers && \
+			echo 'copy ..\..\..'$(_proj_subdir)$$$$F' $$$$(CopyDir)\include'$(_headers_destdir)'\'$$$$F >>$(top_builddir)/build/win32/vs10/$(1).vs10.headers \
+			;; \
+		esac;	\
+	done
+
+endef
+
+$(foreach proj,$(MSVCPROJS),$(eval $(call msvcproj-builder,$(proj))))
 
 @HAVE_INTROSPECTION_TRUE@GdkPixbuf-2.0.gir: libgdk_pixbuf-2.0.la Makefile
+
+#
+# Create NMake Makefile Sections for Building Introspection files
+# from autotools files
+# $(1) - File Name of the .gir that is to be generated
+#
+
+@HAVE_INTROSPECTION_TRUE@define gir-nmake-builder
+
+# Basic sanity check, to make sure required variables are set
+@HAVE_INTROSPECTION_TRUE@$(if $($(_gir_name)_MSVC_FILES),,$(error Need to define $(_gir_name)_MSVC_FILES))
+@HAVE_INTROSPECTION_TRUE@$(if $(or $(findstring --header-only,$($(_gir_name)_MSVC_SCANNERFLAGS)),
+@HAVE_INTROSPECTION_TRUE@          $($(_gir_name)_MSVC_LIBS),
+@HAVE_INTROSPECTION_TRUE@          $($(_gir_name)_MSVC_PROGRAM)),,
+@HAVE_INTROSPECTION_TRUE@    $(error Need to define $(_gir_name)_MSVC_LIBS or $(_gir_name)_MSVC_PROGRAM))
+
+@HAVE_INTROSPECTION_TRUE@$(top_builddir)/build/win32/$(_gir_name)_list:
+@HAVE_INTROSPECTION_TRUE@	for F in $(_gir_files_msvc); do \
+@HAVE_INTROSPECTION_TRUE@		case $$$$F in \
+@HAVE_INTROSPECTION_TRUE@		*.c|*.cpp|*.cc|*.cxx|*.h|*.hpp|*.hh|*.hxx) \
+@HAVE_INTROSPECTION_TRUE@			echo '..\..'$(_gir_source_subdir_msvc)$$$$F >>$(top_builddir)/build/win32/$(_gir_name)_list \
+@HAVE_INTROSPECTION_TRUE@			;; \
+@HAVE_INTROSPECTION_TRUE@		esac; \
+@HAVE_INTROSPECTION_TRUE@	done
+
+@HAVE_INTROSPECTION_TRUE@$(top_builddir)/build/win32/$(1).msvc.introspect:
+@HAVE_INTROSPECTION_TRUE@	-$(RM) $(top_builddir)/build/win32/$(1).msvc.introspect
+
+# Assemble the Command to Run g-ir-scanner
+@HAVE_INTROSPECTION_TRUE@	echo $(1)': '$(_gir_name)'_list '$($(_gir_name)_MSVC_GIR_DEPS)>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	@-echo Generating $$$$@...'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	$$$$(PYTHON) $$$$(G_IR_SCANNER)	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	--verbose -no-libtool	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	--namespace='$(_gir_namespace_msvc)'	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	--nsversion='$(_gir_version_msvc)'	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	'$(_gir_packages_msvc)'	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	'$(_gir_libraries_msvc)'	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	'$(_gir_program_msvc)'	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	--add-include-path=$$$$(G_IR_INCLUDEDIR)	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	'$(_gir_includes_msvc)'	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	'$(_gir_export_packages_msvc)'	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	--cflags-begin	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	'$($(_gir_name)_MSVC_CFLAGS)'	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	--cflags-end	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	'$($(_gir_name)_MSVC_SCANNERFLAGS)'	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	--filelist='$(_gir_name)'_list	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	-o $$$$@'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '' >>$(top_builddir)/build/win32/$(1).msvc.introspect
+
+# Finally Assemble the Command to Compile the generated .gir
+@HAVE_INTROSPECTION_TRUE@	echo '$(_typelib_basename_msvc).typelib: '$(_typelib_basename_msvc)'.gir'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	@-echo Compiling $$$$@...'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	$$$$(G_IR_COMPILER)	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	--includedir=. --debug --verbose	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	'$(1)'	\'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '	-o $$$$@'>>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	echo '' >>$(top_builddir)/build/win32/$(1).msvc.introspect
+@HAVE_INTROSPECTION_TRUE@endef
+
+@HAVE_INTROSPECTION_TRUE@$(foreach gir,$(MSVC_INTROSPECT_GIRS),$(eval $(call gir-nmake-builder,$(gir))))
+
+dist-hook:	\
+	$(top_builddir)/build/win32/vs9/gdk-pixbuf.vcproj	\
+	$(top_builddir)/build/win32/vs9/gdk-pixbuf.headers	\
+	$(MSVC_INTROSPECTION_INTERMEDIATE_ITEMS)
 
 # Running this if cross compiling or if DESTDIR is set is going to
 # not work at all, so skip it

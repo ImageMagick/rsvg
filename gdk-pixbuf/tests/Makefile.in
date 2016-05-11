@@ -96,7 +96,7 @@ host_triplet = @host@
 TESTS = $(am__EXEEXT_2)
 installed_test_PROGRAMS = $(am__EXEEXT_5)
 noinst_PROGRAMS = $(am__EXEEXT_6) pixbuf-read$(EXEEXT) \
-	pixbuf-lowmem$(EXEEXT) pixbuf-random$(EXEEXT) $(am__EXEEXT_1)
+	pixbuf-random$(EXEEXT) pixbuf-lowmem$(EXEEXT) $(am__EXEEXT_1)
 check_PROGRAMS = $(am__EXEEXT_4)
 @ENABLE_ALWAYS_BUILD_TESTS_TRUE@am__append_1 = $(all_test_ltlibs)
 @ENABLE_ALWAYS_BUILD_TESTS_TRUE@am__append_2 = $(all_test_programs)
@@ -177,13 +177,14 @@ am__installdirs = "$(DESTDIR)$(installed_testdir)" \
 LTLIBRARIES = $(installed_test_LTLIBRARIES) $(noinst_LTLIBRARIES)
 am__EXEEXT_1 =
 am__EXEEXT_2 = animation$(EXEEXT) cve-2015-4491$(EXEEXT) \
-	pixbuf-icon-serialize$(EXEEXT) \
+	pixbuf-fail$(EXEEXT) pixbuf-icon-serialize$(EXEEXT) \
 	pixbuf-randomly-modified$(EXEEXT) pixbuf-threads$(EXEEXT) \
 	pixbuf-icc$(EXEEXT) pixbuf-jpeg$(EXEEXT) pixbuf-dpi$(EXEEXT) \
-	pixbuf-stream$(EXEEXT) pixbuf-resource$(EXEEXT) \
-	pixbuf-scale$(EXEEXT) pixbuf-short-gif-write$(EXEEXT) \
-	pixbuf-save$(EXEEXT) pixbuf-readonly-to-mutable$(EXEEXT) \
-	pixbuf-composite$(EXEEXT) $(am__EXEEXT_1)
+	pixbuf-stream$(EXEEXT) pixbuf-reftest$(EXEEXT) \
+	pixbuf-resource$(EXEEXT) pixbuf-scale$(EXEEXT) \
+	pixbuf-short-gif-write$(EXEEXT) pixbuf-save$(EXEEXT) \
+	pixbuf-readonly-to-mutable$(EXEEXT) pixbuf-composite$(EXEEXT) \
+	$(am__EXEEXT_1)
 am__EXEEXT_3 = $(am__EXEEXT_2)
 @ENABLE_ALWAYS_BUILD_TESTS_FALSE@am__EXEEXT_4 = $(am__EXEEXT_3)
 @ENABLE_INSTALLED_TESTS_TRUE@am__EXEEXT_5 = $(am__EXEEXT_2)
@@ -201,8 +202,8 @@ am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 am__objects_1 =
-am_cve_2015_4491_OBJECTS = cve-2015-4491.$(OBJEXT) resources.$(OBJEXT) \
-	$(am__objects_1)
+am_cve_2015_4491_OBJECTS = cve-2015-4491.$(OBJEXT) \
+	test-common.$(OBJEXT) resources.$(OBJEXT) $(am__objects_1)
 cve_2015_4491_OBJECTS = $(am_cve_2015_4491_OBJECTS)
 cve_2015_4491_LDADD = $(LDADD)
 cve_2015_4491_DEPENDENCIES = $(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la \
@@ -220,6 +221,13 @@ am_pixbuf_dpi_OBJECTS = pixbuf-dpi.$(OBJEXT) test-common.$(OBJEXT) \
 pixbuf_dpi_OBJECTS = $(am_pixbuf_dpi_OBJECTS)
 pixbuf_dpi_LDADD = $(LDADD)
 pixbuf_dpi_DEPENDENCIES = $(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+am_pixbuf_fail_OBJECTS = pixbuf-fail.$(OBJEXT) test-common.$(OBJEXT) \
+	$(am__objects_1)
+pixbuf_fail_OBJECTS = $(am_pixbuf_fail_OBJECTS)
+pixbuf_fail_LDADD = $(LDADD)
+pixbuf_fail_DEPENDENCIES = $(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am_pixbuf_icc_OBJECTS = pixbuf-icc.$(OBJEXT) test-common.$(OBJEXT) \
@@ -255,8 +263,11 @@ pixbuf_random_LDADD = $(LDADD)
 pixbuf_random_DEPENDENCIES = $(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
-pixbuf_randomly_modified_SOURCES = pixbuf-randomly-modified.c
-pixbuf_randomly_modified_OBJECTS = pixbuf-randomly-modified.$(OBJEXT)
+am_pixbuf_randomly_modified_OBJECTS =  \
+	pixbuf-randomly-modified.$(OBJEXT) test-common.$(OBJEXT) \
+	$(am__objects_1)
+pixbuf_randomly_modified_OBJECTS =  \
+	$(am_pixbuf_randomly_modified_OBJECTS)
 pixbuf_randomly_modified_LDADD = $(LDADD)
 pixbuf_randomly_modified_DEPENDENCIES = $(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -274,6 +285,13 @@ pixbuf_readonly_to_mutable_OBJECTS =  \
 	$(am_pixbuf_readonly_to_mutable_OBJECTS)
 pixbuf_readonly_to_mutable_LDADD = $(LDADD)
 pixbuf_readonly_to_mutable_DEPENDENCIES = $(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+am_pixbuf_reftest_OBJECTS = pixbuf-reftest.$(OBJEXT) \
+	test-common.$(OBJEXT) $(am__objects_1)
+pixbuf_reftest_OBJECTS = $(am_pixbuf_reftest_OBJECTS)
+pixbuf_reftest_LDADD = $(LDADD)
+pixbuf_reftest_DEPENDENCIES = $(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am_pixbuf_resource_OBJECTS = pixbuf-resource.$(OBJEXT) \
@@ -297,8 +315,8 @@ pixbuf_scale_LDADD = $(LDADD)
 pixbuf_scale_DEPENDENCIES = $(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
-pixbuf_short_gif_write_SOURCES = pixbuf-short-gif-write.c
-pixbuf_short_gif_write_OBJECTS = pixbuf-short-gif-write.$(OBJEXT)
+am_pixbuf_short_gif_write_OBJECTS = pixbuf-short-gif-write.$(OBJEXT)
+pixbuf_short_gif_write_OBJECTS = $(am_pixbuf_short_gif_write_OBJECTS)
 pixbuf_short_gif_write_LDADD = $(LDADD)
 pixbuf_short_gif_write_DEPENDENCIES = $(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -354,22 +372,26 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = animation.c $(cve_2015_4491_SOURCES) \
 	$(pixbuf_composite_SOURCES) $(pixbuf_dpi_SOURCES) \
-	$(pixbuf_icc_SOURCES) $(pixbuf_icon_serialize_SOURCES) \
-	$(pixbuf_jpeg_SOURCES) pixbuf-lowmem.c pixbuf-random.c \
-	pixbuf-randomly-modified.c pixbuf-read.c \
+	$(pixbuf_fail_SOURCES) $(pixbuf_icc_SOURCES) \
+	$(pixbuf_icon_serialize_SOURCES) $(pixbuf_jpeg_SOURCES) \
+	pixbuf-lowmem.c pixbuf-random.c \
+	$(pixbuf_randomly_modified_SOURCES) pixbuf-read.c \
 	$(pixbuf_readonly_to_mutable_SOURCES) \
-	$(pixbuf_resource_SOURCES) $(pixbuf_save_SOURCES) \
-	$(pixbuf_scale_SOURCES) pixbuf-short-gif-write.c \
-	$(pixbuf_stream_SOURCES) $(pixbuf_threads_SOURCES)
+	$(pixbuf_reftest_SOURCES) $(pixbuf_resource_SOURCES) \
+	$(pixbuf_save_SOURCES) $(pixbuf_scale_SOURCES) \
+	$(pixbuf_short_gif_write_SOURCES) $(pixbuf_stream_SOURCES) \
+	$(pixbuf_threads_SOURCES)
 DIST_SOURCES = animation.c $(cve_2015_4491_SOURCES) \
 	$(pixbuf_composite_SOURCES) $(pixbuf_dpi_SOURCES) \
-	$(pixbuf_icc_SOURCES) $(pixbuf_icon_serialize_SOURCES) \
-	$(pixbuf_jpeg_SOURCES) pixbuf-lowmem.c pixbuf-random.c \
-	pixbuf-randomly-modified.c pixbuf-read.c \
+	$(pixbuf_fail_SOURCES) $(pixbuf_icc_SOURCES) \
+	$(pixbuf_icon_serialize_SOURCES) $(pixbuf_jpeg_SOURCES) \
+	pixbuf-lowmem.c pixbuf-random.c \
+	$(pixbuf_randomly_modified_SOURCES) pixbuf-read.c \
 	$(pixbuf_readonly_to_mutable_SOURCES) \
-	$(pixbuf_resource_SOURCES) $(pixbuf_save_SOURCES) \
-	$(pixbuf_scale_SOURCES) pixbuf-short-gif-write.c \
-	$(pixbuf_stream_SOURCES) $(pixbuf_threads_SOURCES)
+	$(pixbuf_reftest_SOURCES) $(pixbuf_resource_SOURCES) \
+	$(pixbuf_save_SOURCES) $(pixbuf_scale_SOURCES) \
+	$(pixbuf_short_gif_write_SOURCES) $(pixbuf_stream_SOURCES) \
+	$(pixbuf_threads_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -847,6 +869,7 @@ LDADD = \
 test_programs = \
 	animation			\
 	cve-2015-4491			\
+	pixbuf-fail			\
 	pixbuf-icon-serialize 		\
 	pixbuf-randomly-modified	\
 	pixbuf-threads			\
@@ -854,6 +877,7 @@ test_programs = \
 	pixbuf-jpeg			\
 	pixbuf-dpi			\
 	pixbuf-stream			\
+	pixbuf-reftest			\
 	pixbuf-resource			\
 	pixbuf-scale			\
 	pixbuf-short-gif-write		\
@@ -865,6 +889,7 @@ test_programs = \
 dist_installed_test_data = \
 	test-image.png			\
 	test-animation.gif		\
+	1_partyanimsm2.gif		\
 	test-animation.ani		\
 	icc-profile.jpeg		\
 	icc-profile.png			\
@@ -875,10 +900,25 @@ dist_installed_test_data = \
 	premature-end.jpg		\
 	bug725582-testrotate.jpg	\
 	bug725582-testrotate.png	\
-	$(wildcard $(srcdir)/test-images/*)
+	cve-2015-4491.bmp		\
+	large.png			\
+	large.jpg			\
+	$(wildcard $(srcdir)/test-images/fail/*) \
+	$(wildcard $(srcdir)/test-images/randomly-modified/*) \
+	$(wildcard $(srcdir)/test-images/reftests/*.*) \
+	$(wildcard $(srcdir)/test-images/reftests/tga/*) \
+	$(NULL)
+
+pixbuf_randomly_modified_SOURCES = \
+	pixbuf-randomly-modified.c	\
+	test-common.c			\
+	test-common.h			\
+	$(NULL)
 
 cve_2015_4491_SOURCES = \
 	cve-2015-4491.c			\
+	test-common.c			\
+	test-common.h			\
 	resources.h			\
 	resources.c			\
 	$(NULL)
@@ -891,6 +931,12 @@ pixbuf_icc_SOURCES = \
 
 pixbuf_dpi_SOURCES = \
 	pixbuf-dpi.c			\
+	test-common.c			\
+	test-common.h			\
+	$(NULL)
+
+pixbuf_fail_SOURCES = \
+	pixbuf-fail.c			\
 	test-common.c			\
 	test-common.h			\
 	$(NULL)
@@ -925,13 +971,19 @@ pixbuf_save_SOURCES = \
 	test-common.h			\
 	$(NULL)
 
+pixbuf_reftest_SOURCES = \
+	pixbuf-reftest.c		\
+	test-common.c			\
+	test-common.h			\
+	$(NULL)
+
 pixbuf_jpeg_SOURCES = \
 	pixbuf-jpeg.c			\
 	test-common.c			\
 	test-common.h			\
 	$(NULL)
 
-pixbuf_short_git_write_SOURCES = \
+pixbuf_short_gif_write_SOURCES = \
 	pixbuf-short-gif-write.c
 
 pixbuf_readonly_to_mutable_SOURCES = \
@@ -1130,6 +1182,10 @@ pixbuf-dpi$(EXEEXT): $(pixbuf_dpi_OBJECTS) $(pixbuf_dpi_DEPENDENCIES) $(EXTRA_pi
 	@rm -f pixbuf-dpi$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(pixbuf_dpi_OBJECTS) $(pixbuf_dpi_LDADD) $(LIBS)
 
+pixbuf-fail$(EXEEXT): $(pixbuf_fail_OBJECTS) $(pixbuf_fail_DEPENDENCIES) $(EXTRA_pixbuf_fail_DEPENDENCIES) 
+	@rm -f pixbuf-fail$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(pixbuf_fail_OBJECTS) $(pixbuf_fail_LDADD) $(LIBS)
+
 pixbuf-icc$(EXEEXT): $(pixbuf_icc_OBJECTS) $(pixbuf_icc_DEPENDENCIES) $(EXTRA_pixbuf_icc_DEPENDENCIES) 
 	@rm -f pixbuf-icc$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(pixbuf_icc_OBJECTS) $(pixbuf_icc_LDADD) $(LIBS)
@@ -1161,6 +1217,10 @@ pixbuf-read$(EXEEXT): $(pixbuf_read_OBJECTS) $(pixbuf_read_DEPENDENCIES) $(EXTRA
 pixbuf-readonly-to-mutable$(EXEEXT): $(pixbuf_readonly_to_mutable_OBJECTS) $(pixbuf_readonly_to_mutable_DEPENDENCIES) $(EXTRA_pixbuf_readonly_to_mutable_DEPENDENCIES) 
 	@rm -f pixbuf-readonly-to-mutable$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(pixbuf_readonly_to_mutable_OBJECTS) $(pixbuf_readonly_to_mutable_LDADD) $(LIBS)
+
+pixbuf-reftest$(EXEEXT): $(pixbuf_reftest_OBJECTS) $(pixbuf_reftest_DEPENDENCIES) $(EXTRA_pixbuf_reftest_DEPENDENCIES) 
+	@rm -f pixbuf-reftest$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(pixbuf_reftest_OBJECTS) $(pixbuf_reftest_LDADD) $(LIBS)
 
 pixbuf-resource$(EXEEXT): $(pixbuf_resource_OBJECTS) $(pixbuf_resource_DEPENDENCIES) $(EXTRA_pixbuf_resource_DEPENDENCIES) 
 	@rm -f pixbuf-resource$(EXEEXT)
@@ -1231,6 +1291,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cve-2015-4491.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-composite.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-dpi.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-fail.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-icc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-icon-serialize.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-jpeg.Po@am__quote@
@@ -1239,6 +1300,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-randomly-modified.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-read.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-readonly-to-mutable.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-reftest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-resource.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-save.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pixbuf-scale.Po@am__quote@
@@ -1527,6 +1589,13 @@ cve-2015-4491.log: cve-2015-4491$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+pixbuf-fail.log: pixbuf-fail$(EXEEXT)
+	@p='pixbuf-fail$(EXEEXT)'; \
+	b='pixbuf-fail'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 pixbuf-icon-serialize.log: pixbuf-icon-serialize$(EXEEXT)
 	@p='pixbuf-icon-serialize$(EXEEXT)'; \
 	b='pixbuf-icon-serialize'; \
@@ -1572,6 +1641,13 @@ pixbuf-dpi.log: pixbuf-dpi$(EXEEXT)
 pixbuf-stream.log: pixbuf-stream$(EXEEXT)
 	@p='pixbuf-stream$(EXEEXT)'; \
 	b='pixbuf-stream'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+pixbuf-reftest.log: pixbuf-reftest$(EXEEXT)
+	@p='pixbuf-reftest$(EXEEXT)'; \
+	b='pixbuf-reftest'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

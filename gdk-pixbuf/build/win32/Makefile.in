@@ -391,13 +391,28 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+@HAVE_INTROSPECTION_FALSE@GENERATED_ITEMS = 
+@HAVE_INTROSPECTION_TRUE@GENERATED_ITEMS = \
+@HAVE_INTROSPECTION_TRUE@	introspection.body.mak	\
+@HAVE_INTROSPECTION_TRUE@	GdkPixbuf_2_0_gir_list
+
+@HAVE_INTROSPECTION_TRUE@DISTCLEANFILES = $(GENERATED_ITEMS)
 SUBDIRS = \
 	vs9	\
 	vs10	\
 	vs11	\
-	vs12
+	vs12	\
+	vs14
 
-EXTRA_DIST = math-compat/math.h
+EXTRA_DIST = \
+	detectenv-msvc.mak			\
+	introspection-msvc.mak			\
+	gdk-pixbuf-introspection-msvc.mak	\
+	gdkpixbuf-pc.py				\
+	pc_base.py				\
+	replace.py				\
+	$(GENERATED_ITEMS)
+
 all: all-recursive
 
 .SUFFIXES:
@@ -622,6 +637,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -709,6 +725,16 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
+
+@HAVE_INTROSPECTION_TRUE@introspection.body.mak: GdkPixbuf-2.0.gir.msvc.introspect
+@HAVE_INTROSPECTION_TRUE@	-$(RM) introspection.body.mak
+@HAVE_INTROSPECTION_TRUE@	for F in `ls *.msvc.introspect`; do \
+@HAVE_INTROSPECTION_TRUE@		case $$F in \
+@HAVE_INTROSPECTION_TRUE@			*)	cat $(top_builddir)/build/win32/$$F >>$@ \
+@HAVE_INTROSPECTION_TRUE@			;; \
+@HAVE_INTROSPECTION_TRUE@		esac; \
+@HAVE_INTROSPECTION_TRUE@	done
+@HAVE_INTROSPECTION_TRUE@	$(RM) GdkPixbuf-2.0.gir.msvc.introspect
 
 -include $(top_srcdir)/git.mk
 

@@ -20,6 +20,8 @@
 #include "gdk-pixdata.h"
 #include <string.h>
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+
 /**
  * SECTION:inline
  * @Short_description: Functions for inlined pixbuf handling.
@@ -451,10 +453,10 @@ gdk_pixbuf_from_pixdata (const GdkPixdata *pixdata,
 	{
 	  g_set_error (error, GDK_PIXBUF_ERROR,
 		       GDK_PIXBUF_ERROR_INSUFFICIENT_MEMORY,
-		       /* g_dngettext(GETTEXT_PACKAGE,
-				   "failed to allocate image buffer of %u byte",*/
+		       g_dngettext(GETTEXT_PACKAGE,
+				   "failed to allocate image buffer of %u byte",
 				   "failed to allocate image buffer of %u bytes",
-				   /* pixdata->rowstride * pixdata->height), */
+				   pixdata->rowstride * pixdata->height),
 		       pixdata->rowstride * pixdata->height);
 	  return NULL;
 	}
@@ -755,7 +757,8 @@ gdk_pixdata_to_csource (GdkPixdata        *pixdata,
   if (cdata.dump_stream)
     {
       guint pix_length = img_buffer_end - img_buffer;
-      
+
+
       stream = gdk_pixdata_serialize (pixdata, &stream_length);
       img_buffer = stream;
       img_buffer_end = stream + stream_length;

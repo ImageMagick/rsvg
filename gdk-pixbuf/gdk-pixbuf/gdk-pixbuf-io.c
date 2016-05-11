@@ -1,4 +1,3 @@
-/* -*- mode: C; c-file-style: "linux" -*- */
 /* GdkPixbuf library - Main loading interface.
  *
  * Copyright (C) 1999 The Free Software Foundation
@@ -196,7 +195,7 @@ get_file_formats (void)
 
 /* DllMain function needed to tuck away the gdk-pixbuf DLL handle */
 
-/* static HMODULE gdk_pixbuf_dll;
+static HMODULE gdk_pixbuf_dll;
 
 BOOL WINAPI
 DllMain (HINSTANCE hinstDLL,
@@ -210,8 +209,45 @@ DllMain (HINSTANCE hinstDLL,
         }
 
   return TRUE;
-} */
+}
 #endif
+
+
+#ifdef GDK_PIXBUF_RELOCATABLE
+
+gchar *
+gdk_pixbuf_get_toplevel (void)
+{
+  static gchar *toplevel = NULL;
+
+  if (toplevel == NULL) {
+#if defined(G_OS_WIN32)
+    toplevel = g_win32_get_package_installation_directory_of_module (gdk_pixbuf_dll);
+#elif defined(OS_DARWIN)
+    char pathbuf[PATH_MAX + 1];
+    uint32_t  bufsize = sizeof(pathbuf);
+    gchar *bin_dir;
+
+    _NSGetExecutablePath(pathbuf, &bufsize);
+    bin_dir = g_dirname(pathbuf);
+    toplevel = g_build_path (G_DIR_SEPARATOR_S, bin_dir, "..", NULL);
+    g_free (bin_dir);
+#elif defined (OS_LINUX)
+    gchar *exe_path, *bin_dir;
+
+    exe_path = g_file_read_link ("/proc/self/exe", NULL);
+    bin_dir = g_dirname(exe_path);
+    toplevel = g_build_path (G_DIR_SEPARATOR_S, bin_dir, "..", NULL);
+    g_free (exe_path);
+    g_free (bin_dir);
+#else
+#error "Relocations not supported for this platform"
+#endif
+  }
+  return toplevel;
+}
+
+#endif  /* GDK_PIXBUF_RELOCATABLE */
 
 
 #ifdef USE_GMODULE 
@@ -296,38 +332,6 @@ skip_space (const char **pos)
 }
 
 #ifdef GDK_PIXBUF_RELOCATABLE
-
-gchar *
-gdk_pixbuf_get_toplevel (void)
-{
-  static gchar *toplevel = NULL;
-
-  if (toplevel == NULL) {
-#if defined(G_OS_WIN32)
-    toplevel = g_win32_get_package_installation_directory_of_module (gdk_pixbuf_dll);
-#elif defined(OS_DARWIN)
-    char pathbuf[PATH_MAX + 1];
-    uint32_t  bufsize = sizeof(pathbuf);
-    gchar *bin_dir;
-
-    _NSGetExecutablePath(pathbuf, &bufsize);
-    bin_dir = g_dirname(pathbuf);
-    toplevel = g_build_path (G_DIR_SEPARATOR_S, bin_dir, "..", NULL);
-    g_free (bin_dir);
-#elif defined (OS_LINUX)
-    gchar *exe_path, *bin_dir;
-
-    exe_path = g_file_read_link ("/proc/self/exe", NULL);
-    bin_dir = g_dirname(exe_path);
-    toplevel = g_build_path (G_DIR_SEPARATOR_S, bin_dir, "..", NULL);
-    g_free (exe_path);
-    g_free (bin_dir);
-#else
-#error "Relocations not supported for this platform"
-#endif
-  }
-  return toplevel;
-}
 
 static char *
 get_libdir (void)
@@ -432,9 +436,6 @@ gdk_pixbuf_io_init (void)
 #ifdef INCLUDE_bmp
         load_one_builtin_module (bmp);
 #endif
-#ifdef INCLUDE_wbmp
-        load_one_builtin_module (wbmp);
-#endif
 #ifdef INCLUDE_gif
         load_one_builtin_module (gif);
 #endif
@@ -447,9 +448,6 @@ gdk_pixbuf_io_init (void)
 #ifdef INCLUDE_pnm
         load_one_builtin_module (pnm);
 #endif
-#ifdef INCLUDE_ras
-        load_one_builtin_module (ras);
-#endif
 #ifdef INCLUDE_tiff
         load_one_builtin_module (tiff);
 #endif
@@ -459,14 +457,8 @@ gdk_pixbuf_io_init (void)
 #ifdef INCLUDE_xbm
         load_one_builtin_module (xbm);
 #endif
-#ifdef INCLUDE_svg
-        load_one_builtin_module (svg);
-#endif
 #ifdef INCLUDE_tga
         load_one_builtin_module (tga);
-#endif
-#ifdef INCLUDE_pcx
-        load_one_builtin_module (pcx);
 #endif
 #ifdef INCLUDE_icns
         load_one_builtin_module (icns);
@@ -664,16 +656,12 @@ module (jpeg);
 module (gif);
 module (ico);
 module (ani);
-module (ras);
 module (xpm);
 module (tiff);
 module (pnm);
 module (bmp);
-module (wbmp);
 module (xbm);
-module (svg);
 module (tga);
-module (pcx);
 module (icns);
 module (jasper);
 module (qtif);
@@ -722,14 +710,11 @@ gdk_pixbuf_load_module_unlocked (GdkPixbufModule *image_module,
 #ifdef INCLUDE_gdip_png
         try_module (png,gdip_png);
 #endif
-#ifdef INCLUDE_png      
+#ifdef INCLUDE_png
         try_module (png,png);
 #endif
 #ifdef INCLUDE_bmp
         try_module (bmp,bmp);
-#endif
-#ifdef INCLUDE_wbmp
-        try_module (wbmp,wbmp);
 #endif
 #ifdef INCLUDE_gif
         try_module (gif,gif);
@@ -746,9 +731,6 @@ gdk_pixbuf_load_module_unlocked (GdkPixbufModule *image_module,
 #ifdef INCLUDE_pnm
         try_module (pnm,pnm);
 #endif
-#ifdef INCLUDE_ras
-        try_module (ras,ras);
-#endif
 #ifdef INCLUDE_tiff
         try_module (tiff,tiff);
 #endif
@@ -758,14 +740,8 @@ gdk_pixbuf_load_module_unlocked (GdkPixbufModule *image_module,
 #ifdef INCLUDE_xbm
         try_module (xbm,xbm);
 #endif
-#ifdef INCLUDE_svg
-        try_module (svg,svg);
-#endif
 #ifdef INCLUDE_tga
         try_module (tga,tga);
-#endif
-#ifdef INCLUDE_pcx
-        try_module (pcx,pcx);
 #endif
 #ifdef INCLUDE_icns
         try_module (icns,icns);
@@ -838,19 +814,19 @@ _gdk_pixbuf_load_module (GdkPixbufModule *image_module,
                          GError         **error)
 {
         gboolean ret;
-        /* gboolean locked = FALSE; */
+        gboolean locked = FALSE;
 
         /* be extra careful, maybe the module initializes
          * the thread system
          */
-        /* if (g_threads_got_initialized) { */
+        if (g_threads_got_initialized) {
                 G_LOCK (init_lock);
-                /* locked = TRUE;
-        } */
+                locked = TRUE;
+        }
 
         ret = gdk_pixbuf_load_module_unlocked (image_module, error);
 
-        /* if (locked) */
+        if (locked)
                 G_UNLOCK (init_lock);
 
         return ret;
@@ -1692,8 +1668,10 @@ _gdk_pixbuf_new_from_resource_try_mmap (const char *resource_path)
 	gsize data_size;
 	GBytes *bytes;
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	/* We specialize uncompressed GdkPixdata files, making these a reference to the
-	   compiled-in resource data */
+	 * compiled-in resource data
+         */
 	if (g_resources_get_info  (resource_path, 0, &data_size, &flags, NULL) &&
 	    (flags & G_RESOURCE_FLAGS_COMPRESSED) == 0 &&
 	    data_size >= GDK_PIXDATA_HEADER_LENGTH &&
@@ -1717,6 +1695,7 @@ _gdk_pixbuf_new_from_resource_try_mmap (const char *resource_path)
 			g_bytes_unref (bytes);
 		}
 	}
+G_GNUC_END_IGNORE_DEPRECATIONS
 
         return NULL;
 }
@@ -1739,8 +1718,8 @@ _gdk_pixbuf_new_from_resource_try_mmap (const char *resource_path)
  * Since: 2.26
  **/
 GdkPixbuf *
-gdk_pixbuf_new_from_resource (const char *resource_path,
-			      GError    **error)
+gdk_pixbuf_new_from_resource (const gchar  *resource_path,
+			      GError      **error)
 {
 	GInputStream *stream;
 	GdkPixbuf *pixbuf;
@@ -2895,7 +2874,47 @@ save_to_stream (const gchar  *buffer,
         return TRUE;
 }
 
-/** 
+/**
+ * gdk_pixbuf_save_to_streamv:
+ * @pixbuf: a #GdkPixbuf
+ * @stream: a #GOutputStream to save the pixbuf to
+ * @type: name of file format
+ * @option_keys: (array zero-terminated=1): name of options to set, %NULL-terminated
+ * @option_values: (array zero-terminated=1): values for named options
+ * @cancellable: (allow-none): optional #GCancellable object, %NULL to ignore
+ * @error: (allow-none): return location for error, or %NULL
+ *
+ * Saves @pixbuf to an output stream.
+ *
+ * Supported file formats are currently "jpeg", "tiff", "png", "ico" or
+ * "bmp". See gdk_pixbuf_save_to_stream() for more details.
+ *
+ * Returns: %TRUE if the pixbuf was saved successfully, %FALSE if an
+ *     error was set.
+ *
+ * Since: 2.36
+ */
+gboolean
+gdk_pixbuf_save_to_streamv (GdkPixbuf      *pixbuf,
+                            GOutputStream  *stream,
+                            const char     *type,
+                            char          **option_keys,
+                            char          **option_values,
+                            GCancellable   *cancellable,
+                            GError        **error)
+{
+        SaveToStreamData data;
+
+        data.stream = stream;
+        data.cancellable = cancellable;
+
+        return gdk_pixbuf_save_to_callbackv (pixbuf, save_to_stream,
+                                             &data, type,
+                                             option_keys, option_values,
+                                             error);
+}
+
+/**
  * gdk_pixbuf_save_to_stream:
  * @pixbuf: a #GdkPixbuf
  * @stream: a #GOutputStream to save the pixbuf to
@@ -2933,19 +2952,14 @@ gdk_pixbuf_save_to_stream (GdkPixbuf      *pixbuf,
         gchar **keys = NULL;
         gchar **values = NULL;
         va_list args;
-        SaveToStreamData data;
 
         va_start (args, error);
         collect_save_options (args, &keys, &values);
         va_end (args);
 
-        data.stream = stream;
-        data.cancellable = cancellable;
-
-        res = gdk_pixbuf_save_to_callbackv (pixbuf, save_to_stream, 
-                                            &data, type, 
-                                            keys, values, 
-                                            error);
+        res = gdk_pixbuf_save_to_streamv (pixbuf, stream, type,
+                                          keys, values,
+                                          cancellable, error);
 
         g_strfreev (keys);
         g_strfreev (values);
@@ -2997,6 +3011,59 @@ save_to_stream_thread (GTask                 *task,
 }
 
 /**
+ * gdk_pixbuf_save_to_streamv_async:
+ * @pixbuf: a #GdkPixbuf
+ * @stream: a #GOutputStream to which to save the pixbuf
+ * @type: name of file format
+ * @option_keys: (array zero-terminated=1): name of options to set, %NULL-terminated
+ * @option_values: (array zero-terminated=1): values for named options
+ * @cancellable: (allow-none): optional #GCancellable object, %NULL to ignore
+ * @callback: a #GAsyncReadyCallback to call when the the pixbuf is loaded
+ * @user_data: the data to pass to the callback function
+ *
+ * Saves @pixbuf to an output stream asynchronously.
+ *
+ * For more details see gdk_pixbuf_save_to_streamv(), which is the synchronous
+ * version of this function.
+ *
+ * When the operation is finished, @callback will be called in the main thread.
+ * You can then call gdk_pixbuf_save_to_stream_finish() to get the result of the operation.
+ *
+ * Since: 2.36
+ **/
+void
+gdk_pixbuf_save_to_streamv_async (GdkPixbuf           *pixbuf,
+                                  GOutputStream       *stream,
+                                  const gchar         *type,
+                                  gchar              **option_keys,
+                                  gchar              **option_values,
+                                  GCancellable        *cancellable,
+                                  GAsyncReadyCallback  callback,
+                                  gpointer             user_data)
+{
+        GTask *task;
+        SaveToStreamAsyncData *data;
+
+        g_return_if_fail (GDK_IS_PIXBUF (pixbuf));
+        g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
+        g_return_if_fail (type != NULL);
+        g_return_if_fail (callback != NULL);
+        g_return_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable));
+
+        data = g_slice_new (SaveToStreamAsyncData);
+        data->stream = g_object_ref (stream);
+        data->type = g_strdup (type);
+        data->keys = g_strdupv (option_keys);
+        data->values = g_strdupv (option_values);
+
+        task = g_task_new (pixbuf, cancellable, callback, user_data);
+        g_task_set_source_tag (task, gdk_pixbuf_save_to_streamv_async);
+        g_task_set_task_data (task, data, (GDestroyNotify) save_to_stream_async_data_free);
+        g_task_run_in_thread (task, (GTaskThreadFunc) save_to_stream_thread);
+        g_object_unref (task);
+}
+
+/**
  * gdk_pixbuf_save_to_stream_async:
  * @pixbuf: a #GdkPixbuf
  * @stream: a #GOutputStream to which to save the pixbuf
@@ -3025,33 +3092,25 @@ gdk_pixbuf_save_to_stream_async (GdkPixbuf           *pixbuf,
 				 gpointer             user_data,
 				 ...)
 {
-	GTask *task;
-	gchar **keys = NULL;
-	gchar **values = NULL;
-	va_list args;
-	SaveToStreamAsyncData *data;
+        gchar **keys = NULL;
+        gchar **values = NULL;
+        va_list args;
 
-	g_return_if_fail (GDK_IS_PIXBUF (pixbuf));
-	g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
-	g_return_if_fail (type != NULL);
-	g_return_if_fail (callback != NULL);
-	g_return_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable));
+        g_return_if_fail (GDK_IS_PIXBUF (pixbuf));
+        g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
+        g_return_if_fail (type != NULL);
+        g_return_if_fail (callback != NULL);
+        g_return_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable));
 
-	va_start (args, user_data);
-	collect_save_options (args, &keys, &values);
-	va_end (args);
+        va_start (args, user_data);
+        collect_save_options (args, &keys, &values);
+        va_end (args);
 
-	data = g_slice_new (SaveToStreamAsyncData);
-	data->stream = g_object_ref (stream);
-	data->type = g_strdup (type);
-	data->keys = keys;
-	data->values = values;
-
-	task = g_task_new (pixbuf, cancellable, callback, user_data);
-	g_task_set_source_tag (task, gdk_pixbuf_save_to_stream_async);
-	g_task_set_task_data (task, data, (GDestroyNotify) save_to_stream_async_data_free);
-	g_task_run_in_thread (task, (GTaskThreadFunc) save_to_stream_thread);
-	g_object_unref (task);
+        gdk_pixbuf_save_to_streamv_async (pixbuf, stream, type,
+                                          keys, values,
+                                          cancellable, callback, user_data);
+        g_strfreev (keys);
+        g_strfreev (values);
 }
 
 /**
@@ -3080,7 +3139,8 @@ gdk_pixbuf_save_to_stream_finish (GAsyncResult  *async_result,
 	task = G_TASK (async_result);
 
 	g_return_val_if_fail (!error || (error && !*error), FALSE);
-	g_warn_if_fail (g_task_get_source_tag (task) == gdk_pixbuf_save_to_stream_async);
+	g_warn_if_fail (g_task_get_source_tag (task) == gdk_pixbuf_save_to_stream_async ||
+			g_task_get_source_tag (task) == gdk_pixbuf_save_to_streamv_async);
 
 	return g_task_propagate_boolean (task, error);
 }

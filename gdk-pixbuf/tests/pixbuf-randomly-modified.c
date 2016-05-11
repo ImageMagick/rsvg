@@ -29,21 +29,25 @@
 #include <sys/resource.h>
 #endif
 
+#include "test-common.h"
+
 static void
 randomly_modify (const gchar *image, guint size)
 {
-  int i;
+  int i, n;
 
   guchar *img_copy = g_malloc (size);
   g_memmove (img_copy, image, size);
   
-  for (i = 0; i < size / 4; i++)
+  n = MIN (100, size / 4);
+
+  for (i = 0; i < n; i++)
     {
       FILE *f;
       GdkPixbufLoader *loader;
       
-      guint index = g_random_int_range (0, size);
-      guchar byte = g_random_int_range (0, 256);
+      guint index = g_test_rand_int_range (0, size);
+      guchar byte = g_test_rand_int_range (0, 256);
       
       img_copy[index] = byte;
       f = fopen ("pixbuf-randomly-modified-image", "w");
@@ -63,16 +67,14 @@ randomly_modify (const gchar *image, guint size)
 static void
 test_randomly_modified (gconstpointer data)
 {
-  const gchar *file = data;
-  const gchar *path;
+  GFile *file = G_FILE (data);
   gchar *buffer;
   gsize size;
   gint iterations;
   gint i;
   GError *error = NULL;
 
-  path = g_test_get_filename (G_TEST_DIST, "test-images", file, NULL);
-  g_file_get_contents (path, &buffer, &size, &error);
+  g_file_load_contents (file, NULL, &buffer, &size, NULL, &error);
   g_assert_no_error (error);
 
   if (g_test_thorough ())
@@ -89,33 +91,31 @@ test_randomly_modified (gconstpointer data)
 int
 main (int argc, char **argv)
 {
-  const gchar *name;
-  gchar *test_images_dir;
-  gchar *path;
-  GDir *dir;
+  gchar *base_dir;
+  GFile *base, *test_images;
 #ifdef HAVE_SETRLIMIT
   struct rlimit max_mem_size;
 
   max_mem_size.rlim_cur = 100 * 1024 * 1024; /* 100M */
   max_mem_size.rlim_max = max_mem_size.rlim_cur;
   setrlimit (RLIMIT_DATA, &max_mem_size);
-#ifdef RLIMIT_AS
-  setrlimit (RLIMIT_AS, &max_mem_size);
-#endif
 #endif
 
   g_test_init (&argc, &argv, NULL);
 
-  test_images_dir = g_build_filename (g_test_get_dir (G_TEST_DIST), "test-images", NULL);
-  dir = g_dir_open (test_images_dir, 0, NULL);
-  while ((name = g_dir_read_name (dir)) != NULL)
-    {
-      path = g_strconcat ("/pixbuf/randomly-modified/", name, NULL);
-      g_test_add_data_func_full (path, g_strdup (name), test_randomly_modified, g_free);
-      g_free (path);
-    }
-  g_dir_close (dir);
-  g_free (test_images_dir);
+  base_dir = g_build_filename (g_test_get_dir (G_TEST_DIST), "test-images", NULL);
+  base = g_file_new_for_path (base_dir);
+
+  test_images = g_file_get_child (base, "randomly-modified");
+  add_test_for_all_images ("/pixbuf", base, test_images, test_randomly_modified, NULL);
+  g_object_unref (test_images);
+
+  test_images = g_file_get_child (base, "fail");
+  add_test_for_all_images ("/pixbuf/randomly-modified", base, test_images, test_randomly_modified, NULL);
+  g_object_unref (test_images);
+
+  g_object_unref (base);
+  g_free (base_dir);
 
   g_test_message ("Modified image is written to pixbuf-randomly-modified-image");
 

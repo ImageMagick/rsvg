@@ -8,7 +8,7 @@
 <link rel="up" href="rn01.html" title="API Reference">
 <link rel="prev" href="gdk-pixbuf-File-saving.html" title="File saving">
 <link rel="next" href="gdk-pixbuf-Inline-data.html" title="Inline data">
-<meta name="generator" content="GTK-Doc V1.24.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -141,7 +141,7 @@ gdk_pixbuf_new (<em class="parameter"><code><a class="link" href="gdk-pixbuf-The
 buffer has an optimal rowstride.  Note that the buffer is not cleared;
 you will have to fill it completely yourself.</p>
 <div class="refsect3">
-<a name="id-1.2.8.6.2.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-new.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -178,7 +178,7 @@ you will have to fill it completely yourself.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.6.2.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-new.returns"></a><h4>Returns</h4>
 <p> A newly-created <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> with a reference count of 1, or
 <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if not enough memory could be allocated for the image buffer.</p>
 </div>
@@ -198,7 +198,7 @@ gdk_pixbuf_new_from_bytes (<em class="parameter"><code><a href="https://develope
 Currently only RGB images with 8 bits per sample are supported.
 This is the <a href="https://developer.gnome.org/glib/unstable/glib-Byte-Arrays.html#GBytes"><span class="type">GBytes</span></a> variant of <a class="link" href="gdk-pixbuf-Image-Data-in-Memory.html#gdk-pixbuf-new-from-data" title="gdk_pixbuf_new_from_data ()"><code class="function">gdk_pixbuf_new_from_data()</code></a>.</p>
 <div class="refsect3">
-<a name="id-1.2.8.6.3.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-new-from-bytes.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -245,7 +245,7 @@ This is the <a href="https://developer.gnome.org/glib/unstable/glib-Byte-Arrays.
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.6.3.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-new-from-bytes.returns"></a><h4>Returns</h4>
 <p> A newly-created <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> structure with a reference count of 1. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -273,7 +273,7 @@ finalized, your destroy notification function will be called, and
 it is its responsibility to free the pixel array.</p>
 <p>See also <a class="link" href="gdk-pixbuf-Image-Data-in-Memory.html#gdk-pixbuf-new-from-bytes" title="gdk_pixbuf_new_from_bytes ()"><code class="function">gdk_pixbuf_new_from_bytes()</code></a>.</p>
 <div class="refsect3">
-<a name="id-1.2.8.6.4.7"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-new-from-data.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -331,7 +331,7 @@ drops to zero, or <a href="https://developer.gnome.org/glib/unstable/glib-Standa
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.6.4.8"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-new-from-data.returns"></a><h4>Returns</h4>
 <p> A newly-created <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> structure with a reference count of 1. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -344,7 +344,7 @@ gdk_pixbuf_new_from_xpm_data (<em class="parameter"><code>const <span class="typ
 <p>Creates a new pixbuf by parsing XPM data in memory.  This data is commonly
 the result of including an XPM file into a program's C source.</p>
 <div class="refsect3">
-<a name="id-1.2.8.6.5.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-new-from-xpm-data.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -359,7 +359,7 @@ the result of including an XPM file into a program's C source.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.6.5.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-new-from-xpm-data.returns"></a><h4>Returns</h4>
 <p> A newly-created pixbuf with a reference count of 1.</p>
 </div>
 </div>
@@ -373,14 +373,14 @@ gdk_pixbuf_new_from_inline (<em class="parameter"><code><a href="https://develop
                             <em class="parameter"><code><a href="https://developer.gnome.org/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
 <div class="warning">
 <p><code class="literal">gdk_pixbuf_new_from_inline</code> has been deprecated since version 2.32 and should not be used in newly-written code.</p>
-<p>Use <a href="https://developer.gnome.org/gio/unstable/GResource.html"><span class="type">GResource</span></a> instead.</p>
+<p>Use <a href="https://developer.gnome.org/gio/unstable/GResource.html#GResource-struct"><span class="type">GResource</span></a> instead.</p>
 </div>
 <p>Create a <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> from a flat representation that is suitable for
 storing as inline data in a program. This is useful if you want to
 ship a program with images, but don't want to depend on any
 external files.</p>
 <p>gdk-pixbuf ships with a program called <a class="link" href="gdk-pixbuf-csource.html" title="gdk-pixbuf-csource">gdk-pixbuf-csource</a>,
-which allows for conversion of <a href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbufs</span></a> into such a inline representation.
+which allows for conversion of <a href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf-struct"><span class="type">GdkPixbufs</span></a> into such a inline representation.
 In almost all cases, you should pass the <code class="literal">--raw</code> option to
 <code class="literal">gdk-pixbuf-csource</code>. A sample invocation would be:</p>
 <div class="informalexample">
@@ -421,7 +421,7 @@ since things will always succeed:</p>
 inline data located at runtime, you could have corrupt inline data in 
 addition.</p>
 <div class="refsect3">
-<a name="id-1.2.8.6.6.14"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-new-from-inline.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -458,7 +458,7 @@ for the resulting pixbuf</p></td>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.6.6.15"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-new-from-inline.returns"></a><h4>Returns</h4>
 <p> A newly-created <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> structure with a reference,
 count of 1, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if an error occurred.</p>
 </div>
@@ -484,7 +484,7 @@ pixbuf is finalized.</p>
  is read-only, this function will force it
 to be mutable.</p>
 <div class="refsect3">
-<a name="id-1.2.8.6.7.6"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-new-subpixbuf.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -525,7 +525,7 @@ to be mutable.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.6.7.7"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-new-subpixbuf.returns"></a><h4>Returns</h4>
 <p> a new pixbuf. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -539,7 +539,7 @@ gdk_pixbuf_copy (<em class="parameter"><code>const <a class="link" href="gdk-pix
 <em class="parameter"><code>pixbuf</code></em>
 .</p>
 <div class="refsect3">
-<a name="id-1.2.8.6.8.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-copy.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -554,7 +554,7 @@ gdk_pixbuf_copy (<em class="parameter"><code>const <a class="link" href="gdk-pix
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.8.6.8.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-copy.returns"></a><h4>Returns</h4>
 <p> A newly-created pixbuf with a reference count of 1, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if
 not enough memory could be allocated. </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
@@ -570,6 +570,6 @@ not enough memory could be allocated. </p>
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.24.1</div>
+<hr>Generated by GTK-Doc V1.25.1</div>
 </body>
 </html>

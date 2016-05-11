@@ -27,8 +27,18 @@
 
 G_BEGIN_DECLS
 
+typedef gboolean (* AddTestFunc) (GFile *file);
+
 gboolean format_supported (const gchar *filename);
-gboolean pixdata_equal (GdkPixbuf *p1, GdkPixbuf *p2, GError **error);
+gboolean file_supported (GFile *file);
+gboolean skip_if_insufficient_memory (GError **err);
+gboolean pixdata_equal (GdkPixbuf *test, GdkPixbuf *ref, GError **error);
+void add_test_for_all_images (const gchar   *prefix,
+                              GFile         *base,
+                              GFile         *file,
+                              GTestDataFunc  test_func,
+                              AddTestFunc    add_test_func);
+
 
 G_END_DECLS
 

@@ -104,7 +104,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = gdk-pixbuf-version-paths.vsprops
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -126,7 +126,8 @@ am__can_run_installinfo = \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
-am__DIST_COMMON = $(srcdir)/Makefile.in
+am__DIST_COMMON = $(srcdir)/Makefile.in \
+	$(srcdir)/gdk-pixbuf-version-paths.vsprops.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -331,20 +332,26 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+GENERATED_ITEMS = \
+	gdk-pixbuf.vcproj	\
+	gdk-pixbuf-install.vsprops
+
 EXTRA_DIST = \
 	README.txt	\
 	gdk-pixbuf.sln	\
 	gdk-pixbuf-version-paths.vsprops	\
 	gdk-pixbuf-build-defines.vsprops	\
 	gdk-pixbuf-gen-srcs.vsprops	\
-	gdk-pixbuf-install.vsprops	\
-	gdk-pixbuf.vcproj	\
+	gdk-pixbuf-install.vspropsin	\
 	gdk-pixbuf.vcprojin	\
 	gdk-pixbuf-csource.vcproj	\
 	gdk-pixbuf-query-loaders.vcproj	\
 	gdk-pixbuf-pixdata.vcproj	\
-	gdk-pixbuf-install.vcproj
+	gdk-pixbuf-install.vcproj	\
+	$(GENERATED_ITEMS)		\
+	math.h
 
+DISTCLEANFILES = $(GENERATED_ITEMS)
 all: all-am
 
 .SUFFIXES:
@@ -377,6 +384,8 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+gdk-pixbuf-version-paths.vsprops: $(top_builddir)/config.status $(srcdir)/gdk-pixbuf-version-paths.vsprops.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -450,6 +459,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -536,6 +546,10 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
+
+gdk-pixbuf-install.vsprops: $(top_srcdir)/build/win32/vs9/gdk-pixbuf-install.vspropsin gdk-pixbuf.headers
+	$(CPP) -P - <$(top_srcdir)/build/win32/vs9/gdk-pixbuf-install.vspropsin >$@
+	rm gdk-pixbuf.headers
 
 -include $(top_srcdir)/git.mk
 

@@ -8,7 +8,7 @@
 <link rel="up" href="rn01.html" title="API Reference">
 <link rel="prev" href="gdk-pixbuf-Animations.html" title="Animations">
 <link rel="next" href="gdk-pixbuf-Module-Interface.html" title="Module Interface">
-<meta name="generator" content="GTK-Doc V1.24.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -171,7 +171,7 @@
 </div>
 <div class="refsect1">
 <a name="GdkPixbufLoader.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">    <a href="https://developer.gnome.org/gobject/unstable/gobject-The-Base-Object-Type.html#GObject">GObject</a>
+<pre class="screen">    <a href="https://developer.gnome.org/gobject/unstable/gobject-The-Base-Object-Type.html#GObject-struct">GObject</a>
     <span class="lineart">╰──</span> GdkPixbufLoader
 </pre>
 </div>
@@ -227,7 +227,7 @@ displaying it.</p>
 gdk_pixbuf_loader_new (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Creates a new pixbuf loader object.</p>
 <div class="refsect3">
-<a name="id-1.2.15.9.2.5"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-loader-new.returns"></a><h4>Returns</h4>
 <p> A newly-created pixbuf loader.</p>
 </div>
 </div>
@@ -250,7 +250,7 @@ are installed, but typically "png", "jpeg", "gif", "tiff" and
 supported image formats, call <a class="link" href="gdk-pixbuf-Module-Interface.html#gdk-pixbuf-format-get-name" title="gdk_pixbuf_format_get_name ()"><code class="function">gdk_pixbuf_format_get_name()</code></a> on each 
 of the <a class="link" href="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat" title="struct GdkPixbufFormat"><span class="type">GdkPixbufFormat</span></a> structs returned by <a class="link" href="gdk-pixbuf-Module-Interface.html#gdk-pixbuf-get-formats" title="gdk_pixbuf_get_formats ()"><code class="function">gdk_pixbuf_get_formats()</code></a>.</p>
 <div class="refsect3">
-<a name="id-1.2.15.9.3.6"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-loader-new-with-type.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -272,7 +272,7 @@ of the <a class="link" href="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat" t
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.15.9.3.7"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-loader-new-with-type.returns"></a><h4>Returns</h4>
 <p> A newly-created pixbuf loader.</p>
 </div>
 </div>
@@ -296,7 +296,7 @@ To obtain the full list of supported mime types, call
 <a class="link" href="gdk-pixbuf-Module-Interface.html#gdk-pixbuf-format-get-mime-types" title="gdk_pixbuf_format_get_mime_types ()"><code class="function">gdk_pixbuf_format_get_mime_types()</code></a> on each of the <a class="link" href="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat" title="struct GdkPixbufFormat"><span class="type">GdkPixbufFormat</span></a> 
 structs returned by <a class="link" href="gdk-pixbuf-Module-Interface.html#gdk-pixbuf-get-formats" title="gdk_pixbuf_get_formats ()"><code class="function">gdk_pixbuf_get_formats()</code></a>.</p>
 <div class="refsect3">
-<a name="id-1.2.15.9.4.6"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-loader-new-with-mime-type.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -318,7 +318,7 @@ structs returned by <a class="link" href="gdk-pixbuf-Module-Interface.html#gdk-p
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.15.9.4.7"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-loader-new-with-mime-type.returns"></a><h4>Returns</h4>
 <p> A newly-created pixbuf loader.</p>
 </div>
 <p class="since">Since: <a class="link" href="api-index-2-4.html#api-index-2.4">2.4</a></p>
@@ -331,7 +331,7 @@ gdk_pixbuf_loader_get_format (<em class="parameter"><code><a class="link" href="
 <p>Obtains the available information about the format of the 
 currently loading image file.</p>
 <div class="refsect3">
-<a name="id-1.2.15.9.5.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-loader-get-format.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -346,7 +346,7 @@ currently loading image file.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.15.9.5.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-loader-get-format.returns"></a><h4>Returns</h4>
 <p> A <a class="link" href="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat" title="struct GdkPixbufFormat"><span class="type">GdkPixbufFormat</span></a> or
 <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. The return value is owned by GdkPixbuf and should not be
 freed. </p>
@@ -371,7 +371,7 @@ returned, <em class="parameter"><code>error</code></em>
  will be set to an error from the <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GDK-PIXBUF-ERROR:CAPS" title="GDK_PIXBUF_ERROR"><span class="type">GDK_PIXBUF_ERROR</span></a>
 or <a href="https://developer.gnome.org/glib/unstable/glib-File-Utilities.html#G-FILE-ERROR:CAPS"><span class="type">G_FILE_ERROR</span></a> domains.</p>
 <div class="refsect3">
-<a name="id-1.2.15.9.6.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-loader-write.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -404,7 +404,7 @@ buffer in bytes.</p></td>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.15.9.6.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-loader-write.returns"></a><h4>Returns</h4>
 <p> <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if the write was successful, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#FALSE:CAPS"><code class="literal">FALSE</code></a> if the loader
 cannot parse the buffer.</p>
 </div>
@@ -425,7 +425,7 @@ returned, <em class="parameter"><code>error</code></em>
 or <a href="https://developer.gnome.org/glib/unstable/glib-File-Utilities.html#G-FILE-ERROR:CAPS"><span class="type">G_FILE_ERROR</span></a> domains.</p>
 <p>See also: <a class="link" href="GdkPixbufLoader.html#gdk-pixbuf-loader-write" title="gdk_pixbuf_loader_write ()"><code class="function">gdk_pixbuf_loader_write()</code></a></p>
 <div class="refsect3">
-<a name="id-1.2.15.9.7.6"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-loader-write-bytes.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -452,7 +452,7 @@ or <a href="https://developer.gnome.org/glib/unstable/glib-File-Utilities.html#G
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.15.9.7.7"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-loader-write-bytes.returns"></a><h4>Returns</h4>
 <p> <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if the write was successful, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#FALSE:CAPS"><code class="literal">FALSE</code></a> if the loader
 cannot parse the buffer.</p>
 </div>
@@ -472,7 +472,7 @@ signal handler for the ::size-prepared signal.</p>
 <p>Attempts to set the desired image size  are ignored after the 
 emission of the ::size-prepared signal.</p>
 <div class="refsect3">
-<a name="id-1.2.15.9.8.6"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-loader-set-size.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -517,7 +517,7 @@ using it.  Additionally, if the loader is an animation, it will
 return the "static image" of the animation
 (see <a class="link" href="gdk-pixbuf-Animations.html#gdk-pixbuf-animation-get-static-image" title="gdk_pixbuf_animation_get_static_image ()"><code class="function">gdk_pixbuf_animation_get_static_image()</code></a>).</p>
 <div class="refsect3">
-<a name="id-1.2.15.9.9.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-loader-get-pixbuf.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -532,7 +532,7 @@ return the "static image" of the animation
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.15.9.9.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-loader-get-pixbuf.returns"></a><h4>Returns</h4>
 <p> The <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> that the loader is creating, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if not
 enough data has been read to determine how to create the image buffer. </p>
 <p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
@@ -549,7 +549,7 @@ signal has been emitted by the loader. If the loader doesn't have enough
 bytes yet (hasn't emitted the "area-prepared" signal) this function will 
 return <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>.</p>
 <div class="refsect3">
-<a name="id-1.2.15.9.10.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-loader-get-animation.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -564,7 +564,7 @@ return <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.h
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.15.9.10.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-loader-get-animation.returns"></a><h4>Returns</h4>
 <p> The <a class="link" href="gdk-pixbuf-Animations.html#GdkPixbufAnimation"><span class="type">GdkPixbufAnimation</span></a> that the loader is loading, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if
 not enough data has been read to determine the information. </p>
 <p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
@@ -590,7 +590,7 @@ reasonable.</p>
 <p>Remember that this does not unref the loader, so if you plan not to
 use it anymore, please <a href="https://developer.gnome.org/gobject/unstable/gobject-The-Base-Object-Type.html#g-object-unref"><code class="function">g_object_unref()</code></a> it.</p>
 <div class="refsect3">
-<a name="id-1.2.15.9.11.6"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-loader-close.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -612,7 +612,7 @@ use it anymore, please <a href="https://developer.gnome.org/gobject/unstable/gob
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.15.9.11.7"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-loader-close.returns"></a><h4>Returns</h4>
 <p> <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if all image data written so far was successfully
 passed out via the update_area signal</p>
 </div>
@@ -642,7 +642,7 @@ applications can call <a class="link" href="GdkPixbufLoader.html#gdk-pixbuf-load
 
 the partially-loaded pixbuf.</p>
 <div class="refsect3">
-<a name="id-1.2.15.11.2.5"></a><h4>Parameters</h4>
+<a name="GdkPixbufLoader-area-prepared.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -681,7 +681,7 @@ scanline has been read in, but it could be a different area as
 well.  Applications can use this signal to know when to repaint
 areas of an image that is being loaded.</p>
 <div class="refsect3">
-<a name="id-1.2.15.11.3.5"></a><h4>Parameters</h4>
+<a name="GdkPixbufLoader-area-updated.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -735,7 +735,7 @@ It can be used by different parts of an application to receive
 notification when an image loader is closed by the code that
 drives it.</p>
 <div class="refsect3">
-<a name="id-1.2.15.11.4.5"></a><h4>Parameters</h4>
+<a name="GdkPixbufLoader-closed.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -773,7 +773,7 @@ of the image that it will create.  Applications can call
 <a class="link" href="GdkPixbufLoader.html#gdk-pixbuf-loader-set-size" title="gdk_pixbuf_loader_set_size ()"><code class="function">gdk_pixbuf_loader_set_size()</code></a> in response to this signal to set
 the desired size to which the image should be scaled.</p>
 <div class="refsect3">
-<a name="id-1.2.15.11.5.5"></a><h4>Parameters</h4>
+<a name="GdkPixbufLoader-size-prepared.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -813,6 +813,6 @@ the desired size to which the image should be scaled.</p>
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.24.1</div>
+<hr>Generated by GTK-Doc V1.25.1</div>
 </body>
 </html>

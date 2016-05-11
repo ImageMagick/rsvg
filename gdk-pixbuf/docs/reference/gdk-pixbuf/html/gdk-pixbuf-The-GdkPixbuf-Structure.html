@@ -8,7 +8,7 @@
 <link rel="up" href="rn01.html" title="API Reference">
 <link rel="prev" href="gdk-pixbuf-Versioning.html" title="Initialization and Versions">
 <link rel="next" href="gdk-pixbuf-Reference-Counting-and-Memory-Mangement.html" title="Reference Counting and Memory Mangement">
-<meta name="generator" content="GTK-Doc V1.24.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -246,7 +246,7 @@
 </div>
 <div class="refsect1">
 <a name="gdk-pixbuf-The-GdkPixbuf-Structure.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">    <a href="https://developer.gnome.org/gobject/unstable/gobject-The-Base-Object-Type.html#GObject">GObject</a>
+<pre class="screen">    <a href="https://developer.gnome.org/gobject/unstable/gobject-The-Base-Object-Type.html#GObject-struct">GObject</a>
     <span class="lineart">╰──</span> GdkPixbuf
 </pre>
 </div>
@@ -254,7 +254,7 @@
 <a name="gdk-pixbuf-The-GdkPixbuf-Structure.implemented-interfaces"></a><h2>Implemented Interfaces</h2>
 <p>
 GdkPixbuf implements
- <a href="https://developer.gnome.org/gio/unstable/GIcon.html">GIcon</a> and  <a href="https://developer.gnome.org/gio/unstable/GLoadableIcon.html">GLoadableIcon</a>.</p>
+ <a href="https://developer.gnome.org/gio/unstable/GIcon.html#GIcon-struct">GIcon</a> and  <a href="https://developer.gnome.org/gio/unstable/GLoadableIcon.html#GLoadableIcon-struct">GLoadableIcon</a>.</p>
 </div>
 <div class="refsect1">
 <a name="gdk-pixbuf-The-GdkPixbuf-Structure.includes"></a><h2>Includes</h2>
@@ -366,7 +366,7 @@ last row as <code class="literal">width * ((n_channels * bits_per_sample + 7) / 
 gdk_pixbuf_get_colorspace (<em class="parameter"><code>const <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
 <p>Queries the color space of a pixbuf.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.2.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-colorspace.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -381,7 +381,7 @@ gdk_pixbuf_get_colorspace (<em class="parameter"><code>const <a class="link" hre
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.2.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-colorspace.returns"></a><h4>Returns</h4>
 <p> Color space.</p>
 </div>
 </div>
@@ -392,7 +392,7 @@ gdk_pixbuf_get_colorspace (<em class="parameter"><code>const <a class="link" hre
 gdk_pixbuf_get_n_channels (<em class="parameter"><code>const <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
 <p>Queries the number of channels of a pixbuf.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.3.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-n-channels.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -407,7 +407,7 @@ gdk_pixbuf_get_n_channels (<em class="parameter"><code>const <a class="link" hre
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.3.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-n-channels.returns"></a><h4>Returns</h4>
 <p> Number of channels.</p>
 </div>
 </div>
@@ -418,7 +418,7 @@ gdk_pixbuf_get_n_channels (<em class="parameter"><code>const <a class="link" hre
 gdk_pixbuf_get_has_alpha (<em class="parameter"><code>const <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
 <p>Queries whether a pixbuf has an alpha channel (opacity information).</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.4.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-has-alpha.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -433,7 +433,7 @@ gdk_pixbuf_get_has_alpha (<em class="parameter"><code>const <a class="link" href
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.4.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-has-alpha.returns"></a><h4>Returns</h4>
 <p> <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if it has an alpha channel, <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#FALSE:CAPS"><code class="literal">FALSE</code></a> otherwise.</p>
 </div>
 </div>
@@ -444,7 +444,7 @@ gdk_pixbuf_get_has_alpha (<em class="parameter"><code>const <a class="link" href
 gdk_pixbuf_get_bits_per_sample (<em class="parameter"><code>const <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
 <p>Queries the number of bits per color sample in a pixbuf.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.5.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-bits-per-sample.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -459,7 +459,7 @@ gdk_pixbuf_get_bits_per_sample (<em class="parameter"><code>const <a class="link
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.5.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-bits-per-sample.returns"></a><h4>Returns</h4>
 <p> Number of bits per color sample.</p>
 </div>
 </div>
@@ -470,7 +470,7 @@ gdk_pixbuf_get_bits_per_sample (<em class="parameter"><code>const <a class="link
 gdk_pixbuf_get_pixels (<em class="parameter"><code>const <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
 <p>Queries a pointer to the pixel data of a pixbuf.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.6.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-pixels.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -485,7 +485,7 @@ gdk_pixbuf_get_pixels (<em class="parameter"><code>const <a class="link" href="g
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.6.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-pixels.returns"></a><h4>Returns</h4>
 <p> A pointer to the pixbuf's pixel data.
 Please see the section on <a class="ulink" href="image-data" target="_top">image data</a> for information
 about how the pixel data is stored in memory.</p>
@@ -503,7 +503,7 @@ gdk_pixbuf_get_pixels_with_length (<em class="parameter"><code>const <a class="l
 <p>Queries a pointer to the pixel data of a pixbuf.</p>
 <p><span class="annotation">[<acronym title="Rename the original symbol's name to SYMBOL."><span class="acronym">rename-to</span></acronym> gdk_pixbuf_get_pixels]</span></p>
 <div class="refsect3">
-<a name="id-1.2.4.11.7.6"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-pixels-with-length.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -525,7 +525,7 @@ gdk_pixbuf_get_pixels_with_length (<em class="parameter"><code>const <a class="l
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.7.7"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-pixels-with-length.returns"></a><h4>Returns</h4>
 <p> A pointer to the pixbuf's
 pixel data.  Please see the section on <a class="ulink" href="image-data" target="_top">image data</a>
 for information about how the pixel data is stored in memory.</p>
@@ -542,7 +542,7 @@ pixbuf was created from read-only data. </p>
 gdk_pixbuf_get_width (<em class="parameter"><code>const <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
 <p>Queries the width of a pixbuf.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.8.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-width.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -557,7 +557,7 @@ gdk_pixbuf_get_width (<em class="parameter"><code>const <a class="link" href="gd
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.8.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-width.returns"></a><h4>Returns</h4>
 <p> Width in pixels.</p>
 </div>
 </div>
@@ -568,7 +568,7 @@ gdk_pixbuf_get_width (<em class="parameter"><code>const <a class="link" href="gd
 gdk_pixbuf_get_height (<em class="parameter"><code>const <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
 <p>Queries the height of a pixbuf.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.9.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-height.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -583,7 +583,7 @@ gdk_pixbuf_get_height (<em class="parameter"><code>const <a class="link" href="g
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.9.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-height.returns"></a><h4>Returns</h4>
 <p> Height in pixels.</p>
 </div>
 </div>
@@ -595,7 +595,7 @@ gdk_pixbuf_get_rowstride (<em class="parameter"><code>const <a class="link" href
 <p>Queries the rowstride of a pixbuf, which is the number of bytes between
 the start of a row and the start of the next row.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.10.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-rowstride.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -610,7 +610,7 @@ the start of a row and the start of the next row.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.10.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-rowstride.returns"></a><h4>Returns</h4>
 <p> Distance between row starts.</p>
 </div>
 </div>
@@ -621,7 +621,7 @@ the start of a row and the start of the next row.</p>
 gdk_pixbuf_get_byte_length (<em class="parameter"><code>const <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#GdkPixbuf"><span class="type">GdkPixbuf</span></a> *pixbuf</code></em>);</pre>
 <p>Returns the length of the pixel data, in bytes.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.11.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-byte-length.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -636,7 +636,7 @@ gdk_pixbuf_get_byte_length (<em class="parameter"><code>const <a class="link" hr
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.11.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-byte-length.returns"></a><h4>Returns</h4>
 <p> The length of the pixel data.</p>
 </div>
 <p class="since">Since: <a class="link" href="api-index-2-26.html#api-index-2.26">2.26</a></p>
@@ -662,7 +662,7 @@ the "multipage" option string to "yes" when a multi-page TIFF is loaded.
 Since 2.32 the JPEG and PNG loaders set "x-dpi" and "y-dpi" if the file
 contains image density information in dots per inch.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.12.6"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-option.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -684,7 +684,7 @@ contains image density information in dots per inch.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.12.7"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-option.returns"></a><h4>Returns</h4>
 <p> the value associated with <em class="parameter"><code>key</code></em>
 . This is a nul-terminated
 string that should not be freed or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if <em class="parameter"><code>key</code></em>
@@ -704,7 +704,7 @@ exists in the list of options attached to <em class="parameter"><code>pixbuf</co
 , the new value is 
 ignored and <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#FALSE:CAPS"><code class="literal">FALSE</code></a> is returned.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.13.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-set-option.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -731,7 +731,7 @@ ignored and <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Mac
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.13.6"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-set-option.returns"></a><h4>Returns</h4>
 <p> <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> on success.</p>
 </div>
 <p class="since">Since: <a class="link" href="api-index-2-2.html#api-index-2.2">2.2</a></p>
@@ -747,7 +747,7 @@ attached to the <em class="parameter"><code>pixbuf</code></em>
 attached by another function using <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#gdk-pixbuf-set-option" title="gdk_pixbuf_set_option ()"><code class="function">gdk_pixbuf_set_option()</code></a>.</p>
 <p>See <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#gdk-pixbuf-get-option" title="gdk_pixbuf_get_option ()"><code class="function">gdk_pixbuf_get_option()</code></a> for more details.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.14.6"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-get-options.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -762,7 +762,7 @@ attached by another function using <a class="link" href="gdk-pixbuf-The-GdkPixbu
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.11.14.7"></a><h4>Returns</h4>
+<a name="gdk-pixbuf-get-options.returns"></a><h4>Returns</h4>
 <p> a <a href="https://developer.gnome.org/glib/unstable/glib-Hash-Tables.html#GHashTable"><span class="type">GHashTable</span></a> of key/values. </p>
 <p><span class="annotation">[<acronym title="Free data container after the code is done."><span class="acronym">transfer container</span></acronym>][<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> utf8 utf8]</span></p>
 </div>
@@ -778,7 +778,7 @@ modified.  This function allows skipping the implicit copy that
 must be made if <a class="link" href="gdk-pixbuf-The-GdkPixbuf-Structure.html#gdk-pixbuf-get-pixels" title="gdk_pixbuf_get_pixels ()"><code class="function">gdk_pixbuf_get_pixels()</code></a> is called on a read-only
 pixbuf.</p>
 <div class="refsect3">
-<a name="id-1.2.4.11.15.5"></a><h4>Parameters</h4>
+<a name="gdk-pixbuf-read-pixels.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -803,7 +803,7 @@ pixbuf.</p>
 operations can cause errors in this domain, or in the <a href="https://developer.gnome.org/glib/unstable/glib-File-Utilities.html#G-FILE-ERROR:CAPS"><span class="type">G_FILE_ERROR</span></a>
 domain.</p>
 <div class="refsect3">
-<a name="id-1.2.4.12.2.4"></a><h4>Members</h4>
+<a name="GdkPixbufError.members"></a><h4>Members</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
@@ -854,6 +854,13 @@ domain.</p>
 </td>
 <td class="enum_member_annotations"> </td>
 </tr>
+<tr>
+<td class="enum_member_name"><p><a name="GDK-PIXBUF-ERROR-INCOMPLETE-ANIMATION:CAPS"></a>GDK_PIXBUF_ERROR_INCOMPLETE_ANIMATION</p></td>
+<td class="enum_member_description">
+<p>Only part of the animation was loaded.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
 </tbody>
 </table></div>
 </div>
@@ -873,7 +880,7 @@ information on error domains and error codes.</p>
 <p>This enumeration defines the color spaces that are supported by
 the gdk-pixbuf library.  Currently only RGB is supported.</p>
 <div class="refsect3">
-<a name="id-1.2.4.12.4.4"></a><h4>Members</h4>
+<a name="GdkColorspace.members"></a><h4>Members</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
@@ -894,7 +901,7 @@ the gdk-pixbuf library.  Currently only RGB is supported.</p>
 <div class="refsect2">
 <a name="GdkPixbufAlphaMode"></a><h3>enum GdkPixbufAlphaMode</h3>
 <p>These values can be passed to
-<a href="http://library.gnome.org/devel/gdk3/gdk2-Pixbufs.html#gdk-pixbuf-render-to-drawable-alpha"><code class="function">gdk_pixbuf_render_to_drawable_alpha()</code></a> to control how the alpha
+<a href="http://library.gnome.org/devel/gdk2/gdk2-Pixbufs.html#gdk-pixbuf-render-to-drawable-alpha"><code class="function">gdk_pixbuf_render_to_drawable_alpha()</code></a> to control how the alpha
 channel of an image should be handled.  This function can create a
 bilevel clipping mask (black and white) and use it while painting
 the image.  In the future, when the X Window System gets an alpha
@@ -902,7 +909,7 @@ channel extension, it will be possible to do full alpha
 compositing onto arbitrary drawables.  For now both cases fall
 back to a bilevel clipping mask.</p>
 <div class="refsect3">
-<a name="id-1.2.4.12.5.4"></a><h4>Members</h4>
+<a name="GdkPixbufAlphaMode.members"></a><h4>Members</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
@@ -1029,6 +1036,6 @@ be at least as large as the width of the pixbuf.</p>
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.24.1</div>
+<hr>Generated by GTK-Doc V1.25.1</div>
 </body>
 </html>

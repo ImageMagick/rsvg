@@ -65,19 +65,129 @@ test_scale (gconstpointer data)
   g_object_unref (ref);
 }
 
+static void
+test_scale_down (gconstpointer data)
+{
+  const gchar *filename = data;
+  const gchar *path;
+  GError *error = NULL;
+  GdkPixbuf *ref;
+  GdkPixbuf *pixbuf;
+  gint width, height;
+
+  if (!format_supported (filename))
+    {
+      g_test_skip ("format not supported");
+      return;
+    }
+
+  path = g_test_get_filename (G_TEST_DIST, filename, NULL);
+  ref = gdk_pixbuf_new_from_file (path, &error);
+
+  if (skip_if_insufficient_memory (&error))
+    return;
+  g_assert_no_error (error);
+
+  width = gdk_pixbuf_get_width (ref);
+  height = gdk_pixbuf_get_height (ref);
+
+  pixbuf = gdk_pixbuf_scale_simple (ref, width / 10, height / 10, GDK_INTERP_BILINEAR);
+  g_assert (pixbuf != NULL);
+
+  g_object_unref (ref);
+}
+
+static void
+test_add_alpha (gconstpointer data)
+{
+  const gchar *filename = data;
+  const gchar *path;
+  GError *error = NULL;
+  GdkPixbuf *ref;
+  GdkPixbuf *pixbuf;
+
+  if (!format_supported (filename))
+    {
+      g_test_skip ("format not supported");
+      return;
+    }
+
+  path = g_test_get_filename (G_TEST_DIST, filename, NULL);
+  ref = gdk_pixbuf_new_from_file (path, &error);
+
+  if (skip_if_insufficient_memory (&error))
+    return;
+  g_assert_no_error (error);
+
+  pixbuf = gdk_pixbuf_add_alpha (ref, FALSE, 0, 0, 0);
+
+  if (pixbuf == NULL)
+    {
+      g_test_skip ("Couldn't add alpha to the image - your system probably lacks sufficient memory.");
+      g_object_unref (ref);
+      return;
+    }
+
+  g_object_unref (pixbuf);
+
+  pixbuf = gdk_pixbuf_add_alpha (ref, TRUE, 0, 0, 255);
+  g_assert (pixbuf != NULL);
+  g_object_unref (pixbuf);
+
+  g_object_unref (ref);
+}
+
+static void
+test_rotate (gconstpointer data)
+{
+  const gchar *filename = data;
+  const gchar *path;
+  GError *error = NULL;
+  GdkPixbuf *ref;
+  GdkPixbuf *pixbuf;
+
+  if (!format_supported (filename))
+    {
+      g_test_skip ("format not supported");
+      return;
+    }
+
+  path = g_test_get_filename (G_TEST_DIST, filename, NULL);
+  ref = gdk_pixbuf_new_from_file (path, &error);
+
+  if (skip_if_insufficient_memory (&error))
+    return;
+  g_assert_no_error (error);
+
+  pixbuf = gdk_pixbuf_rotate_simple (ref, GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE);
+
+  if (pixbuf == NULL)
+    g_test_skip ("Couldn't rotate the image - your system probably lacks sufficient memory.");
+  else
+    g_object_unref (pixbuf);
+
+  g_object_unref (ref);
+}
+
 int
 main (int argc, char **argv)
 {
   g_test_init (&argc, &argv, NULL);
 
-  g_test_add_data_func ("/pixbuf/scale/png", "test-images/valid_png_test", test_scale);
-  g_test_add_data_func ("/pixbuf/scale/bmp", "test-images/valid_bmp_test", test_scale);
-  g_test_add_data_func ("/pixbuf/scale/gif", "test-images/valid_gif_test", test_scale);
-  g_test_add_data_func ("/pixbuf/scale/jpeg", "test-images/valid_jpeg_test", test_scale);
-  g_test_add_data_func ("/pixbuf/scale/ras", "test-images/valid_ras_test", test_scale);
-  g_test_add_data_func ("/pixbuf/scale/tga", "test-images/valid_tga_test", test_scale);
-  g_test_add_data_func ("/pixbuf/scale/xpm", "test-images/valid_xpm_test", test_scale);
-  g_test_add_data_func ("/pixbuf/scale/xbm", "test-images/valid.xbm", test_scale);
+  g_test_add_data_func ("/pixbuf/scale/png", "test-images/randomly-modified/valid.1.png", test_scale);
+  g_test_add_data_func ("/pixbuf/scale/bmp", "test-images/randomly-modified/valid.1.bmp", test_scale);
+  g_test_add_data_func ("/pixbuf/scale/gif", "test-images/randomly-modified/valid.1.gif", test_scale);
+  g_test_add_data_func ("/pixbuf/scale/jpeg", "test-images/randomly-modified/valid.1.jpeg", test_scale);
+  g_test_add_data_func ("/pixbuf/scale/tga", "test-images/randomly-modified/valid.1.tga", test_scale);
+  g_test_add_data_func ("/pixbuf/scale/xpm", "test-images/randomly-modified/valid.1.xpm", test_scale);
+  g_test_add_data_func ("/pixbuf/scale/xbm", "test-images/randomly-modified/valid.1.xbm", test_scale);
+  if (g_test_slow ())
+    {
+      g_test_add_data_func ("/pixbuf/scale/png/large", "large.png", test_scale_down);
+      g_test_add_data_func ("/pixbuf/scale/jpeg/large", "large.jpg", test_scale_down);
+      g_test_add_data_func ("/pixbuf/add-alpha/large", "large.png", test_add_alpha);
+      g_test_add_data_func ("/pixbuf/rotate/large", "large.png", test_rotate);
+    }
 
   return g_test_run ();
 }

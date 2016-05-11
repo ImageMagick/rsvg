@@ -18,13 +18,14 @@ LDADD = \
 
 noinst_PROGRAMS += 			\
 	pixbuf-read			\
-	pixbuf-lowmem			\
 	pixbuf-random			\
+	pixbuf-lowmem			\
 	$(NULL)
 
 test_programs = 			\
 	animation			\
 	cve-2015-4491			\
+	pixbuf-fail			\
 	pixbuf-icon-serialize 		\
 	pixbuf-randomly-modified	\
 	pixbuf-threads			\
@@ -32,6 +33,7 @@ test_programs = 			\
 	pixbuf-jpeg			\
 	pixbuf-dpi			\
 	pixbuf-stream			\
+	pixbuf-reftest			\
 	pixbuf-resource			\
 	pixbuf-scale			\
 	pixbuf-short-gif-write		\
@@ -43,6 +45,7 @@ test_programs = 			\
 dist_installed_test_data =		\
 	test-image.png			\
 	test-animation.gif		\
+	1_partyanimsm2.gif		\
 	test-animation.ani		\
 	icc-profile.jpeg		\
 	icc-profile.png			\
@@ -53,10 +56,25 @@ dist_installed_test_data =		\
 	premature-end.jpg		\
 	bug725582-testrotate.jpg	\
 	bug725582-testrotate.png	\
-	$(wildcard $(srcdir)/test-images/*)
+	cve-2015-4491.bmp		\
+	large.png			\
+	large.jpg			\
+	$(wildcard $(srcdir)/test-images/fail/*) \
+	$(wildcard $(srcdir)/test-images/randomly-modified/*) \
+	$(wildcard $(srcdir)/test-images/reftests/*.*) \
+	$(wildcard $(srcdir)/test-images/reftests/tga/*) \
+	$(NULL)
+
+pixbuf_randomly_modified_SOURCES =	\
+	pixbuf-randomly-modified.c	\
+	test-common.c			\
+	test-common.h			\
+	$(NULL)
 
 cve_2015_4491_SOURCES =			\
 	cve-2015-4491.c			\
+	test-common.c			\
+	test-common.h			\
 	resources.h			\
 	resources.c			\
 	$(NULL)
@@ -69,6 +87,12 @@ pixbuf_icc_SOURCES = 			\
 
 pixbuf_dpi_SOURCES = 			\
 	pixbuf-dpi.c			\
+	test-common.c			\
+	test-common.h			\
+	$(NULL)
+
+pixbuf_fail_SOURCES =			\
+	pixbuf-fail.c			\
 	test-common.c			\
 	test-common.h			\
 	$(NULL)
@@ -103,13 +127,19 @@ pixbuf_save_SOURCES =			\
 	test-common.h			\
 	$(NULL)
 
+pixbuf_reftest_SOURCES =		\
+	pixbuf-reftest.c		\
+	test-common.c			\
+	test-common.h			\
+	$(NULL)
+
 pixbuf_jpeg_SOURCES =			\
 	pixbuf-jpeg.c			\
 	test-common.c			\
 	test-common.h			\
 	$(NULL)
 
-pixbuf_short_git_write_SOURCES =	\
+pixbuf_short_gif_write_SOURCES =	\
 	pixbuf-short-gif-write.c
 
 pixbuf_readonly_to_mutable_SOURCES =	\

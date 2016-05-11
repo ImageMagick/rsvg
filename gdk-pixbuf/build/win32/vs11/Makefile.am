@@ -13,16 +13,19 @@ EXTRA_DIST = \
 	gdk-pixbuf-query-loaders.vcxproj.filters	\
 	gdk-pixbuf-pixdata.vcxproj	\
 	gdk-pixbuf-pixdata.vcxproj.filters	\
-	gdk-pixbuf-install.vcxproj
+	gdk-pixbuf-install.vcxproj	\
+	gdk-pixbuf-install.vcxproj.filters	\
+	math.h
 
 DISTCLEANFILES = $(EXTRA_DIST)
 
-MSVC_SLN = gdk-pixbuf
-
 MSVC_VER = 11
-
 MSVC_VER_LONG = 2012
+MSVC_FORMAT_VER = 12
 
 include $(top_srcdir)/build/Makefile-newvs.am
+
+math.h: $(top_srcdir)/build/win32/vs9/math.h
+	cp $< $@
 
 -include $(top_srcdir)/git.mk

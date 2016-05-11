@@ -8,7 +8,7 @@
 <link rel="up" href="rn01.html" title="API Reference">
 <link rel="prev" href="gdk-pixbuf-X-Drawables-to-Pixbufs.html" title="X Drawables to Pixbufs">
 <link rel="next" href="rn02.html" title="Tools Reference">
-<meta name="generator" content="GTK-Doc V1.24.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -260,7 +260,7 @@ function XlibRGB will automatically pick the best visual available on your
 display.  This function or <a class="link" href="gdk-pixbuf-XlibRGB.html#xlib-rgb-init-with-depth" title="xlib_rgb_init_with_depth ()"><code class="function">xlib_rgb_init_with_depth()</code></a> must be called before
 using any of the other functions in XlibRGB.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.2.5"></a><h4>Parameters</h4>
+<a name="xlib-rgb-init.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -294,7 +294,7 @@ instead of automatically picking the best depth in the display.  This
 function or <a class="link" href="gdk-pixbuf-XlibRGB.html#xlib-rgb-init" title="xlib_rgb_init ()"><code class="function">xlib_rgb_init()</code></a> must be called before using any of the other
 functions in XlibRGB.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.3.5"></a><h4>Parameters</h4>
+<a name="xlib-rgb-init-with-depth.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -331,7 +331,7 @@ xlib_rgb_xpixel_from_rgb (<em class="parameter"><code><a href="https://developer
 <p>Converts an RGB triplet into the closest color that XlibRGB visual can
 handle.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.4.5"></a><h4>Parameters</h4>
+<a name="xlib-rgb-xpixel-from-rgb.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -346,7 +346,7 @@ handle.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.20.7.4.6"></a><h4>Returns</h4>
+<a name="xlib-rgb-xpixel-from-rgb.returns"></a><h4>Returns</h4>
 <p> X pixel value that corresponds to the closest color in the
 XlibRGB visual and colormap.</p>
 </div>
@@ -361,7 +361,7 @@ xlib_rgb_gc_set_foreground (<em class="parameter"><code><span class="type">GC</s
 triplet.  It calls <a class="link" href="gdk-pixbuf-XlibRGB.html#xlib-rgb-xpixel-from-rgb" title="xlib_rgb_xpixel_from_rgb ()"><code class="function">xlib_rgb_xpixel_from_rgb()</code></a> internally and uses the
 returned pixel value to set the GC's foreground.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.5.5"></a><h4>Parameters</h4>
+<a name="xlib-rgb-gc-set-foreground.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -393,7 +393,7 @@ xlib_rgb_gc_set_background (<em class="parameter"><code><span class="type">GC</s
 triplet.  It calls <a class="link" href="gdk-pixbuf-XlibRGB.html#xlib-rgb-xpixel-from-rgb" title="xlib_rgb_xpixel_from_rgb ()"><code class="function">xlib_rgb_xpixel_from_rgb()</code></a> internally and uses the
 returned pixel value to set the GC's background.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.6.5"></a><h4>Parameters</h4>
+<a name="xlib-rgb-gc-set-background.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -434,7 +434,7 @@ sequence of 8-bit values.  This function does not let you specify dither
 offsets; applications that need to render partial regions of a buffer to
 build the final image should use <a class="link" href="gdk-pixbuf-XlibRGB.html#xlib-draw-rgb-image-dithalign" title="xlib_draw_rgb_image_dithalign ()"><code class="function">xlib_draw_rgb_image_dithalign()</code></a> instead.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.7.5"></a><h4>Parameters</h4>
+<a name="xlib-draw-rgb-image.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -514,7 +514,7 @@ offsets.  It should be used when you need to render regions of an RGB buffer
 separately to form the final image; the dither offsets let you align the
 dither mask appropriately.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.8.5"></a><h4>Parameters</h4>
+<a name="xlib-draw-rgb-image-dithalign.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -601,7 +601,7 @@ least-significant 8 bits are actually discarded.  This function can lead to
 faster results than <a class="link" href="gdk-pixbuf-XlibRGB.html#xlib-draw-rgb-image" title="xlib_draw_rgb_image ()"><code class="function">xlib_draw_rgb_image()</code></a> since the pixels are aligned on
 32-bit boundaries.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.9.5"></a><h4>Parameters</h4>
+<a name="xlib-draw-rgb-32-image.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -676,7 +676,7 @@ xlib_draw_gray_image (<em class="parameter"><code><span class="type">Drawable</s
 intensity values.  An image will thus look as a GGGGGG sequence of 8-bit
 values.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.10.5"></a><h4>Parameters</h4>
+<a name="xlib-draw-gray-image.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -742,7 +742,7 @@ xlib_rgb_cmap_new (<em class="parameter"><code><a href="https://developer.gnome.
                    <em class="parameter"><code><span class="type">int</span> n_colors</code></em>);</pre>
 <p>FIXME</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.11.5"></a><h4>Parameters</h4>
+<a name="xlib-rgb-cmap-new.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -764,7 +764,7 @@ xlib_rgb_cmap_new (<em class="parameter"><code><a href="https://developer.gnome.
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.20.7.11.6"></a><h4>Returns</h4>
+<a name="xlib-rgb-cmap-new.returns"></a><h4>Returns</h4>
 <p> FIXME</p>
 </div>
 </div>
@@ -775,7 +775,7 @@ xlib_rgb_cmap_new (<em class="parameter"><code><a href="https://developer.gnome.
 xlib_rgb_cmap_free (<em class="parameter"><code><a class="link" href="gdk-pixbuf-XlibRGB.html#XlibRgbCmap" title="struct XlibRgbCmap"><span class="type">XlibRgbCmap</span></a> *cmap</code></em>);</pre>
 <p>Frees an XlibRGB colormap.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.12.5"></a><h4>Parameters</h4>
+<a name="xlib-rgb-cmap-free.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -806,7 +806,7 @@ xlib_draw_indexed_image (<em class="parameter"><code><span class="type">Drawable
                          <em class="parameter"><code><a class="link" href="gdk-pixbuf-XlibRGB.html#XlibRgbCmap" title="struct XlibRgbCmap"><span class="type">XlibRgbCmap</span></a> *cmap</code></em>);</pre>
 <p>FIXME</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.13.5"></a><h4>Parameters</h4>
+<a name="xlib-draw-indexed-image.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -875,7 +875,7 @@ xlib_draw_indexed_image (<em class="parameter"><code><span class="type">Drawable
 xlib_rgb_ditherable (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Queries whether XlibRGB supports dithering for its chosen visual.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.14.5"></a><h4>Returns</h4>
+<a name="xlib-rgb-ditherable.returns"></a><h4>Returns</h4>
 <p> TRUE if dithering can be performed for the visual that XlibRGB
 is using, FALSE otherwise.</p>
 </div>
@@ -887,7 +887,7 @@ is using, FALSE otherwise.</p>
 xlib_rgb_set_verbose (<em class="parameter"><code><span class="type">Bool</span> verbose</code></em>);</pre>
 <p>Enables/disables debug spew.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.15.5"></a><h4>Parameters</h4>
+<a name="xlib-rgb-set-verbose.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -909,7 +909,7 @@ xlib_rgb_set_verbose (<em class="parameter"><code><span class="type">Bool</span>
 xlib_rgb_set_install (<em class="parameter"><code><span class="type">Bool</span> install</code></em>);</pre>
 <p>Sets whether we install an RGB colormap.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.16.5"></a><h4>Parameters</h4>
+<a name="xlib-rgb-set-install.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -931,7 +931,7 @@ xlib_rgb_set_install (<em class="parameter"><code><span class="type">Bool</span>
 xlib_rgb_set_min_colors (<em class="parameter"><code><span class="type">int</span> min_colors</code></em>);</pre>
 <p>Sets the minimum number of colors in the color cube.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.17.5"></a><h4>Parameters</h4>
+<a name="xlib-rgb-set-min-colors.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -953,7 +953,7 @@ xlib_rgb_set_min_colors (<em class="parameter"><code><span class="type">int</spa
 xlib_rgb_get_cmap (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Queries the X colormap that XlibRGB is using.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.18.5"></a><h4>Returns</h4>
+<a name="xlib-rgb-get-cmap.returns"></a><h4>Returns</h4>
 <p> An X colormap.</p>
 </div>
 </div>
@@ -964,7 +964,7 @@ xlib_rgb_get_cmap (<em class="parameter"><code><span class="type">void</span></c
 xlib_rgb_get_visual (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Queries the visual that XlibRGB is using.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.19.5"></a><h4>Returns</h4>
+<a name="xlib-rgb-get-visual.returns"></a><h4>Returns</h4>
 <p> An X visual.</p>
 </div>
 </div>
@@ -975,7 +975,7 @@ xlib_rgb_get_visual (<em class="parameter"><code><span class="type">void</span><
 xlib_rgb_get_visual_info (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Queries the visual info structure for the visual that XlibRGB is using.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.20.5"></a><h4>Returns</h4>
+<a name="xlib-rgb-get-visual-info.returns"></a><h4>Returns</h4>
 <p> An XVisualInfo structure.</p>
 </div>
 </div>
@@ -986,7 +986,7 @@ xlib_rgb_get_visual_info (<em class="parameter"><code><span class="type">void</s
 xlib_rgb_get_depth (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Queries the depth of the visual that XlibRGB is using.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.21.5"></a><h4>Returns</h4>
+<a name="xlib-rgb-get-depth.returns"></a><h4>Returns</h4>
 <p> Bit depth.</p>
 </div>
 </div>
@@ -997,7 +997,7 @@ xlib_rgb_get_depth (<em class="parameter"><code><span class="type">void</span></
 xlib_rgb_get_display (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Queries the X display that XlibRGB is using.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.22.5"></a><h4>Returns</h4>
+<a name="xlib-rgb-get-display.returns"></a><h4>Returns</h4>
 <p> An X display.</p>
 </div>
 </div>
@@ -1008,7 +1008,7 @@ xlib_rgb_get_display (<em class="parameter"><code><span class="type">void</span>
 xlib_rgb_get_screen (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Queries the screen that XlibRGB is using.</p>
 <div class="refsect3">
-<a name="id-1.2.20.7.23.5"></a><h4>Returns</h4>
+<a name="xlib-rgb-get-screen.returns"></a><h4>Returns</h4>
 <p> An X screen.</p>
 </div>
 </div>
@@ -1024,7 +1024,7 @@ xlib_rgb_get_screen (<em class="parameter"><code><span class="type">void</span><
 </pre>
 <p>FIXME: Describe this.</p>
 <div class="refsect3">
-<a name="id-1.2.20.8.2.5"></a><h4>Members</h4>
+<a name="XlibRgbCmap.members"></a><h4>Members</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="300px" class="struct_members_name">
@@ -1056,10 +1056,10 @@ that the display can provide.
 &lt;symbol&gt;XLIB_RGB_DITHER_NORMAL&lt;/symbol&gt; will provide dithering
 only on pseudocolor displays.
 &lt;symbol&gt;XLIB_RGB_DITHER_MAX&lt;/symbol&gt; will provide dithering on
-pseudocolor and 16-bit truecolor or “high color”
+pseudocolor and 16-bit truecolor or &amp;ldquo;high color&amp;rdquo;
 displays.</p>
 <div class="refsect3">
-<a name="id-1.2.20.8.3.4"></a><h4>Members</h4>
+<a name="XlibRgbDither.members"></a><h4>Members</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
@@ -1100,6 +1100,6 @@ displays.</p>
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.24.1</div>
+<hr>Generated by GTK-Doc V1.25.1</div>
 </body>
 </html>

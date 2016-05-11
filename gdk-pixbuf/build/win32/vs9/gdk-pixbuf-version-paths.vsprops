@@ -9,8 +9,24 @@
 		Value="9"
 	/>
 	<UserMacro
+		Name="GdkPixbufMajorVersion"
+		Value="2"
+	/>
+	<UserMacro
+		Name="GdkPixbufMinorVersion"
+		Value="35"
+	/>
+	<UserMacro
+		Name="GdkPixbufMicroVersion"
+		Value="1"
+	/>
+	<UserMacro
+		Name="ApiVersion"
+		Value="2.0"
+	/>
+	<UserMacro
 		Name="GlibEtcInstallRoot"
-		Value="..\..\..\..\vs$(VSVer)\$(PlatformName)"
+		Value="$(SolutionDir)\..\..\..\..\vs$(VSVer)\$(PlatformName)"
 	/>
 	<UserMacro
 		Name="DefDir"
@@ -19,10 +35,6 @@
 	<UserMacro
 		Name="CopyDir"
 		Value="$(GlibEtcInstallRoot)"
-	/>
-	<UserMacro
-		Name="ApiVersion"
-		Value="2.0"
 	/>
 	<UserMacro
 		Name="GdkPixbufLibtoolCompatibleDllPrefix"
@@ -49,5 +61,13 @@
 	<UserMacro
 		Name="GdkPixbufDllSuffix"
 		Value="$(GdkPixbufSeparateVSDllSuffix)"
+	/>
+	<UserMacro
+		Name="PythonPath"
+		Value="c:\python27"
+	/>
+	<UserMacro
+		Name="PythonPathX64"
+		Value="$(PythonPath).x64"
 	/>
 </VisualStudioPropertySheet>

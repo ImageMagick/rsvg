@@ -46,11 +46,6 @@ typedef struct _GdkPixbufClass GdkPixbufClass;
 #define GDK_IS_PIXBUF_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GDK_TYPE_PIXBUF))
 #define GDK_PIXBUF_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS ((obj), GDK_TYPE_PIXBUF, GdkPixbufClass))
 
-static inline double round(double val)
-{
-  return floor(val + 0.5);
-}
-
 /* Helper macros to convert between density units */
 #define DPI_TO_DPM(value) ((int) round ((value) * 1000 / 25.4))
 #define DPI_TO_DPCM(value) ((int) round ((value) / 2.54))

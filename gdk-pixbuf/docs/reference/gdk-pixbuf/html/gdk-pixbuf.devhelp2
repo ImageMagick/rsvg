@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<book xmlns="http://www.devhelp.net/book" title="GDK-PixBuf Reference Manual" link="index.html" author="Federico Mena Quintero" name="gdk-pixbuf" version="2" language="c">
+<book xmlns="http://www.devhelp.net/book" title="GDK-PixBuf Reference Manual" link="index.html" author="Federico Mena Quintero" name="gdk-pixbuf" version="2" language="c" online="http://library.gnome.org/devel/gdk-pixbuf/unstable/">
   <chapters>
     <sub name="API Reference" link="rn01.html">
       <sub name="Initialization and Versions" link="gdk-pixbuf-Versioning.html"/>
@@ -37,18 +37,19 @@
     <sub name="Index of new symbols in 2.28" link="api-index-2-28.html"/>
     <sub name="Index of new symbols in 2.30" link="api-index-2-30.html"/>
     <sub name="Index of new symbols in 2.32" link="api-index-2-32.html"/>
+    <sub name="Index of new symbols in 2.34" link="api-index-2-36.html"/>
     <sub name="License" link="license.html"/>
     <sub name="Annotation Glossary" link="annotation-glossary.html"/>
   </chapters>
   <functions>
-    <keyword type="macro" name="GDK_PIXBUF_MAJOR" link="gdk-pixbuf-Versioning.html#GDK-PIXBUF-MAJOR:CAPS"/>
-    <keyword type="macro" name="GDK_PIXBUF_MINOR" link="gdk-pixbuf-Versioning.html#GDK-PIXBUF-MINOR:CAPS"/>
-    <keyword type="macro" name="GDK_PIXBUF_MICRO" link="gdk-pixbuf-Versioning.html#GDK-PIXBUF-MICRO:CAPS"/>
     <keyword type="variable" name="gdk_pixbuf_version" link="gdk-pixbuf-Versioning.html#gdk-pixbuf-version"/>
     <keyword type="variable" name="gdk_pixbuf_major_version" link="gdk-pixbuf-Versioning.html#gdk-pixbuf-major-version"/>
     <keyword type="variable" name="gdk_pixbuf_minor_version" link="gdk-pixbuf-Versioning.html#gdk-pixbuf-minor-version"/>
     <keyword type="variable" name="gdk_pixbuf_micro_version" link="gdk-pixbuf-Versioning.html#gdk-pixbuf-micro-version"/>
     <keyword type="macro" name="GDK_PIXBUF_VERSION" link="gdk-pixbuf-Versioning.html#GDK-PIXBUF-VERSION:CAPS"/>
+    <keyword type="macro" name="GDK_PIXBUF_MAJOR" link="gdk-pixbuf-Versioning.html#GDK-PIXBUF-MAJOR:CAPS"/>
+    <keyword type="macro" name="GDK_PIXBUF_MINOR" link="gdk-pixbuf-Versioning.html#GDK-PIXBUF-MINOR:CAPS"/>
+    <keyword type="macro" name="GDK_PIXBUF_MICRO" link="gdk-pixbuf-Versioning.html#GDK-PIXBUF-MICRO:CAPS"/>
     <keyword type="function" name="gdk_pixbuf_get_colorspace ()" link="gdk-pixbuf-The-GdkPixbuf-Structure.html#gdk-pixbuf-get-colorspace"/>
     <keyword type="function" name="gdk_pixbuf_get_n_channels ()" link="gdk-pixbuf-The-GdkPixbuf-Structure.html#gdk-pixbuf-get-n-channels"/>
     <keyword type="function" name="gdk_pixbuf_get_has_alpha ()" link="gdk-pixbuf-The-GdkPixbuf-Structure.html#gdk-pixbuf-get-has-alpha"/>
@@ -101,7 +102,9 @@
     <keyword type="function" name="gdk_pixbuf_save_to_buffer ()" link="gdk-pixbuf-File-saving.html#gdk-pixbuf-save-to-buffer" since="2.4"/>
     <keyword type="function" name="gdk_pixbuf_save_to_bufferv ()" link="gdk-pixbuf-File-saving.html#gdk-pixbuf-save-to-bufferv" since="2.4"/>
     <keyword type="function" name="gdk_pixbuf_save_to_stream ()" link="gdk-pixbuf-File-saving.html#gdk-pixbuf-save-to-stream" since="2.14"/>
+    <keyword type="function" name="gdk_pixbuf_save_to_streamv ()" link="gdk-pixbuf-File-saving.html#gdk-pixbuf-save-to-streamv" since="2.36"/>
     <keyword type="function" name="gdk_pixbuf_save_to_stream_async ()" link="gdk-pixbuf-File-saving.html#gdk-pixbuf-save-to-stream-async" since="2.24"/>
+    <keyword type="function" name="gdk_pixbuf_save_to_streamv_async ()" link="gdk-pixbuf-File-saving.html#gdk-pixbuf-save-to-streamv-async" since="2.36"/>
     <keyword type="function" name="gdk_pixbuf_save_to_stream_finish ()" link="gdk-pixbuf-File-saving.html#gdk-pixbuf-save-to-stream-finish" since="2.24"/>
     <keyword type="function" name="gdk_pixbuf_new ()" link="gdk-pixbuf-Image-Data-in-Memory.html#gdk-pixbuf-new"/>
     <keyword type="function" name="gdk_pixbuf_new_from_bytes ()" link="gdk-pixbuf-Image-Data-in-Memory.html#gdk-pixbuf-new-from-bytes" since="2.32"/>
@@ -110,7 +113,6 @@
     <keyword type="function" name="gdk_pixbuf_new_from_inline ()" link="gdk-pixbuf-Image-Data-in-Memory.html#gdk-pixbuf-new-from-inline" deprecated="2.32: Use #GResource instead."/>
     <keyword type="function" name="gdk_pixbuf_new_subpixbuf ()" link="gdk-pixbuf-Image-Data-in-Memory.html#gdk-pixbuf-new-subpixbuf"/>
     <keyword type="function" name="gdk_pixbuf_copy ()" link="gdk-pixbuf-Image-Data-in-Memory.html#gdk-pixbuf-copy"/>
-    <keyword type="macro" name="GDK_PIXBUF_MAGIC_NUMBER" link="gdk-pixbuf-Inline-data.html#GDK-PIXBUF-MAGIC-NUMBER:CAPS" deprecated=""/>
     <keyword type="function" name="gdk_pixdata_from_pixbuf ()" link="gdk-pixbuf-Inline-data.html#gdk-pixdata-from-pixbuf" deprecated="2.32: Use #GResource instead."/>
     <keyword type="function" name="gdk_pixbuf_from_pixdata ()" link="gdk-pixbuf-Inline-data.html#gdk-pixbuf-from-pixdata" deprecated="2.32: Use #GResource instead."/>
     <keyword type="function" name="gdk_pixdata_serialize ()" link="gdk-pixbuf-Inline-data.html#gdk-pixdata-serialize" deprecated="2.32: Use #GResource instead."/>
@@ -119,6 +121,7 @@
     <keyword type="struct" name="struct GdkPixdata" link="gdk-pixbuf-Inline-data.html#GdkPixdata" deprecated=""/>
     <keyword type="enum" name="enum GdkPixdataType" link="gdk-pixbuf-Inline-data.html#GdkPixdataType" deprecated=""/>
     <keyword type="enum" name="enum GdkPixdataDumpType" link="gdk-pixbuf-Inline-data.html#GdkPixdataDumpType" deprecated=""/>
+    <keyword type="macro" name="GDK_PIXBUF_MAGIC_NUMBER" link="gdk-pixbuf-Inline-data.html#GDK-PIXBUF-MAGIC-NUMBER:CAPS" deprecated=""/>
     <keyword type="macro" name="GDK_PIXDATA_HEADER_LENGTH" link="gdk-pixbuf-Inline-data.html#GDK-PIXDATA-HEADER-LENGTH:CAPS" deprecated=""/>
     <keyword type="function" name="gdk_pixbuf_scale_simple ()" link="gdk-pixbuf-Scaling.html#gdk-pixbuf-scale-simple"/>
     <keyword type="function" name="gdk_pixbuf_scale ()" link="gdk-pixbuf-Scaling.html#gdk-pixbuf-scale"/>
@@ -233,6 +236,7 @@
     <keyword type="constant" name="GDK_PIXBUF_ERROR_UNKNOWN_TYPE" link="gdk-pixbuf-The-GdkPixbuf-Structure.html#GDK-PIXBUF-ERROR-UNKNOWN-TYPE:CAPS"/>
     <keyword type="constant" name="GDK_PIXBUF_ERROR_UNSUPPORTED_OPERATION" link="gdk-pixbuf-The-GdkPixbuf-Structure.html#GDK-PIXBUF-ERROR-UNSUPPORTED-OPERATION:CAPS"/>
     <keyword type="constant" name="GDK_PIXBUF_ERROR_FAILED" link="gdk-pixbuf-The-GdkPixbuf-Structure.html#GDK-PIXBUF-ERROR-FAILED:CAPS"/>
+    <keyword type="constant" name="GDK_PIXBUF_ERROR_INCOMPLETE_ANIMATION" link="gdk-pixbuf-The-GdkPixbuf-Structure.html#GDK-PIXBUF-ERROR-INCOMPLETE-ANIMATION:CAPS"/>
     <keyword type="constant" name="GDK_COLORSPACE_RGB" link="gdk-pixbuf-The-GdkPixbuf-Structure.html#GDK-COLORSPACE-RGB:CAPS"/>
     <keyword type="constant" name="GDK_PIXBUF_ALPHA_BILEVEL" link="gdk-pixbuf-The-GdkPixbuf-Structure.html#GDK-PIXBUF-ALPHA-BILEVEL:CAPS"/>
     <keyword type="constant" name="GDK_PIXBUF_ALPHA_FULL" link="gdk-pixbuf-The-GdkPixbuf-Structure.html#GDK-PIXBUF-ALPHA-FULL:CAPS"/>
@@ -266,5 +270,46 @@
     <keyword type="constant" name="XLIB_RGB_DITHER_NONE" link="gdk-pixbuf-XlibRGB.html#XLIB-RGB-DITHER-NONE:CAPS"/>
     <keyword type="constant" name="XLIB_RGB_DITHER_NORMAL" link="gdk-pixbuf-XlibRGB.html#XLIB-RGB-DITHER-NORMAL:CAPS"/>
     <keyword type="constant" name="XLIB_RGB_DITHER_MAX" link="gdk-pixbuf-XlibRGB.html#XLIB-RGB-DITHER-MAX:CAPS"/>
+    <keyword type="member" name="GdkPixdata.magic" link="gdk-pixbuf-Inline-data.html#GdkPixdata.magic"/>
+    <keyword type="member" name="GdkPixdata.length" link="gdk-pixbuf-Inline-data.html#GdkPixdata.length"/>
+    <keyword type="member" name="GdkPixdata.pixdata-type" link="gdk-pixbuf-Inline-data.html#GdkPixdata.pixdata-type"/>
+    <keyword type="member" name="GdkPixdata.rowstride" link="gdk-pixbuf-Inline-data.html#GdkPixdata.rowstride"/>
+    <keyword type="member" name="GdkPixdata.width" link="gdk-pixbuf-Inline-data.html#GdkPixdata.width"/>
+    <keyword type="member" name="GdkPixdata.height" link="gdk-pixbuf-Inline-data.html#GdkPixdata.height"/>
+    <keyword type="member" name="GdkPixdata.pixel-data" link="gdk-pixbuf-Inline-data.html#GdkPixdata.pixel-data"/>
+    <keyword type="member" name="GdkPixbufFormat.name" link="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat.name"/>
+    <keyword type="member" name="GdkPixbufFormat.signature" link="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat.signature"/>
+    <keyword type="member" name="GdkPixbufFormat.domain" link="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat.domain"/>
+    <keyword type="member" name="GdkPixbufFormat.description" link="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat.description"/>
+    <keyword type="member" name="GdkPixbufFormat.mime-types" link="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat.mime-types"/>
+    <keyword type="member" name="GdkPixbufFormat.extensions" link="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat.extensions"/>
+    <keyword type="member" name="GdkPixbufFormat.flags" link="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat.flags"/>
+    <keyword type="member" name="GdkPixbufFormat.disabled" link="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat.disabled"/>
+    <keyword type="member" name="GdkPixbufFormat.license" link="gdk-pixbuf-Module-Interface.html#GdkPixbufFormat.license"/>
+    <keyword type="member" name="GdkPixbufModulePattern.prefix" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModulePattern.prefix"/>
+    <keyword type="member" name="GdkPixbufModulePattern.mask" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModulePattern.mask"/>
+    <keyword type="member" name="GdkPixbufModulePattern.relevance" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModulePattern.relevance"/>
+    <keyword type="member" name="GdkPixbufModule.module-name" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.module-name"/>
+    <keyword type="member" name="GdkPixbufModule.module-path" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.module-path"/>
+    <keyword type="member" name="GdkPixbufModule.module" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.module"/>
+    <keyword type="member" name="GdkPixbufModule.info" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.info"/>
+    <keyword type="member" name="GdkPixbufModule.load" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.load"/>
+    <keyword type="member" name="GdkPixbufModule.load-xpm-data" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.load-xpm-data"/>
+    <keyword type="member" name="GdkPixbufModule.begin-load" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.begin-load"/>
+    <keyword type="member" name="GdkPixbufModule.stop-load" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.stop-load"/>
+    <keyword type="member" name="GdkPixbufModule.load-increment" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.load-increment"/>
+    <keyword type="member" name="GdkPixbufModule.load-animation" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.load-animation"/>
+    <keyword type="member" name="GdkPixbufModule.save" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.save"/>
+    <keyword type="member" name="GdkPixbufModule.save-to-callback" link="gdk-pixbuf-Module-Interface.html#GdkPixbufModule.save-to-callback"/>
+    <keyword type="member" name="GdkPixbufAnimationClass.is-static-image" link="gdk-pixbuf-Module-Interface.html#GdkPixbufAnimationClass.is-static-image"/>
+    <keyword type="member" name="GdkPixbufAnimationClass.get-static-image" link="gdk-pixbuf-Module-Interface.html#GdkPixbufAnimationClass.get-static-image"/>
+    <keyword type="member" name="GdkPixbufAnimationClass.get-size" link="gdk-pixbuf-Module-Interface.html#GdkPixbufAnimationClass.get-size"/>
+    <keyword type="member" name="GdkPixbufAnimationClass.get-iter" link="gdk-pixbuf-Module-Interface.html#GdkPixbufAnimationClass.get-iter"/>
+    <keyword type="member" name="GdkPixbufAnimationIterClass.get-delay-time" link="gdk-pixbuf-Module-Interface.html#GdkPixbufAnimationIterClass.get-delay-time"/>
+    <keyword type="member" name="GdkPixbufAnimationIterClass.get-pixbuf" link="gdk-pixbuf-Module-Interface.html#GdkPixbufAnimationIterClass.get-pixbuf"/>
+    <keyword type="member" name="GdkPixbufAnimationIterClass.on-currently-loading-frame" link="gdk-pixbuf-Module-Interface.html#GdkPixbufAnimationIterClass.on-currently-loading-frame"/>
+    <keyword type="member" name="GdkPixbufAnimationIterClass.advance" link="gdk-pixbuf-Module-Interface.html#GdkPixbufAnimationIterClass.advance"/>
+    <keyword type="member" name="XlibRgbCmap.colors" link="gdk-pixbuf-XlibRGB.html#XlibRgbCmap.colors"/>
+    <keyword type="member" name="XlibRgbCmap.lut" link="gdk-pixbuf-XlibRGB.html#XlibRgbCmap.lut"/>
   </functions>
 </book>
