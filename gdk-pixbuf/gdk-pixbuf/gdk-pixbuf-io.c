@@ -195,7 +195,7 @@ get_file_formats (void)
 
 /* DllMain function needed to tuck away the gdk-pixbuf DLL handle */
 
-static HMODULE gdk_pixbuf_dll;
+/* static HMODULE gdk_pixbuf_dll;
 
 BOOL WINAPI
 DllMain (HINSTANCE hinstDLL,
@@ -209,7 +209,7 @@ DllMain (HINSTANCE hinstDLL,
         }
 
   return TRUE;
-}
+} */
 #endif
 
 
@@ -457,6 +457,9 @@ gdk_pixbuf_io_init (void)
 #ifdef INCLUDE_xbm
         load_one_builtin_module (xbm);
 #endif
+#ifdef INCLUDE_svg
+        load_one_builtin_module (svg);
+#endif
 #ifdef INCLUDE_tga
         load_one_builtin_module (tga);
 #endif
@@ -661,6 +664,7 @@ module (tiff);
 module (pnm);
 module (bmp);
 module (xbm);
+module (svg);
 module (tga);
 module (icns);
 module (jasper);
@@ -740,6 +744,9 @@ gdk_pixbuf_load_module_unlocked (GdkPixbufModule *image_module,
 #ifdef INCLUDE_xbm
         try_module (xbm,xbm);
 #endif
+#ifdef INCLUDE_svg
+        try_module (svg,svg);
+#endif
 #ifdef INCLUDE_tga
         try_module (tga,tga);
 #endif
@@ -814,19 +821,19 @@ _gdk_pixbuf_load_module (GdkPixbufModule *image_module,
                          GError         **error)
 {
         gboolean ret;
-        gboolean locked = FALSE;
+        /* gboolean locked = FALSE; */
 
         /* be extra careful, maybe the module initializes
          * the thread system
          */
-        if (g_threads_got_initialized) {
+        /* if (g_threads_got_initialized) { */
                 G_LOCK (init_lock);
-                locked = TRUE;
-        }
+                /* locked = TRUE;
+        } */
 
         ret = gdk_pixbuf_load_module_unlocked (image_module, error);
 
-        if (locked)
+        /* if (locked) */
                 G_UNLOCK (init_lock);
 
         return ret;
