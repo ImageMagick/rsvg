@@ -1,6 +1,4 @@
-
-#include	<glib-object.h>
-
+#include <glib-object.h>
 
 #ifdef G_ENABLE_DEBUG
 #define g_marshal_value_peek_boolean(v)  g_value_get_boolean (v)
@@ -48,8 +46,38 @@
 #define g_marshal_value_peek_variant(v)  (v)->data[0].v_pointer
 #endif /* !G_ENABLE_DEBUG */
 
-
 /* VOID:VOID (./gdk-pixbuf-marshal.list:25) */
+void
+_gdk_pixbuf_marshal_VOID__VOID (GClosure     *closure,
+                                GValue       *return_value G_GNUC_UNUSED,
+                                guint         n_param_values,
+                                const GValue *param_values,
+                                gpointer      invocation_hint G_GNUC_UNUSED,
+                                gpointer      marshal_data)
+{
+  typedef void (*GMarshalFunc_VOID__VOID) (gpointer data1,
+                                           gpointer data2);
+  GCClosure *cc = (GCClosure *) closure;
+  gpointer data1, data2;
+  GMarshalFunc_VOID__VOID callback;
+
+  g_return_if_fail (n_param_values == 1);
+
+  if (G_CCLOSURE_SWAP_DATA (closure))
+    {
+      data1 = closure->data;
+      data2 = g_value_peek_pointer (param_values + 0);
+    }
+  else
+    {
+      data1 = g_value_peek_pointer (param_values + 0);
+      data2 = closure->data;
+    }
+  callback = (GMarshalFunc_VOID__VOID) (marshal_data ? marshal_data : cc->callback);
+
+  callback (data1,
+            data2);
+}
 
 /* VOID:INT,INT (./gdk-pixbuf-marshal.list:26) */
 void
@@ -60,13 +88,13 @@ _gdk_pixbuf_marshal_VOID__INT_INT (GClosure     *closure,
                                    gpointer      invocation_hint G_GNUC_UNUSED,
                                    gpointer      marshal_data)
 {
-  typedef void (*GMarshalFunc_VOID__INT_INT) (gpointer     data1,
-                                              gint         arg_1,
-                                              gint         arg_2,
-                                              gpointer     data2);
-  GMarshalFunc_VOID__INT_INT callback;
-  GCClosure *cc = (GCClosure*) closure;
+  typedef void (*GMarshalFunc_VOID__INT_INT) (gpointer data1,
+                                              gint arg1,
+                                              gint arg2,
+                                              gpointer data2);
+  GCClosure *cc = (GCClosure *) closure;
   gpointer data1, data2;
+  GMarshalFunc_VOID__INT_INT callback;
 
   g_return_if_fail (n_param_values == 3);
 
@@ -97,15 +125,15 @@ _gdk_pixbuf_marshal_VOID__INT_INT_INT_INT (GClosure     *closure,
                                            gpointer      invocation_hint G_GNUC_UNUSED,
                                            gpointer      marshal_data)
 {
-  typedef void (*GMarshalFunc_VOID__INT_INT_INT_INT) (gpointer     data1,
-                                                      gint         arg_1,
-                                                      gint         arg_2,
-                                                      gint         arg_3,
-                                                      gint         arg_4,
-                                                      gpointer     data2);
-  GMarshalFunc_VOID__INT_INT_INT_INT callback;
-  GCClosure *cc = (GCClosure*) closure;
+  typedef void (*GMarshalFunc_VOID__INT_INT_INT_INT) (gpointer data1,
+                                                      gint arg1,
+                                                      gint arg2,
+                                                      gint arg3,
+                                                      gint arg4,
+                                                      gpointer data2);
+  GCClosure *cc = (GCClosure *) closure;
   gpointer data1, data2;
+  GMarshalFunc_VOID__INT_INT_INT_INT callback;
 
   g_return_if_fail (n_param_values == 5);
 
@@ -130,4 +158,37 @@ _gdk_pixbuf_marshal_VOID__INT_INT_INT_INT (GClosure     *closure,
 }
 
 /* VOID:POINTER (./gdk-pixbuf-marshal.list:28) */
+void
+_gdk_pixbuf_marshal_VOID__POINTER (GClosure     *closure,
+                                   GValue       *return_value G_GNUC_UNUSED,
+                                   guint         n_param_values,
+                                   const GValue *param_values,
+                                   gpointer      invocation_hint G_GNUC_UNUSED,
+                                   gpointer      marshal_data)
+{
+  typedef void (*GMarshalFunc_VOID__POINTER) (gpointer data1,
+                                              gpointer arg1,
+                                              gpointer data2);
+  GCClosure *cc = (GCClosure *) closure;
+  gpointer data1, data2;
+  GMarshalFunc_VOID__POINTER callback;
+
+  g_return_if_fail (n_param_values == 2);
+
+  if (G_CCLOSURE_SWAP_DATA (closure))
+    {
+      data1 = closure->data;
+      data2 = g_value_peek_pointer (param_values + 0);
+    }
+  else
+    {
+      data1 = g_value_peek_pointer (param_values + 0);
+      data2 = closure->data;
+    }
+  callback = (GMarshalFunc_VOID__POINTER) (marshal_data ? marshal_data : cc->callback);
+
+  callback (data1,
+            g_marshal_value_peek_pointer (param_values + 1),
+            data2);
+}
 

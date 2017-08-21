@@ -40,34 +40,53 @@
 G_BEGIN_DECLS
 
 typedef struct _GdkPixbufFormat GdkPixbufFormat;
- 
+
+GDK_PIXBUF_AVAILABLE_IN_ALL
 GType gdk_pixbuf_format_get_type (void) G_GNUC_CONST;
 
+GDK_PIXBUF_AVAILABLE_IN_ALL
 GSList    *gdk_pixbuf_get_formats            (void);
+GDK_PIXBUF_AVAILABLE_IN_2_2
 gchar     *gdk_pixbuf_format_get_name        (GdkPixbufFormat *format);
+GDK_PIXBUF_AVAILABLE_IN_2_2
 gchar     *gdk_pixbuf_format_get_description (GdkPixbufFormat *format);
+GDK_PIXBUF_AVAILABLE_IN_2_2
 gchar    **gdk_pixbuf_format_get_mime_types  (GdkPixbufFormat *format);
+GDK_PIXBUF_AVAILABLE_IN_2_2
 gchar    **gdk_pixbuf_format_get_extensions  (GdkPixbufFormat *format);
+GDK_PIXBUF_AVAILABLE_IN_2_36
+gboolean   gdk_pixbuf_format_is_save_option_supported (GdkPixbufFormat *format,
+                                                       const gchar     *option_key);
+GDK_PIXBUF_AVAILABLE_IN_2_2
 gboolean   gdk_pixbuf_format_is_writable     (GdkPixbufFormat *format);
+GDK_PIXBUF_AVAILABLE_IN_2_6
 gboolean   gdk_pixbuf_format_is_scalable     (GdkPixbufFormat *format);
+GDK_PIXBUF_AVAILABLE_IN_2_6
 gboolean   gdk_pixbuf_format_is_disabled     (GdkPixbufFormat *format);
+GDK_PIXBUF_AVAILABLE_IN_2_6
 void       gdk_pixbuf_format_set_disabled    (GdkPixbufFormat *format,
 					      gboolean         disabled);
+GDK_PIXBUF_AVAILABLE_IN_2_6
 gchar     *gdk_pixbuf_format_get_license     (GdkPixbufFormat *format);
 
+GDK_PIXBUF_AVAILABLE_IN_2_4
 GdkPixbufFormat *gdk_pixbuf_get_file_info    (const gchar     *filename,
 					      gint            *width, 
 					      gint            *height);
+GDK_PIXBUF_AVAILABLE_IN_2_32
 void             gdk_pixbuf_get_file_info_async  (const gchar          *filename,
 						  GCancellable         *cancellable,
 						  GAsyncReadyCallback   callback,
 						  gpointer              user_data);
+GDK_PIXBUF_AVAILABLE_IN_2_32
 GdkPixbufFormat *gdk_pixbuf_get_file_info_finish (GAsyncResult         *async_result,
 						  gint                 *width,
 						  gint                 *height,
 						  GError              **error);
 
+GDK_PIXBUF_AVAILABLE_IN_ALL
 GdkPixbufFormat *gdk_pixbuf_format_copy (const GdkPixbufFormat *format);
+GDK_PIXBUF_AVAILABLE_IN_ALL
 void             gdk_pixbuf_format_free (GdkPixbufFormat       *format);
 
 #ifdef GDK_PIXBUF_ENABLE_BACKEND
@@ -203,6 +222,7 @@ struct _GdkPixbufModulePattern {
  * @load_animation: loads an animation from a file.
  * @save: saves a #GdkPixbuf to a file.
  * @save_to_callback: saves a #GdkPixbuf by calling the given #GdkPixbufSaveFunc.
+ * @is_save_option_supported: returns whether a save option key is supported by the module
  * 
  * A #GdkPixbufModule contains the necessary functions to load and save 
  * images in a certain file format. 
@@ -255,13 +275,13 @@ struct _GdkPixbufModule {
 				      gchar **option_values,
 				      GError **error);
   
+        gboolean (* is_save_option_supported) (const gchar *option_key);
+
   /*< private >*/
 	void (*_reserved1) (void); 
 	void (*_reserved2) (void); 
 	void (*_reserved3) (void); 
-	void (*_reserved4) (void); 
-	void (*_reserved5) (void); 
-
+	void (*_reserved4) (void);
 };
 
 /**
@@ -286,12 +306,6 @@ typedef void (* GdkPixbufModuleFillVtableFunc) (GdkPixbufModule *module);
  * Since: 2.2
  */
 typedef void (* GdkPixbufModuleFillInfoFunc) (GdkPixbufFormat *info);
-
-/*  key/value pairs that can be attached by the pixbuf loader  */
-
-gboolean gdk_pixbuf_set_option  (GdkPixbuf   *pixbuf,
-                                 const gchar *key,
-                                 const gchar *value);
 
 /**
  * GdkPixbufFormatFlags:

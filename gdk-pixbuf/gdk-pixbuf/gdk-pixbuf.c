@@ -35,7 +35,7 @@
 /* Include the marshallers */
 #include <glib-object.h>
 #include <gio/gio.h>
-#include "gdk-pixbuf-marshal.c"
+#include "gdk-pixbuf-marshal.h"
 
 /**
  * SECTION:creating
@@ -134,6 +134,10 @@ G_DEFINE_TYPE_WITH_CODE (GdkPixbuf, gdk_pixbuf, G_TYPE_OBJECT,
 static void 
 gdk_pixbuf_init (GdkPixbuf *pixbuf)
 {
+  pixbuf->colorspace = GDK_COLORSPACE_RGB;
+  pixbuf->n_channels = 3;
+  pixbuf->bits_per_sample = 8;
+  pixbuf->has_alpha = FALSE;
 }
 
 static void
@@ -148,6 +152,7 @@ gdk_pixbuf_class_init (GdkPixbufClass *klass)
         object_class->get_property = gdk_pixbuf_get_property;
 
 #define PIXBUF_PARAM_FLAGS G_PARAM_READWRITE|G_PARAM_CONSTRUCT_ONLY|\
+                           G_PARAM_EXPLICIT_NOTIFY|\
                            G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB
         /**
          * GdkPixbuf:n-channels:
@@ -417,6 +422,46 @@ free_buffer (guchar *pixels, gpointer data)
 }
 
 /**
+ * gdk_pixbuf_calculate_rowstride:
+ * @colorspace: Color space for image
+ * @has_alpha: Whether the image should have transparency information
+ * @bits_per_sample: Number of bits per color sample
+ * @width: Width of image in pixels, must be > 0
+ * @height: Height of image in pixels, must be > 0
+ *
+ * Calculates the rowstride that an image created with those values would
+ * have. This is useful for front-ends and backends that want to sanity
+ * check image values without needing to create them.
+ *
+ * Return value: the rowstride for the given values, or -1 in case of error.
+ *
+ * Since: 2.36.8
+ */
+gint
+gdk_pixbuf_calculate_rowstride (GdkColorspace colorspace,
+				gboolean      has_alpha,
+				int           bits_per_sample,
+				int           width,
+				int           height)
+{
+	unsigned int channels;
+
+	g_return_val_if_fail (colorspace == GDK_COLORSPACE_RGB, -1);
+	g_return_val_if_fail (bits_per_sample == 8, -1);
+	g_return_val_if_fail (width > 0, -1);
+	g_return_val_if_fail (height > 0, -1);
+
+	channels = has_alpha ? 4 : 3;
+
+	/* Overflow? */
+	if (width > (G_MAXINT - 3) / channels)
+		return -1;
+
+	/* Always align rows to 32-bit boundaries */
+	return (width * channels + 3) & ~3;
+}
+
+/**
  * gdk_pixbuf_new:
  * @colorspace: Color space for image
  * @has_alpha: Whether the image should have transparency information
@@ -439,21 +484,15 @@ gdk_pixbuf_new (GdkColorspace colorspace,
                 int           height)
 {
 	guchar *buf;
-	int channels;
 	int rowstride;
 
-	g_return_val_if_fail (colorspace == GDK_COLORSPACE_RGB, NULL);
-	g_return_val_if_fail (bits_per_sample == 8, NULL);
-	g_return_val_if_fail (width > 0, NULL);
-	g_return_val_if_fail (height > 0, NULL);
-
-	channels = has_alpha ? 4 : 3;
-        rowstride = width * channels;
-        if (rowstride / channels != width || rowstride + 3 < 0) /* overflow */
-                return NULL;
-        
-	/* Always align rows to 32-bit boundaries */
-	rowstride = (rowstride + 3) & ~3;
+	rowstride = gdk_pixbuf_calculate_rowstride (colorspace,
+						    has_alpha,
+						    bits_per_sample,
+						    width,
+						    height);
+	if (rowstride <= 0)
+		return NULL;
 
 	buf = g_try_malloc_n (height, rowstride);
 	if (!buf)
@@ -469,7 +508,8 @@ gdk_pixbuf_new (GdkColorspace colorspace,
  * @pixbuf: A pixbuf.
  * 
  * Creates a new #GdkPixbuf with a copy of the information in the specified
- * @pixbuf.
+ * @pixbuf. Note that this does not copy the options set on the original #GdkPixbuf,
+ * use gdk_pixbuf_copy_options() for this.
  * 
  * Return value: (transfer full): A newly-created pixbuf with a reference count of 1, or %NULL if
  * not enough memory could be allocated.
@@ -902,6 +942,8 @@ gdk_pixbuf_fill (GdkPixbuf *pixbuf,
  * the "multipage" option string to "yes" when a multi-page TIFF is loaded.
  * Since 2.32 the JPEG and PNG loaders set "x-dpi" and "y-dpi" if the file
  * contains image density information in dots per inch.
+ * Since 2.36.6, the JPEG loader sets the "comment" option with the comment
+ * EXIF tag.
  * 
  * Return value: the value associated with @key. This is a nul-terminated 
  * string that should not be freed or %NULL if @key was not found.
@@ -965,6 +1007,72 @@ gdk_pixbuf_get_options (GdkPixbuf *pixbuf)
 }
 
 /**
+ * gdk_pixbuf_remove_option:
+ * @pixbuf: a #GdkPixbuf
+ * @key: a nul-terminated string representing the key to remove.
+ *
+ * Remove the key/value pair option attached to a #GdkPixbuf.
+ *
+ * Return value: %TRUE if an option was removed, %FALSE if not.
+ *
+ * Since: 2.36
+ **/
+gboolean
+gdk_pixbuf_remove_option (GdkPixbuf   *pixbuf,
+                          const gchar *key)
+{
+        GQuark  quark;
+        gchar **options;
+        guint n;
+        GPtrArray *array;
+        gboolean found;
+
+        g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), FALSE);
+        g_return_val_if_fail (key != NULL, FALSE);
+
+        quark = g_quark_from_static_string ("gdk_pixbuf_options");
+
+        options = g_object_get_qdata (G_OBJECT (pixbuf), quark);
+        if (!options)
+                return FALSE;
+
+        g_object_steal_qdata (G_OBJECT (pixbuf), quark);
+
+        /* There's at least a nul-terminator */
+        array = g_ptr_array_new_full (1, g_free);
+
+        found = FALSE;
+        for (n = 0; options[2*n]; n++) {
+                if (strcmp (options[2*n], key) != 0) {
+                        g_ptr_array_add (array, g_strdup (options[2*n]));   /* key */
+                        g_ptr_array_add (array, g_strdup (options[2*n+1])); /* value */
+                } else {
+                        found = TRUE;
+                }
+        }
+
+        if (array->len == 0) {
+                g_ptr_array_unref (array);
+                g_strfreev (options);
+                return found;
+        }
+
+        if (!found) {
+                g_ptr_array_free (array, TRUE);
+                g_object_set_qdata_full (G_OBJECT (pixbuf), quark,
+                                         options, (GDestroyNotify) g_strfreev);
+                return FALSE;
+        }
+
+        g_ptr_array_add (array, NULL);
+        g_object_set_qdata_full (G_OBJECT (pixbuf), quark,
+                                 g_ptr_array_free (array, FALSE), (GDestroyNotify) g_strfreev);
+        g_strfreev (options);
+
+        return TRUE;
+}
+
+/**
  * gdk_pixbuf_set_option:
  * @pixbuf: a #GdkPixbuf
  * @key: a nul-terminated string.
@@ -1017,6 +1125,46 @@ gdk_pixbuf_set_option (GdkPixbuf   *pixbuf,
         return TRUE;
 }
 
+/**
+ * gdk_pixbuf_copy_options:
+ * @src_pixbuf: a #GdkPixbuf to copy options from
+ * @dest_pixbuf: the #GdkPixbuf to copy options to
+ *
+ * Copy the key/value pair options attached to a #GdkPixbuf to another.
+ * This is useful to keep original metadata after having manipulated
+ * a file. However be careful to remove metadata which you've already
+ * applied, such as the "orientation" option after rotating the image.
+ *
+ * Return value: %TRUE on success.
+ *
+ * Since: 2.36
+ **/
+gboolean
+gdk_pixbuf_copy_options (GdkPixbuf *src_pixbuf,
+                         GdkPixbuf *dest_pixbuf)
+{
+        GQuark  quark;
+        gchar **options;
+
+        g_return_val_if_fail (GDK_IS_PIXBUF (src_pixbuf), FALSE);
+        g_return_val_if_fail (GDK_IS_PIXBUF (dest_pixbuf), FALSE);
+
+        quark = g_quark_from_static_string ("gdk_pixbuf_options");
+
+        options = g_object_dup_qdata (G_OBJECT (src_pixbuf),
+                                      quark,
+                                      (GDuplicateFunc) g_strdupv,
+                                      NULL);
+
+        if (options == NULL)
+                return TRUE;
+
+        g_object_set_qdata_full (G_OBJECT (dest_pixbuf), quark,
+                                 options, (GDestroyNotify) g_strfreev);
+
+        return TRUE;
+}
+
 static void
 gdk_pixbuf_set_property (GObject         *object,
 			 guint            prop_id,
@@ -1024,40 +1172,53 @@ gdk_pixbuf_set_property (GObject         *object,
 			 GParamSpec      *pspec)
 {
   GdkPixbuf *pixbuf = GDK_PIXBUF (object);
+  gboolean notify = TRUE;
 
   switch (prop_id)
           {
           case PROP_COLORSPACE:
+                  notify = pixbuf->colorspace != g_value_get_enum (value);
                   pixbuf->colorspace = g_value_get_enum (value);
                   break;
           case PROP_N_CHANNELS:
+                  notify = pixbuf->n_channels != g_value_get_int (value);
                   pixbuf->n_channels = g_value_get_int (value);
                   break;
           case PROP_HAS_ALPHA:
+                  notify = pixbuf->has_alpha != g_value_get_boolean (value);
                   pixbuf->has_alpha = g_value_get_boolean (value);
                   break;
           case PROP_BITS_PER_SAMPLE:
+                  notify = pixbuf->bits_per_sample != g_value_get_int (value);
                   pixbuf->bits_per_sample = g_value_get_int (value);
                   break;
           case PROP_WIDTH:
+                  notify = pixbuf->width != g_value_get_int (value);
                   pixbuf->width = g_value_get_int (value);
                   break;
           case PROP_HEIGHT:
+                  notify = pixbuf->height != g_value_get_int (value);
                   pixbuf->height = g_value_get_int (value);
                   break;
           case PROP_ROWSTRIDE:
+                  notify = pixbuf->rowstride != g_value_get_int (value);
                   pixbuf->rowstride = g_value_get_int (value);
                   break;
           case PROP_PIXELS:
+                  notify = pixbuf->pixels != (guchar *) g_value_get_pointer (value);
                   pixbuf->pixels = (guchar *) g_value_get_pointer (value);
                   break;
           case PROP_PIXEL_BYTES:
+                  notify = pixbuf->bytes != g_value_get_boxed (value);
                   pixbuf->bytes = g_value_dup_boxed (value);
                   break;
           default:
                   G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
                   break;
           }
+
+        if (notify)
+                g_object_notify_by_pspec (G_OBJECT (object), pspec);
 }
 
 static void

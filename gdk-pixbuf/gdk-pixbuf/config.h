@@ -41,11 +41,21 @@
 /*#define HAVE_INTTYPES_H*/
 #endif
 
+/* Define to 1 if lrint() is available */
+#if !defined (_MSC_VER) || (_MSC_VER >= 1800)
+#define HAVE_LRINT 1
+#endif
+
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 is libjpeg supports progressive JPEG */
 #define HAVE_PROGRESSIVE_JPEG 1
+
+/* Define to 1 if round() is available */
+#if !defined (_MSC_VER) || (_MSC_VER >= 1800)
+#define HAVE_ROUND 1
+#endif
 
 /* Define to 1 if sigsetjmp is available */
 /*#undef HAVE_SIGSETJMP*/
@@ -110,7 +120,7 @@
 #define PACKAGE_NAME "gdk-pixbuf"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "gdk-pixbuf 2.35.1"
+#define PACKAGE_STRING "gdk-pixbuf 2.36.9"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gdk-pixbuf"
@@ -119,13 +129,13 @@
 #define PACKAGE_URL "http://www.gtk.org/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.35.1"
+#define PACKAGE_VERSION "2.36.9"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Define to 1 if gmodule works and should be used */
-#undef USE_GMODULE 1
+#define USE_GMODULE 1
 
 /* Whether to load modules via .la files rather than directly */
 /*#undef USE_LA_MODULES*/
@@ -146,27 +156,15 @@
 /* Number of bits in a file offset, on hosts where this is settable. */
 /*#undef _FILE_OFFSET_BITS*/
 
+/* defines how to decorate public symbols while building */
+#ifdef _MSC_VER
+#define _GDK_PIXBUF_EXTERN __declspec(dllexport) extern
+#else
+#define _GDK_PIXBUF_EXTERN __attribute__((visibility("default"))) __declspec(dllexport) extern
+#endif
+
 /* Define for large files, on AIX-style hosts. */
 /*#undef _LARGE_FILES*/
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /*#undef const*/
-
-#define INCLUDE_ani
-#define INCLUDE_bmp
-#define INCLUDE_gif
-#define INCLUDE_ico
-#define INCLUDE_icns
-#define INCLUDE_jasper
-#define INCLUDE_jpeg
-#define INCLUDE_pcx
-#define INCLUDE_png
-#define INCLUDE_pnm
-#define INCLUDE_qtif
-#define INCLUDE_ras
-#define INCLUDE_svg
-#define INCLUDE_tga
-#define INCLUDE_tiff
-#define INCLUDE_xpm
-#define INCLUDE_xbm
-#define INCLUDE_wbmp

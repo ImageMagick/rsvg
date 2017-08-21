@@ -23,6 +23,10 @@
  */
 
 #undef DUMPBIH
+#define DEBUG(s)
+
+#define INFOHEADER_SIZE 40
+
 /*
 
 Icons are just like BMP's, except for the header.
@@ -75,14 +79,14 @@ struct BitmapInfoHeader {
 };
 
 #ifdef DUMPBIH
-/* 
+/*
 
 DumpBIH printf's the values in a BitmapInfoHeader to the screen, for 
 debugging purposes.
 
 */
 static void DumpBIH(unsigned char *BIH)
-{				
+{
 	printf("biSize      = %i \n",
 	       (int)(BIH[3] << 24) + (BIH[2] << 16) + (BIH[1] << 8) + (BIH[0]));
 	printf("biWidth     = %i \n",
@@ -125,7 +129,9 @@ struct headerpair {
 /* Score the various parts of the icon */
 struct ico_direntry_data {
 	gint ImageScore;
-	gint DIBoffset;
+        gint width;
+        gint height;
+	guint DIBoffset;
 	gint x_hot;
 	gint y_hot;
 };
@@ -160,7 +166,7 @@ struct ico_progressive_state {
 
 	struct headerpair Header;	/* Decoded (BE->CPU) header */
 	GList *entries;
-	gint			DIBoffset;
+	guint			DIBoffset;
 
 	GdkPixbuf *pixbuf;	/* Our "target" */
 };
@@ -197,7 +203,11 @@ compare_direntry_scores (gconstpointer a,
 	const struct ico_direntry_data *ib = b;
 
 	/* Backwards, so largest first */
-	return ib->ImageScore - ia->ImageScore;
+	if (ib->ImageScore < ia->ImageScore)
+		return -1;
+	else if (ib->ImageScore > ia->ImageScore)
+		return 1;
+	return 0;
 }
 
 static void DecodeHeader(guchar *Data, gint Bytes,
@@ -205,9 +215,9 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 			 GError **error)
 {
 /* For ICO's we have to be very clever. There are multiple images possible
-   in an .ICO. As a simple heuristic, we select the image which occupies the 
-   largest number of bytes.
- */   
+   in an .ICO. As a simple heuristic, we select the image which is the largest
+   in pixels.
+ */
 	struct ico_direntry_data *entry;
 	gint IconCount = 0; /* The number of icon-versions in the file */
 	guchar *BIH; /* The DIB for the used icon */
@@ -215,15 +225,16 @@ static void DecodeHeader(guchar *Data, gint Bytes,
  	gint I;
 	guint16 imgtype; /* 1 = icon, 2 = cursor */
 	GList *l;
+	gboolean got_broken_header = FALSE;
 
  	/* Step 1: The ICO header */
 
 	/* First word should be 0 according to specs */
 	if (((Data[1] << 8) + Data[0]) != 0) {
-		g_set_error_literal (error,
-				     GDK_PIXBUF_ERROR,
-				     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-				     _("Invalid header in icon"));
+		g_set_error (error,
+			     GDK_PIXBUF_ERROR,
+			     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+			     _("Invalid header in icon (%s)"), "first word");
 		return;
 
 	}
@@ -234,17 +245,18 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 
 	/* If it is not a cursor make sure it is actually an icon */
 	if (!State->cursor && imgtype != 1) {
-		g_set_error_literal (error,
-				     GDK_PIXBUF_ERROR,
-				     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-				     _("Invalid header in icon"));
+		g_set_error (error,
+			     GDK_PIXBUF_ERROR,
+			     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+			     _("Invalid header in icon (%s)"), "image type");
 		return;
 	}
-
 
  	IconCount = (Data[5] << 8) + (Data[4]);
 	
  	State->HeaderSize = 6 + IconCount*16;
+
+        DEBUG(g_print ("Image type: %d (%s)\nImage count: %d\n", imgtype, imgtype == 2 ? "cursor" : "icon", IconCount));
 
  	if (State->HeaderSize>State->BytesInHeaderBuf) {
  		guchar *tmp=g_try_realloc(State->HeaderBuf,State->HeaderSize);
@@ -258,8 +270,9 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 		State->HeaderBuf = tmp;
  		State->BytesInHeaderBuf = State->HeaderSize;
  	}
- 	if (Bytes < State->HeaderSize)
+ 	if (Bytes < State->HeaderSize) {
  		return;
+	}
 
 	/* Now iterate through the ICONDIRENTRY structures, and sort them by
 	 * which one we think is "best" (essentially the largest) */
@@ -267,39 +280,67 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 	State->entries = 0;
 	Ptr = Data + 6;
 	for (I=0;I<IconCount;I++) {
+                int width;
+                int height;
+                int depth;
+                int x_hot;
+                int y_hot;
+                guint data_size G_GNUC_UNUSED;
+                guint data_offset;
+
+                width = Ptr[0];
+                height = Ptr[1];
+                depth = Ptr[2];
+		x_hot = (Ptr[5] << 8) + Ptr[4];
+		y_hot = (Ptr[7] << 8) + Ptr[6];
+                data_size = ((guint) (Ptr[11]) << 24) + (Ptr[10] << 16) + (Ptr[9] << 8) + (Ptr[8]);
+		data_offset = ((guint) (Ptr[15]) << 24) + (Ptr[14] << 16) + (Ptr[13] << 8) + (Ptr[12]);
+                DEBUG(g_print ("Image %d: %d x %d\n\tDepth: %d\n", I, width, height, depth);
+                if (imgtype == 2)
+                  g_print ("\tHotspot: %d x %d\n", x_hot, y_hot);
+                else
+                  g_print ("\tColor planes: %d\n\tBits per pixel: %d\n", x_hot, y_hot);
+                g_print ("\tSize: %d\n\tOffset: %d\n", data_size, data_offset);)
+
+                if (depth == 0)
+                        depth = 32;
+                else if (depth <= 2)
+                        depth = 1;
+                else if (depth <= 16)
+                        depth = 4;
+                else if (depth <= 256)
+                        depth = 8;
+
+		/* We check whether the HeaderSize (int) would overflow */
+                if (data_offset > INT_MAX - INFOHEADER_SIZE) {
+			got_broken_header = TRUE;
+			continue;
+		}
+
 		entry = g_new0 (struct ico_direntry_data, 1);
-		entry->ImageScore = (Ptr[11] << 24) + (Ptr[10] << 16) + (Ptr[9] << 8) + (Ptr[8]);
-		if (entry->ImageScore == 0)
-			entry->ImageScore = 256;
-		entry->x_hot = (Ptr[5] << 8) + Ptr[4];
-		entry->y_hot = (Ptr[7] << 8) + Ptr[6];
-		entry->DIBoffset = (Ptr[15]<<24)+(Ptr[14]<<16)+
-		                   (Ptr[13]<<8) + (Ptr[12]);
+                entry->width = width ? width : 256;
+                entry->height = height ? height : 256;
+                entry->ImageScore = entry->width * entry->height * depth;
+		entry->x_hot = x_hot;
+		entry->y_hot = y_hot;
+		entry->DIBoffset = data_offset;
 		State->entries = g_list_insert_sorted (State->entries, entry, compare_direntry_scores);
 		Ptr += 16;
-	} 
+	}
 
 	/* Now go through and find one we can parse */
 	entry = NULL;
 	for (l = State->entries; l != NULL; l = g_list_next (l)) {
 		entry = l->data;
 
-		if (entry->DIBoffset < 0) {
-			g_set_error_literal (error,
-			                     GDK_PIXBUF_ERROR,
-			                     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-			                     _("Invalid header in icon"));
-			return;
-		}
-
 		/* We know how many bytes are in the "header" part. */
-		State->HeaderSize = entry->DIBoffset + 40; /* 40 = sizeof(InfoHeader) */
+		State->HeaderSize = entry->DIBoffset + INFOHEADER_SIZE;
 
 		if (State->HeaderSize < 0) {
-			g_set_error_literal (error,
-			                     GDK_PIXBUF_ERROR,
-			                     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-			                     _("Invalid header in icon"));
+			g_set_error (error,
+			             GDK_PIXBUF_ERROR,
+			             GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+			             _("Invalid header in icon (%s)"), "header size");
 			return;
 		}
 
@@ -322,8 +363,12 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 
 		/* A compressed icon, try the next one */
 		if ((BIH[16] != 0) || (BIH[17] != 0) || (BIH[18] != 0)
-		    || (BIH[19] != 0))
+		    || (BIH[19] != 0)) {
+			DEBUG(g_print("Skipping icon with score %d, as it is compressed\n", entry->ImageScore));
 			continue;
+		}
+
+		DEBUG(g_print("Selecting icon with score %d\n", entry->ImageScore));
 
 		/* If we made it to here then we have selected a BIH structure
 		 * in a format that we can parse */
@@ -333,9 +378,11 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 	/* No valid icon found, because all are compressed? */
 	if (l == NULL) {
 		g_set_error_literal (error,
-		                     GDK_PIXBUF_ERROR,
-		                     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-		                     _("Compressed icons are not supported"));
+				     GDK_PIXBUF_ERROR,
+				     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+				     got_broken_header ?
+					_("Invalid header in icon") :
+					_("Compressed icons are not supported"));
 		return;
 	}
 
@@ -346,9 +393,9 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 
 #ifdef DUMPBIH
 	DumpBIH(BIH);
-#endif	
+#endif
 	/* Add the palette to the headersize */
-		
+
 	State->Header.width =
 	    (int)(BIH[7] << 24) + (BIH[6] << 16) + (BIH[5] << 8) + (BIH[4]);
 	if (State->Header.width == 0)
@@ -359,12 +406,28 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 	    /* /2 because the BIH height includes the transparency mask */
 	if (State->Header.height == 0)
 		State->Header.height = 256;
-	State->Header.depth = (BIH[15] << 8) + (BIH[14]);
 
-	State->Type = State->Header.depth;	
-	if (State->Lines>=State->Header.height)
-		State->Type = 1; /* The transparency mask is 1 bpp */
-	
+	/* Negative heights mean top-down pixel-order */
+	if (State->Header.height < 0) {
+		State->Header.height = -State->Header.height;
+		State->Header.Negative = 1;
+	}
+	if (State->Header.width < 0) {
+		State->Header.width = -State->Header.width;
+	}
+
+        if (State->Header.width != entry->width ||
+            State->Header.height != entry->height) {
+		g_set_error (error,
+                             GDK_PIXBUF_ERROR,
+                             GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+                             _("Invalid header in icon (%s)"), "image size");
+		return;
+        }
+
+	State->Header.depth = (BIH[15] << 8) + (BIH[14]);
+	State->Type = State->Header.depth;
+
 	/* Determine the  palette size. If the header indicates 0, it
 	   is actually the maximum for the bpp. You have to love the
 	   guys who made the spec. */
@@ -380,10 +443,10 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 	State->HeaderSize+=I;
 	
 	if (State->HeaderSize < 0) {
-		g_set_error_literal (error,
-                                     GDK_PIXBUF_ERROR,
-                                     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-                                     _("Invalid header in icon"));
+		g_set_error (error,
+                             GDK_PIXBUF_ERROR,
+                             GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+                             _("Invalid header in icon (%s)"), "palette size");
 		return;
 	}
 
@@ -399,19 +462,9 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 		State->HeaderBuf = tmp;
  		State->BytesInHeaderBuf = State->HeaderSize;
  	}
- 	if (Bytes < State->HeaderSize)
+ 	if (Bytes < State->HeaderSize) {
  		return;
-
-	/* Negative heights mean top-down pixel-order */
-	if (State->Header.height < 0) {
-		State->Header.height = -State->Header.height;
-		State->Header.Negative = 1;
 	}
-	if (State->Header.width < 0) {
-		State->Header.width = -State->Header.width;
-	}
-	g_assert (State->Header.width > 0);
-	g_assert (State->Header.height > 0);
 
         if (State->Type == 32)
                 State->LineWidth = State->Header.width * 4;
@@ -455,7 +508,6 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 
 
 	if (State->pixbuf == NULL) {
-#if 1
 		if (State->size_func) {
 			gint width = State->Header.width;
 			gint height = State->Header.height;
@@ -466,7 +518,6 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 				return;
 			}
 		}
-#endif
 
 		State->pixbuf =
 		    gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8,
@@ -519,7 +570,7 @@ gdk_pixbuf__ico_image_begin_load(GdkPixbufModuleSizeFunc size_func,
 	context->user_data = user_data;
 
 	context->HeaderSize = 54;
-	context->HeaderBuf = g_try_malloc(14 + 40 + 4*256 + 512);
+	context->HeaderBuf = g_try_malloc(14 + INFOHEADER_SIZE + 4*256 + 512);
 	if (!context->HeaderBuf) {
 		g_free (context);
 		g_set_error_literal (error,
@@ -529,7 +580,7 @@ gdk_pixbuf__ico_image_begin_load(GdkPixbufModuleSizeFunc size_func,
 		return NULL;
 	}
 	/* 4*256 for the colormap */
-	context->BytesInHeaderBuf = 14 + 40 + 4*256 + 512 ;
+	context->BytesInHeaderBuf = 14 + INFOHEADER_SIZE + 4*256 + 512 ;
 	context->HeaderDone = 0;
 
 	context->LineWidth = 0;
@@ -559,6 +610,7 @@ gdk_pixbuf__ico_image_stop_load(gpointer data,
 {
 	struct ico_progressive_state *context =
 	    (struct ico_progressive_state *) data;
+	gboolean ret = TRUE;
 
         /* FIXME this thing needs to report errors if
          * we have unused image data
@@ -566,8 +618,16 @@ gdk_pixbuf__ico_image_stop_load(gpointer data,
 
 	g_return_val_if_fail(context != NULL, TRUE);
 
+	if (context->HeaderDone < context->HeaderSize) {
+		g_set_error_literal (error,
+				     GDK_PIXBUF_ERROR,
+				     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+				     _("ICO image was truncated or incomplete."));
+		ret = FALSE;
+	}
+
 	context_free (context);
-        return TRUE;
+        return ret;
 }
 
 static void
@@ -586,6 +646,7 @@ OneLine32 (struct ico_progressive_state *context)
 			  (gsize) context->pixbuf->rowstride *
                           context->Lines);
         while (X < context->Header.width) {
+                /* BGRA */
                 Pixels[X * 4 + 0] = context->LineBuf[X * 4 + 2];
                 Pixels[X * 4 + 1] = context->LineBuf[X * 4 + 1];
                 Pixels[X * 4 + 2] = context->LineBuf[X * 4 + 0];
@@ -612,6 +673,7 @@ static void OneLine24(struct ico_progressive_state *context)
 		Pixels[X * 4 + 0] = context->LineBuf[X * 3 + 2];
 		Pixels[X * 4 + 1] = context->LineBuf[X * 3 + 1];
 		Pixels[X * 4 + 2] = context->LineBuf[X * 3 + 0];
+		Pixels[X * 4 + 3] = 0xff;
 		X++;
 	}
 
@@ -652,7 +714,7 @@ OneLine16 (struct ico_progressive_state *context)
                 *pixels++ = (r << 3) | (r >> 2);
                 *pixels++ = (g << 3) | (g >> 2);
                 *pixels++ = (b << 3) | (b >> 2);
-                pixels++; /* skip alpha channel */
+                *pixels++ = 0xff;
         }
 }
 
@@ -674,11 +736,12 @@ static void OneLine8(struct ico_progressive_state *context)
 	while (X < context->Header.width) {
 		/* The joys of having a BGR byteorder */
 		Pixels[X * 4 + 0] =
-		    context->HeaderBuf[4 * context->LineBuf[X] + 42+context->DIBoffset];
+		    context->HeaderBuf[4 * context->LineBuf[X] + INFOHEADER_SIZE + 2 + context->DIBoffset];
 		Pixels[X * 4 + 1] =
-		    context->HeaderBuf[4 * context->LineBuf[X] + 41+context->DIBoffset];
+		    context->HeaderBuf[4 * context->LineBuf[X] + INFOHEADER_SIZE + 1 +context->DIBoffset];
 		Pixels[X * 4 + 2] =
-		    context->HeaderBuf[4 * context->LineBuf[X] + 40+context->DIBoffset];
+		    context->HeaderBuf[4 * context->LineBuf[X] + INFOHEADER_SIZE +context->DIBoffset];
+		Pixels[X * 4 + 3] = 0xff;
 		X++;
 	}
 }
@@ -703,20 +766,22 @@ static void OneLine4(struct ico_progressive_state *context)
 		Pix = context->LineBuf[X/2];
 
 		Pixels[X * 4 + 0] =
-		    context->HeaderBuf[4 * (Pix>>4) + 42+context->DIBoffset];
+		    context->HeaderBuf[4 * (Pix>>4) + INFOHEADER_SIZE + 2 + context->DIBoffset];
 		Pixels[X * 4 + 1] =
-		    context->HeaderBuf[4 * (Pix>>4) + 41+context->DIBoffset];
+		    context->HeaderBuf[4 * (Pix>>4) + INFOHEADER_SIZE + 1 +context->DIBoffset];
 		Pixels[X * 4 + 2] =
-		    context->HeaderBuf[4 * (Pix>>4) + 40+context->DIBoffset];
+		    context->HeaderBuf[4 * (Pix>>4) + INFOHEADER_SIZE + context->DIBoffset];
+		Pixels[X * 4 + 3] = 0xff;
 		X++;
 		if (X<context->Header.width) { 
 			/* Handle the other 4 bit pixel only when there is one */
 			Pixels[X * 4 + 0] =
-			    context->HeaderBuf[4 * (Pix&15) + 42+context->DIBoffset];
+			    context->HeaderBuf[4 * (Pix&15) + INFOHEADER_SIZE + 2 + context->DIBoffset];
 			Pixels[X * 4 + 1] =
-			    context->HeaderBuf[4 * (Pix&15) + 41+context->DIBoffset];
+			    context->HeaderBuf[4 * (Pix&15) + INFOHEADER_SIZE + 1 + context->DIBoffset];
 			Pixels[X * 4 + 2] =
-			    context->HeaderBuf[4 * (Pix&15) + 40+context->DIBoffset];
+			    context->HeaderBuf[4 * (Pix&15) + INFOHEADER_SIZE + context->DIBoffset];
+			Pixels[X * 4 + 3] = 0xff;
 			X++;
 		}
 	}
@@ -746,6 +811,7 @@ static void OneLine1(struct ico_progressive_state *context)
 		Pixels[X * 4 + 0] = Bit*255;
 		Pixels[X * 4 + 1] = Bit*255;
 		Pixels[X * 4 + 2] = Bit*255;
+		Pixels[X * 4 + 3] = 0xff;
 		X++;
 	}
 }
@@ -817,21 +883,25 @@ static void OneLine(struct ico_progressive_state *context)
 	
 	context->Lines++;
 	if (context->Lines>=context->Header.height) {
-	 	context->Type = 1;
+		context->Type = 1;
 		context->LineWidth = context->Header.width / 8;
 		if ((context->Header.width & 7) != 0)
 			context->LineWidth++;
 		/* Pad to a 32 bit boundary */
 		if (((context->LineWidth % 4) > 0))
 			context->LineWidth = (context->LineWidth / 4) * 4 + 4;
-			
 	}
-	  
 
 	if (context->updated_func != NULL) {
+		int y;
+
+		y = context->Lines % context->Header.height;
+		if (context->Header.Negative == 0 &&
+		    context->Lines < context->Header.height)
+			y = context->Header.height - y;
 		(*context->updated_func) (context->pixbuf,
 					  0,
-					  context->Lines % context->Header.height,
+					  y,
 					  context->Header.width,
 					  1,
 					  context->user_data);
@@ -880,6 +950,9 @@ gdk_pixbuf__ico_image_load_increment(gpointer data,
 				BytesToCopy = size;
 
 			if (BytesToCopy > 0) {
+				/* Should be non-NULL once the header is decoded, as below. */
+				g_assert (context->LineBuf != NULL);
+
 				memmove(context->LineBuf +
 				       context->LineDone, buf,
 				       BytesToCopy);
@@ -888,9 +961,14 @@ gdk_pixbuf__ico_image_load_increment(gpointer data,
 				buf += BytesToCopy;
 				context->LineDone += BytesToCopy;
 			}
-			if ((context->LineDone >= context->LineWidth) &&
-			    (context->LineWidth > 0))
+			if ((context->LineDone >= context->LineWidth) && (context->LineWidth > 0)) {
+				/* By this point, DecodeHeader() will have been called, and should have returned successfully
+				 * or set a #GError, as its only return-FALSE-without-setting-a-GError paths are when
+				 * (context->HeaderDone < context->HeaderSize) or (context->LineWidth == 0).
+				 * If it’s returned a #GError, we will have bailed already; otherwise, pixbuf will be set. */
+				g_assert (context->pixbuf != NULL);
 				OneLine(context);
+			}
 
 
 		}
@@ -1124,7 +1202,7 @@ write_icon (FILE *f, GSList *entries)
 
 	for (entry = entries; entry; entry = entry->next) {
 		icon = (IconEntry *)entry->data;
-		size = 40 + icon->height * (icon->and_rowstride + icon->xor_rowstride);
+		size = INFOHEADER_SIZE + icon->height * (icon->and_rowstride + icon->xor_rowstride);
 		
 		/* directory entry */
 		if (icon->width == 256)
@@ -1158,7 +1236,7 @@ write_icon (FILE *f, GSList *entries)
 		icon = (IconEntry *)entry->data;
 
 		/* bitmap header */
-		dwords[0] = 40;
+		dwords[0] = INFOHEADER_SIZE;
 		dwords[1] = icon->width;
 		dwords[2] = icon->height * 2;
 		write32 (f, dwords, 3);
@@ -1177,6 +1255,47 @@ write_icon (FILE *f, GSList *entries)
 		write8 (f, icon->xor, icon->xor_rowstride * icon->height);
 		write8 (f, icon->and, icon->and_rowstride * icon->height);
 	}
+}
+
+/* Locale-independent signed integer string parser, base 10.
+ * @minimum and @maximum are valid inclusively. */
+static gboolean
+ascii_strtoll (const gchar  *str,
+               gint64        minimum,
+               gint64        maximum,
+               gint64       *out,
+               GError      **error)
+{
+	gint64 retval;
+	const gchar *end_ptr;
+
+	errno = 0;
+	retval = g_ascii_strtoll (str, (gchar **) &end_ptr, 10);
+
+	if (errno != 0) {
+		g_set_error_literal (error,
+		                     G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+		                     g_strerror (errno));
+		return FALSE;
+	} else if (end_ptr == str || *end_ptr != '\0') {
+		g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+		             "Argument is not an integer: %s", str);
+		return FALSE;
+	} else if ((maximum < G_MAXINT64 && retval > maximum) ||
+	           (minimum > G_MININT64 && retval < minimum)) {
+		g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+		             "Argument should be in range [%" G_GINT64_FORMAT
+		             ", %" G_GINT64_FORMAT "]: %s",
+		             minimum, maximum, str);
+		return FALSE;
+	}
+
+	g_assert (retval >= minimum && retval <= maximum);
+
+	if (out != NULL)
+		*out = retval;
+
+	return TRUE;
 }
 
 static gboolean
@@ -1204,15 +1323,24 @@ gdk_pixbuf__ico_image_save (FILE          *f,
 		gchar **viter;
 		
 		for (kiter = keys, viter = values; *kiter && *viter; kiter++, viter++) {
-			char *endptr;
+			gint64 out;
 			if (strcmp (*kiter, "depth") == 0) {
-				sscanf (*viter, "%d", &icon->depth);
+				if (!ascii_strtoll (*viter, 1, 32,
+				                    &out, error))
+					return FALSE;
+				icon->depth = out;
 			}
 			else if (strcmp (*kiter, "x_hot") == 0) {
-				hot_x = strtol (*viter, &endptr, 10);
+				if (!ascii_strtoll (*viter, G_MININT, G_MAXINT,
+				                    &out, error))
+					return FALSE;
+				hot_x = out;
 			}
 			else if (strcmp (*kiter, "y_hot") == 0) {
-				hot_y = strtol (*viter, &endptr, 10);
+				if (!ascii_strtoll (*viter, G_MININT, G_MAXINT,
+				                    &out, error))
+					return FALSE;
+				hot_y = out;
 			}
 
 		}
@@ -1232,6 +1360,17 @@ gdk_pixbuf__ico_image_save (FILE          *f,
 	return TRUE;
 }
 
+static gboolean
+gdk_pixbuf__ico_is_save_option_supported (const gchar *option_key)
+{
+        if (g_strcmp0 (option_key, "depth") == 0 ||
+            g_strcmp0 (option_key, "x_hot") == 0 ||
+            g_strcmp0 (option_key, "y_hot") == 0)
+                return TRUE;
+
+        return FALSE;
+}
+
 #ifndef INCLUDE_ico
 #define MODULE_ENTRY(function) G_MODULE_EXPORT void function
 #else
@@ -1244,6 +1383,7 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
 	module->stop_load = gdk_pixbuf__ico_image_stop_load;
 	module->load_increment = gdk_pixbuf__ico_image_load_increment;
         module->save = gdk_pixbuf__ico_image_save;
+        module->is_save_option_supported = gdk_pixbuf__ico_is_save_option_supported;
 }
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)

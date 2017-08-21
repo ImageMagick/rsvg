@@ -21,6 +21,7 @@
 #include <math.h>
 #include <glib.h>
 
+#include "../fallback-c89.c"
 #include "pixops.h"
 #include "pixops-internal.h"
 
@@ -437,21 +438,51 @@ pixops_composite_nearest_noscale (guchar        *dest_buf,
 				  gboolean       src_has_alpha,
 				  int            overall_alpha)
 {
-  int i, j;
-  int x;
+  gint64 i;
+  gint64 x;
+  gint64 xmax, xstart, xstop, y_pos;
+  const guchar *p;
+  unsigned int  a0;
+
+#define INNER_LOOP_NOSCALE(SRC_CHANNELS,DEST_CHANNELS,ASSIGN_PIXEL) \
+      xmax = x + (render_x1 - render_x0);                       \
+      xstart = MIN (0, xmax);                                   \
+      xstop = MIN (src_width, xmax);                            \
+      p = src + CLAMP (x, xstart, xstop) * SRC_CHANNELS;        \
+      while (x < xstart)                                        \
+        {                                                       \
+          ASSIGN_PIXEL;                                         \
+          dest += DEST_CHANNELS;                                \
+          x++;                                                  \
+        }                                                       \
+      p = src + x * SRC_CHANNELS;                               \
+      while (x < xstop)                                         \
+        {                                                       \
+          ASSIGN_PIXEL;                                         \
+          dest += DEST_CHANNELS;                                \
+          x++;                                                  \
+          p += SRC_CHANNELS;                                    \
+        }                                                       \
+      p = src + CLAMP (x, 0, src_width - 1) * SRC_CHANNELS;     \
+      while (x < xmax)                                          \
+        {                                                       \
+          ASSIGN_PIXEL;                                         \
+          dest += DEST_CHANNELS;                                \
+          x++;                                                  \
+        }
 
   for (i = 0; i < (render_y1 - render_y0); i++)
     {
-      const guchar *src  = src_buf + (gsize)(i + render_y0) * src_rowstride;
-      guchar       *dest = dest_buf + (gsize)i * dest_rowstride;
+      const guchar *src;
+      guchar       *dest;
+      y_pos = i + render_y0;
+      y_pos = CLAMP (y_pos, 0, src_height - 1);
+      src  = src_buf + (gsize)y_pos * src_rowstride;
+      dest = dest_buf + (gsize)i * dest_rowstride;
 
-      x = render_x0 * src_channels;
+      x = render_x0;
 
-      for (j=0; j < (render_x1 - render_x0); j++)
-	{
-	  const guchar *p = src + x;
-	  unsigned int  a0;
-
+      INNER_LOOP_NOSCALE(src_channels, dest_channels,
 	  if (src_has_alpha)
 	    a0 = (p[3] * overall_alpha) / 0xff;
 	  else
@@ -494,11 +525,10 @@ pixops_composite_nearest_noscale (guchar        *dest_buf,
 	        }
 	      break;
 	    }
-	  dest += dest_channels;
-	  x += src_channels;
-	}
+	);
     }
 }
+#undef INNER_LOOP_NOSCALE
 
 static void
 pixops_composite_color_nearest (guchar        *dest_buf,
@@ -1716,6 +1746,141 @@ make_weights (PixopsFilter     *filter,
     }
 }
 
+/* Two-step scaler begins */
+
+/* make_filter_table() bloats out in VM usage and consumes 100% CPU for
+ * tens of seconds when downscaling by a large factor.
+ * https://bugzilla.gnome.org/show_bug.cgi?id=80925
+ * We work round this by doing extreme reductions in two steps.
+ *
+ * The excessive CPU usage is accompanied by an excessive RAM usage because
+ * make_weights() allocates two arrays of weights proportional in size to
+ * n_x = (1 / scale_x + 3) and n_y = (1 / scale_y + 3),  then make_filter_table()
+ * allocates and fills an array of SUBSAMPLE * SUBSAMPLE * n_x * n_y doubles.
+ * Empirically, on machines with plenty of RAM, the execution time slopes upward
+ * when n_filters > 1000.
+ * SUBSAMPLE is 16 so each filter takes 16 x 16 doubles (8 bytes) = 2kb RAM.
+ * Limiting it to 1000 filters limits the scaler's RAM consumption to about 2MB
+ * which should be OK on machines with relatively little memory.
+ *
+ * GDK_INTER_BILINEAR, GDK_INTERP_TILES and GDK_INTER_HYPER all have
+ * similar symptoms; only GDK_INTERP_NEAREST does not need this trick.
+ **/
+#define MAX_FILTERS 1000
+
+/* Check whether prescaling is necessary to avoid the bug */
+static gboolean
+need_to_prescale (double           scale_x,
+		  double           scale_y,
+		  PixopsInterpType interp_type)
+{
+  int n_x, n_y; /* See make_weights() */
+
+  /* The testsuite sets this to compare the results with and without it. */
+  if (g_getenv ("GDK_PIXBUF_DISABLE_TWO_STEP_SCALER"))
+    return FALSE;
+
+  /* Calculate the number of weights created in make_weights() */
+  switch (interp_type) {
+  case PIXOPS_INTERP_HYPER:
+    n_x = ceil (1 / scale_x + 3);
+    n_y = ceil (1 / scale_y + 3);
+    break;
+  case PIXOPS_INTERP_TILES:
+  case PIXOPS_INTERP_BILINEAR:
+    n_x = ceil (1 / scale_x + 1);
+    n_y = ceil (1 / scale_y + 1);
+    break;
+  case PIXOPS_INTERP_NEAREST:
+    /* Doesn't need the optimization */
+    return FALSE;
+  default:
+    g_assert_not_reached ();
+  }
+
+  /* Limit the number of filters created by make_filter_table(). */
+  return (n_x * n_y > MAX_FILTERS);
+}
+
+/* Prescale the source image.
+ * If successful, it changes the source buffer's parameters to reflect the
+ * half-scaled image and the scaling factors to reflect the scaling left to do.
+ * It returns a pointer to the new image data or NULL, so that the caller knows
+ * whether they have to free the temporary buffer or not.
+ */
+static guchar *
+prescale (const guchar     **src_bufp,
+	  int               *src_widthp,
+	  int               *src_heightp,
+	  int               *src_rowstridep,
+	  int                src_channels,
+	  gboolean           src_has_alpha,
+	  double            *scale_xp,
+	  double            *scale_yp,
+	  PixopsInterpType   interp_type)
+{
+  /* Give local names to parameters that may be modified */
+  const guchar *src_buf = *src_bufp;
+  int           src_width = *src_widthp;
+  int           src_height = *src_heightp;
+  int           src_rowstride = *src_rowstridep;
+  double        scale_x = *scale_xp;
+  double        scale_y = *scale_yp;
+
+  /* How much we prescale each axis by */
+  double prescale_x, prescale_y;
+
+  /* The prescaled image */
+  int tmp_width, tmp_height;
+  int tmp_rowstride;
+  int tmp_channels;
+  gboolean tmp_has_alpha;
+  guchar *tmp_buf;
+
+  /* The time taken by make_filter_table() is roughly proportional to
+   * 1/scale_x * 1/scale_y, i.e. to the area reduction factor, so we
+   * reduce the image in two steps, each of which reduces the total area
+   * by the same factor. */
+  prescale_x = sqrt (scale_x);
+  prescale_y = sqrt (scale_y);
+
+  /* Scale the whole source image into a top-left-aligned temporary pixbuf.
+   * render_[xy][01] are done in the final scaling, not here, as they are
+   * measured in the coordinate system of the scaled image. */
+  tmp_width = lrint (src_width * prescale_x);
+  tmp_height = lrint (src_height * prescale_y);
+
+  /* We are below the gdk_ interface, so create the temp image manually.
+   * Code copied from gdk_pixbuf_new() */
+  tmp_channels = src_channels;
+  tmp_has_alpha = src_has_alpha;
+  tmp_rowstride = ((tmp_width * tmp_channels) + 3) & ~3;
+  tmp_buf = g_try_malloc_n (tmp_height, tmp_rowstride);
+  if (!tmp_buf)
+    return NULL; /* Skip the prescaling */
+
+  /* Prescale to an intermediate size */
+  _pixops_scale (tmp_buf, tmp_width, tmp_height, tmp_rowstride,
+		 tmp_channels, tmp_has_alpha, src_buf, src_width,
+		 src_height, src_rowstride, src_channels, src_has_alpha,
+		 0, 0, tmp_width, tmp_height, 0.0, 0.0,
+		 prescale_x, prescale_y,
+		 interp_type);
+
+  /* The second call to the scaler reads from the prescaled image */
+  *src_bufp = tmp_buf;
+  *src_widthp = tmp_width;
+  *src_heightp = tmp_height;
+  *src_rowstridep = tmp_rowstride;
+
+  /* Calculate how much scaling is left to do */
+  *scale_xp /= prescale_x;
+  *scale_yp /= prescale_y;
+
+  return tmp_buf;
+}
+/* End of two-step scaler */
+
 static void
 _pixops_composite_color_real (guchar          *dest_buf,
 			      int              render_x0,
@@ -1743,6 +1908,7 @@ _pixops_composite_color_real (guchar          *dest_buf,
 {
   PixopsFilter filter;
   PixopsLineFunc line_func;
+  guchar *tmp_buf = NULL;
   
 #ifdef USE_MMX
   gboolean found_mmx = _pixops_have_mmx ();
@@ -1765,6 +1931,11 @@ _pixops_composite_color_real (guchar          *dest_buf,
 				      check_size, color1, color2);
       return;
     }
+
+  if (need_to_prescale (scale_x, scale_y, interp_type))
+    tmp_buf = prescale (&src_buf, &src_width, &src_height, &src_rowstride,
+			src_channels, src_has_alpha,
+			&scale_x, &scale_y, interp_type);
   
   filter.overall_alpha = overall_alpha / 255.;
   if (!make_weights (&filter, interp_type, scale_x, scale_y))
@@ -1787,6 +1958,8 @@ _pixops_composite_color_real (guchar          *dest_buf,
 
   g_free (filter.x.weights);
   g_free (filter.y.weights);
+  if (tmp_buf)
+    g_free (tmp_buf);
 }
 
 void
@@ -1896,6 +2069,7 @@ _pixops_composite_real (guchar          *dest_buf,
 {
   PixopsFilter filter;
   PixopsLineFunc line_func;
+  guchar *tmp_buf = NULL;
   
 #ifdef USE_MMX
   gboolean found_mmx = _pixops_have_mmx ();
@@ -1921,6 +2095,11 @@ _pixops_composite_real (guchar          *dest_buf,
 				  src_has_alpha, scale_x, scale_y, overall_alpha);
       return;
     }
+
+  if (need_to_prescale (scale_x, scale_y, interp_type))
+    tmp_buf = prescale (&src_buf, &src_width, &src_height, &src_rowstride,
+			src_channels, src_has_alpha,
+			&scale_x, &scale_y, interp_type);
   
   filter.overall_alpha = overall_alpha / 255.;
   if (!make_weights (&filter, interp_type, scale_x, scale_y))
@@ -1947,6 +2126,8 @@ _pixops_composite_real (guchar          *dest_buf,
 
   g_free (filter.x.weights);
   g_free (filter.y.weights);
+  if (tmp_buf)
+    g_free (tmp_buf);
 }
 
 void
@@ -2308,6 +2489,7 @@ _pixops_scale_real (guchar        *dest_buf,
 {
   PixopsFilter filter;
   PixopsLineFunc line_func;
+  guchar *tmp_buf = NULL;	/* Temporary image for two-step scaling */
 
 #ifdef USE_MMX
   gboolean found_mmx = _pixops_have_mmx ();
@@ -2329,6 +2511,11 @@ _pixops_scale_real (guchar        *dest_buf,
 			    scale_x, scale_y);
       return;
     }
+
+  if (need_to_prescale (scale_x, scale_y, interp_type))
+    tmp_buf = prescale (&src_buf, &src_width, &src_height, &src_rowstride,
+			src_channels, src_has_alpha,
+			&scale_x, &scale_y, interp_type);
   
   filter.overall_alpha = 1.0;
   if (!make_weights (&filter, interp_type, scale_x, scale_y))
@@ -2354,6 +2541,7 @@ _pixops_scale_real (guchar        *dest_buf,
 
   g_free (filter.x.weights);
   g_free (filter.y.weights);
+  g_clear_pointer (&tmp_buf, g_free);
 }
 
 void

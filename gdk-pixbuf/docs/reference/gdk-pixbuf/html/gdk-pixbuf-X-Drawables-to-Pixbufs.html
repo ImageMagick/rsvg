@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>X Drawables to Pixbufs: GDK-PixBuf Reference Manual</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
 <link rel="home" href="index.html" title="GDK-PixBuf Reference Manual">
 <link rel="up" href="rn01.html" title="API Reference">
 <link rel="prev" href="gdk-pixbuf-Xlib-Rendering.html" title="Xlib Rendering">
@@ -33,7 +33,7 @@
 </tr></table></div>
 <div class="refsect1">
 <a name="gdk-pixbuf-X-Drawables-to-Pixbufs.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
@@ -87,7 +87,7 @@ If the drawable is a window, the <em class="parameter"><code>cmap</code></em>
  argument will be ignored and the
 window's own colormap will be used instead.</p>
 <p>If the specified destination pixbuf <em class="parameter"><code>dest</code></em>
- is <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><span class="type">NULL</span></a>, then this function will
+ is <a href="/home/mclasen/gnome/share/gtk-doc/html/glib/glib-Standard-Macros.html#NULL:CAPS"><span class="type">NULL</span></a>, then this function will
 create an RGB pixbuf with 8 bits per channel and no alpha, with the same size
 specified by the <em class="parameter"><code>width</code></em>
  and <em class="parameter"><code>height</code></em>
@@ -95,11 +95,11 @@ specified by the <em class="parameter"><code>width</code></em>
  and
 <em class="parameter"><code>dest_y</code></em>
  arguments must be specified as 0, otherwise the function will return
-<a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><span class="type">NULL</span></a>.  If the specified destination pixbuf is not NULL and it contains alpha
+<a href="/home/mclasen/gnome/share/gtk-doc/html/glib/glib-Standard-Macros.html#NULL:CAPS"><span class="type">NULL</span></a>.  If the specified destination pixbuf is not NULL and it contains alpha
 information, then the filled pixels will be set to full opacity.</p>
 <p>If the specified drawable is a pixmap, then the requested source rectangle
 must be completely contained within the pixmap, otherwise the function will
-return <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><span class="type">NULL</span></a>.</p>
+return <a href="/home/mclasen/gnome/share/gtk-doc/html/glib/glib-Standard-Macros.html#NULL:CAPS"><span class="type">NULL</span></a>.</p>
 <p>If the specified drawable is a window, then it must be viewable, i.e. all of
 its ancestors up to the root window must be mapped.  Also, the specified
 source rectangle must be completely contained within the window and within
@@ -109,7 +109,7 @@ inferior windows of a different depth than that of the source window will also
 be undefined.</p>
 <div class="refsect3">
 <a name="gdk-pixbuf-xlib-get-from-drawable.parameters"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">

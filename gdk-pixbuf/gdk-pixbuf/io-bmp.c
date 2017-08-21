@@ -254,6 +254,7 @@ static gboolean DecodeHeader(unsigned char *BFH, unsigned char *BIH,
                              GError **error)
 {
 	gint clrUsed;
+	guint bytesPerPixel;
 
 	/* First check for the two first bytes content. A sane
 	   BMP file must start with bytes 0x42 0x4D.  */
@@ -293,6 +294,18 @@ static gboolean DecodeHeader(unsigned char *BFH, unsigned char *BIH,
 		State->Compressed = lsb_32 (&BIH[16]);
 	} else if (State->Header.size == 64) {
                 /* BMP OS/2 v2 */
+		State->Header.width = lsb_32 (&BIH[4]);
+		State->Header.height = lsb_32 (&BIH[8]);
+		State->Header.depth = lsb_16 (&BIH[14]);
+		State->Compressed = lsb_32 (&BIH[16]);
+	} else if (State->Header.size == 56) {
+                /* BMP v3 with RGBA bitmasks */
+		State->Header.width = lsb_32 (&BIH[4]);
+		State->Header.height = lsb_32 (&BIH[8]);
+		State->Header.depth = lsb_16 (&BIH[14]);
+		State->Compressed = lsb_32 (&BIH[16]);
+	} else if (State->Header.size == 52) {
+                /* BMP v3 with RGB bitmasks */
 		State->Header.width = lsb_32 (&BIH[4]);
 		State->Header.height = lsb_32 (&BIH[8]);
 		State->Header.depth = lsb_16 (&BIH[14]);
@@ -352,6 +365,14 @@ static gboolean DecodeHeader(unsigned char *BFH, unsigned char *BIH,
 
 	/* Negative heights indicates bottom-down pixelorder */
 	if (State->Header.height < 0) {
+		if (State->Header.height == INT_MIN) {
+			g_set_error_literal (error,
+					     GDK_PIXBUF_ERROR,
+					     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+					     _("BMP image has bogus header data"));
+			State->read_state = READ_STATE_ERROR;
+			return FALSE;
+		}
 		State->Header.height = -State->Header.height;
 		State->Header.Negative = 1;
 	}
@@ -380,15 +401,17 @@ static gboolean DecodeHeader(unsigned char *BFH, unsigned char *BIH,
 		return FALSE;
 	}
 
-	if (State->Type == 32)
-		State->LineWidth = State->Header.width * 4;
-	else if (State->Type == 24)
-		State->LineWidth = State->Header.width * 3;
-	else if (State->Type == 16)
-		State->LineWidth = State->Header.width * 2;
-	else if (State->Type == 8)
-		State->LineWidth = State->Header.width * 1;
-	else if (State->Type == 4)
+	if ((State->Type >= 8) && (State->Type <= 32) && (State->Type % 8 == 0)) {
+		bytesPerPixel = State->Type / 8;
+		State->LineWidth = State->Header.width * bytesPerPixel;
+		if (State->Header.width != State->LineWidth / bytesPerPixel) {
+			g_set_error_literal (error,
+					     GDK_PIXBUF_ERROR,
+					     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+					     _("BMP image width too large"));
+			return FALSE;
+		}
+	} else if (State->Type == 4)
 		State->LineWidth = (State->Header.width + 1) / 2;
 	else if (State->Type == 1) {
 		State->LineWidth = State->Header.width / 8;
@@ -409,6 +432,10 @@ static gboolean DecodeHeader(unsigned char *BFH, unsigned char *BIH,
 		State->LineWidth = (State->LineWidth / 4) * 4 + 4;
 
 	if (State->pixbuf == NULL) {
+		guint64 len;
+		int rowstride;
+		gboolean has_alpha;
+
 		if (State->size_func) {
 			gint width = State->Header.width;
 			gint height = State->Header.height;
@@ -421,19 +448,45 @@ static gboolean DecodeHeader(unsigned char *BFH, unsigned char *BIH,
 			}
 		}
 
-		if (State->Type == 32 || 
-		    State->Compressed == BI_RLE4 || 
+		/* rowstride is always >= width, so do an early check for bogus header */
+		if (State->Header.width <= 0 ||
+		    State->Header.height <= 0 ||
+		    !g_uint64_checked_mul (&len, State->Header.width, State->Header.height) ||
+		    len > G_MAXINT) {
+			g_set_error_literal (error,
+                                             GDK_PIXBUF_ERROR,
+                                             GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+                                             _("BMP image has bogus header data"));
+			State->read_state = READ_STATE_ERROR;
+			return FALSE;
+		}
+
+		if (State->Type == 32 ||
+		    State->Compressed == BI_RLE4 ||
 		    State->Compressed == BI_RLE8)
-			State->pixbuf =
-				gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8,
-					       (gint) State->Header.width,
-					       (gint) State->Header.height);
+			has_alpha = TRUE;
 		else
-			State->pixbuf =
-				gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8,
-					       (gint) State->Header.width,
-					       (gint) State->Header.height);
-		
+			has_alpha = FALSE;
+
+		rowstride = gdk_pixbuf_calculate_rowstride (GDK_COLORSPACE_RGB, has_alpha, 8,
+							    (gint) State->Header.width,
+							    (gint) State->Header.height);
+
+		if (rowstride <= 0 ||
+		    !g_uint64_checked_mul (&len, rowstride, State->Header.height) ||
+		    len > G_MAXINT) {
+			g_set_error_literal (error,
+                                             GDK_PIXBUF_ERROR,
+                                             GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+                                             _("BMP image has bogus header data"));
+			State->read_state = READ_STATE_ERROR;
+			return FALSE;
+		}
+
+		State->pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, has_alpha, 8,
+						(gint) State->Header.width,
+						(gint) State->Header.height);
+
 		if (State->pixbuf == NULL) {
 			g_set_error_literal (error,
                                              GDK_PIXBUF_ERROR,
@@ -441,8 +494,8 @@ static gboolean DecodeHeader(unsigned char *BFH, unsigned char *BIH,
                                              _("Not enough memory to load bitmap image"));
 			State->read_state = READ_STATE_ERROR;
 			return FALSE;
-			}
-		
+		}
+
 		if (State->prepared_func != NULL)
 			/* Notify the client that we are ready to go */
 			(*State->prepared_func) (State->pixbuf, NULL, State->user_data);
@@ -484,9 +537,10 @@ static gboolean DecodeHeader(unsigned char *BFH, unsigned char *BIH,
 			State->BufferSize = State->LineWidth;
 		}
 	} else if (State->Compressed == BI_BITFIELDS) {
-               if (State->Header.size == 108 || State->Header.size == 124) 
+               if (State->Header.size == 52  || State->Header.size == 56 ||
+                   State->Header.size == 108 || State->Header.size == 124)
                {
-			/* v4 and v5 have the bitmasks in the header */
+			/* extended v3, v4 and v5 have the bitmasks in the header */
 			if (!decode_bitmasks (&BIH[40], State, error)) {
 			       State->read_state = READ_STATE_ERROR;
 			       return FALSE;
@@ -518,12 +572,16 @@ static gboolean DecodeColormap (guchar *buff,
 {
 	gint i;
 	gint samples;
+	guint newbuffersize;
 
 	g_assert (State->read_state == READ_STATE_PALETTE);
 
 	samples = (State->Header.size == 12 ? 3 : 4);
-	if (State->BufferSize < State->Header.n_colors * samples) {
-		State->BufferSize = State->Header.n_colors * samples;
+	newbuffersize = State->Header.n_colors * samples;
+	if (newbuffersize / samples != State->Header.n_colors) /* Integer overflow check */
+		return FALSE;
+	if (State->BufferSize < newbuffersize) {
+		State->BufferSize = newbuffersize;
 		if (!grow_buffer (State, error))
 			return FALSE;
 		return TRUE;
@@ -592,8 +650,8 @@ decode_bitmasks (guchar *buf,
 	find_bits (State->g_mask, &State->g_shift, &State->g_bits);
 	find_bits (State->b_mask, &State->b_shift, &State->b_bits);
 
-        /* v4 and v5 have an alpha mask */
-        if (State->Header.size == 108 || State->Header.size == 124) {
+        /* extended v3, v4 and v5 have an alpha mask */
+        if (State->Header.size == 56 || State->Header.size == 108 || State->Header.size == 124) {
 	      buf += 4;
 	      State->a_mask = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 	      find_bits (State->a_mask, &State->a_shift, &State->a_bits);
@@ -718,12 +776,10 @@ static gboolean gdk_pixbuf__bmp_image_stop_load(gpointer data, GError **error)
 		g_object_unref(context->pixbuf);
 
 	if (context->read_state == READ_STATE_HEADERS) {
-                if (error && *error == NULL) {
-                        g_set_error_literal (error,
-                                             GDK_PIXBUF_ERROR,
-                                             GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-                                             _("Premature end-of-file encountered"));
-                }
+                g_set_error_literal (error,
+                                     GDK_PIXBUF_ERROR,
+                                     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+                                     _("Premature end-of-file encountered"));
 		retval = FALSE;
 	}
 	
@@ -1247,8 +1303,13 @@ gdk_pixbuf__bmp_image_load_increment(gpointer data,
 			break;
 
 		case READ_STATE_PALETTE:
-			if (!DecodeColormap (context->buff, context, error))
+			if (!DecodeColormap (context->buff, context, error)) {
+				g_set_error (error,
+					     GDK_PIXBUF_ERROR,
+					     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+					     _("Error while decoding colormap"));
 				return FALSE;
+			}
 			break;
 
 		case READ_STATE_BITMASKS:
@@ -1294,6 +1355,7 @@ gdk_pixbuf__bmp_image_save_to_callback (GdkPixbufSaveFunc   save_func,
 					GError            **error)
 {
 	guint width, height, channel, size, stride, src_stride, x, y;
+	guint bf_size;
 	guchar BFH_BIH[54], *pixels, *buf, *src, *dst, *dst_line;
 	gboolean ret;
 
@@ -1302,14 +1364,33 @@ gdk_pixbuf__bmp_image_save_to_callback (GdkPixbufSaveFunc   save_func,
 	channel = gdk_pixbuf_get_n_channels (pixbuf);
 	pixels = gdk_pixbuf_get_pixels (pixbuf);
 	src_stride = gdk_pixbuf_get_rowstride (pixbuf);
-	stride = (width * 3 + 3) & ~3;
-	size = stride * height;
+
+	/* stride = (width * 3 + 3) & ~3 */
+	if (!g_uint_checked_mul (&stride, width, 3) ||
+	    !g_uint_checked_add (&stride, stride, 3)) {
+		g_set_error_literal (error, GDK_PIXBUF_ERROR,
+		                     GDK_PIXBUF_ERROR_FAILED,
+		                     _("Image is too wide for BMP format."));
+		return FALSE;
+	}
+
+	stride &= ~3;
+
+	/* size = stride * height
+	 * bf_size = size + 14 + 40 */
+	if (!g_uint_checked_mul (&size, stride, height) ||
+	    !g_uint_checked_add (&bf_size, size, 14 + 40)) {
+		g_set_error_literal (error, GDK_PIXBUF_ERROR,
+		                     GDK_PIXBUF_ERROR_FAILED,
+		                     _("Image is too wide for BMP format."));
+		return FALSE;
+	}
 
 	/* filling BFH */
 	dst = BFH_BIH;
 	*dst++ = 'B';			/* bfType */
 	*dst++ = 'M';
-	put32 (dst, size + 14 + 40);	/* bfSize */
+	put32 (dst, bf_size);	/* bfSize */
 	put32 (dst, 0);			/* bfReserved1 + bfReserved2 */
 	put32 (dst, 14 + 40);		/* bfOffBits */
 

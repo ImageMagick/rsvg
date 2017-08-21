@@ -188,6 +188,7 @@ struct _GifContext
         GError **error;
 };
 
+/* The buffer must be at least 255 bytes long. */
 static int GetDataBlock (GifContext *, unsigned char *);
 
 
@@ -210,7 +211,7 @@ gif_read (GifContext *context, guchar *buffer, size_t len)
 		count += len;
 		g_print ("Fsize :%d\tcount :%d\t", len, count);
 #endif
-		retval = (fread(buffer, len, 1, context->file) != 0);
+		retval = (fread (buffer, 1, len, context->file) == len);
 
                 if (!retval && ferror (context->file)) {
                         gint save_errno = errno;
@@ -451,6 +452,7 @@ gif_get_extension (GifContext *context)
 
 static int ZeroDataBlock = FALSE;
 
+/* @buf must be at least 255 bytes long. */
 static int
 GetDataBlock (GifContext *context,
 	      unsigned char *buf)
@@ -1066,11 +1068,11 @@ gif_get_lzw (GifContext *context)
         
 	if (bound_flag && context->update_func) {
 		if (lower_bound <= upper_bound && first_pass == context->draw_pass) {
-                        maybe_update (context, 
+                        maybe_update (context,
                                       context->frame->x_offset,
                                       context->frame->y_offset + lower_bound,
                                       gdk_pixbuf_get_width (context->frame->pixbuf),
-                                      upper_bound - lower_bound);
+                                      upper_bound - lower_bound + 1);
 		} else {
 			if (lower_bound <= upper_bound) {
                                 maybe_update (context,

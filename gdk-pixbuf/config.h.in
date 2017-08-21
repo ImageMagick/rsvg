@@ -40,11 +40,17 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if libm has lrint */
+#undef HAVE_LRINT
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
 /* Define to 1 is libjpeg supports progressive JPEG */
 #undef HAVE_PROGRESSIVE_JPEG
+
+/* Define to 1 if libm has round */
+#undef HAVE_ROUND
 
 /* Define to 1 if you have the `setrlimit' function. */
 #undef HAVE_SETRLIMIT
@@ -75,6 +81,9 @@
 
 /* Define to 1 if sys/systeminfo.h is available */
 #undef HAVE_SYS_SYSTEMINFO_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
@@ -127,7 +136,7 @@
 /* Define to 1 if medialib 2.5 is available */
 #undef USE_MEDIALIB25
 
-/* Define to 1 if XXM is available and should be used */
+/* Define to 1 if MMX is available and should be used */
 #undef USE_MMX
 
 /* Enable large inode numbers on Mac OS X 10.5.  */
@@ -137,6 +146,9 @@
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
+
+/* defines how to decorate public symbols while building */
+#undef _GDK_PIXBUF_EXTERN
 
 /* Define for large files, on AIX-style hosts. */
 #undef _LARGE_FILES

@@ -195,7 +195,7 @@ get_file_formats (void)
 
 /* DllMain function needed to tuck away the gdk-pixbuf DLL handle */
 
-/* static HMODULE gdk_pixbuf_dll;
+static HMODULE gdk_pixbuf_dll;
 
 BOOL WINAPI
 DllMain (HINSTANCE hinstDLL,
@@ -209,7 +209,7 @@ DllMain (HINSTANCE hinstDLL,
         }
 
   return TRUE;
-} */
+}
 #endif
 
 
@@ -424,9 +424,6 @@ gdk_pixbuf_io_init (void)
         else                                                            \
                 g_free (builtin_module)
 
-	/* Always include GdkPixdata format */
-        load_one_builtin_module (pixdata);
-
 #ifdef INCLUDE_ani
         load_one_builtin_module (ani);
 #endif
@@ -456,9 +453,6 @@ gdk_pixbuf_io_init (void)
 #endif
 #ifdef INCLUDE_xbm
         load_one_builtin_module (xbm);
-#endif
-#ifdef INCLUDE_svg
-        load_one_builtin_module (svg);
 #endif
 #ifdef INCLUDE_tga
         load_one_builtin_module (tga);
@@ -653,7 +647,6 @@ gdk_pixbuf_io_init (void)
   extern void _gdk_pixbuf__##type##_fill_info   (GdkPixbufFormat *info);   \
   extern void _gdk_pixbuf__##type##_fill_vtable (GdkPixbufModule *module)
 
-module (pixdata);
 module (png);
 module (jpeg);
 module (gif);
@@ -664,7 +657,6 @@ module (tiff);
 module (pnm);
 module (bmp);
 module (xbm);
-module (svg);
 module (tga);
 module (icns);
 module (jasper);
@@ -699,8 +691,6 @@ gdk_pixbuf_load_module_unlocked (GdkPixbufModule *image_module,
                 fill_info = _gdk_pixbuf__##id##_fill_info;              \
                 fill_vtable = _gdk_pixbuf__##id##_fill_vtable;  \
         }
-
-        try_module (pixdata,pixdata);
 
 #ifdef INCLUDE_gdiplus
         try_module (ico,gdip_ico);
@@ -743,9 +733,6 @@ gdk_pixbuf_load_module_unlocked (GdkPixbufModule *image_module,
 #endif
 #ifdef INCLUDE_xbm
         try_module (xbm,xbm);
-#endif
-#ifdef INCLUDE_svg
-        try_module (svg,svg);
 #endif
 #ifdef INCLUDE_tga
         try_module (tga,tga);
@@ -821,20 +808,12 @@ _gdk_pixbuf_load_module (GdkPixbufModule *image_module,
                          GError         **error)
 {
         gboolean ret;
-        /* gboolean locked = FALSE; */
 
-        /* be extra careful, maybe the module initializes
-         * the thread system
-         */
-        /* if (g_threads_got_initialized) { */
-                G_LOCK (init_lock);
-                /* locked = TRUE;
-        } */
+        G_LOCK (init_lock);
 
         ret = gdk_pixbuf_load_module_unlocked (image_module, error);
 
-        /* if (locked) */
-                G_UNLOCK (init_lock);
+        G_UNLOCK (init_lock);
 
         return ret;
 }
@@ -1147,24 +1126,25 @@ gdk_pixbuf_new_from_file (const char *filename,
 
 #ifdef G_OS_WIN32
 
-#undef gdk_pixbuf_new_from_file
+/**
+ * gdk_pixbuf_new_from_file_utf8:
+ * @filename: Name of file to load, in the GLib file name encoding
+ * @error: Return location for an error
+ *
+ * Same as gdk_pixbuf_new_from_file()
+ *
+ * Return value: A newly-created pixbuf with a reference count of 1, or %NULL if
+ * any of several error conditions occurred:  the file could not be opened,
+ * there was no loader for the file's format, there was not enough memory to
+ * allocate the image buffer, or the image file contained invalid data.
+ **/
 GdkPixbuf *
-gdk_pixbuf_new_from_file (const char *filename,
-                          GError    **error)
+gdk_pixbuf_new_from_file_utf8 (const char *filename,
+                                GError    **error)
 {
-        gchar *utf8_filename =
-                g_locale_to_utf8 (filename, -1, NULL, NULL, error);
-        GdkPixbuf *retval;
-
-        if (utf8_filename == NULL)
-                return NULL;
-
-        retval = gdk_pixbuf_new_from_file_utf8 (utf8_filename, error);
-
-        g_free (utf8_filename);
-
-        return retval;
+    return gdk_pixbuf_new_from_file (filename, error);
 }
+
 #endif
 
 
@@ -1207,29 +1187,32 @@ gdk_pixbuf_new_from_file_at_size (const char *filename,
 
 #ifdef G_OS_WIN32
 
-#undef gdk_pixbuf_new_from_file_at_size
-
+/**
+ * gdk_pixbuf_new_from_file_at_size_utf8:
+ * @filename: Name of file to load, in the GLib file name encoding
+ * @width: The width the image should have or -1 to not constrain the width
+ * @height: The height the image should have or -1 to not constrain the height
+ * @error: Return location for an error
+ *
+ * Same as gdk_pixbuf_new_from_file_at_size()
+ *
+ * Return value: A newly-created pixbuf with a reference count of 1, or
+ * %NULL if any of several error conditions occurred:  the file could not
+ * be opened, there was no loader for the file's format, there was not
+ * enough memory to allocate the image buffer, or the image file contained
+ * invalid data.
+ *
+ * Since: 2.4
+ **/
 GdkPixbuf *
-gdk_pixbuf_new_from_file_at_size (const char *filename,
-                                  int         width, 
-                                  int         height,
-                                  GError    **error)
+gdk_pixbuf_new_from_file_at_size_utf8 (const char *filename,
+                                       int         width,
+                                       int         height,
+                                       GError    **error)
 {
-        gchar *utf8_filename =
-                g_locale_to_utf8 (filename, -1, NULL, NULL, error);
-        GdkPixbuf *retval;
-
-        if (utf8_filename == NULL)
-                return NULL;
-
-        retval = gdk_pixbuf_new_from_file_at_size_utf8 (utf8_filename,
-                                                        width, height,
-                                                        error);
-
-        g_free (utf8_filename);
-
-        return retval;
+    return gdk_pixbuf_new_from_file_at_size (filename, width, height, error);
 }
+
 #endif
 
 typedef struct {
@@ -1411,30 +1394,32 @@ gdk_pixbuf_new_from_file_at_scale (const char *filename,
 
 #ifdef G_OS_WIN32
 
-#undef gdk_pixbuf_new_from_file_at_scale
-
+/**
+ * gdk_pixbuf_new_from_file_at_scale_utf8:
+ * @filename: Name of file to load, in the GLib file name encoding
+ * @width: The width the image should have or -1 to not constrain the width
+ * @height: The height the image should have or -1 to not constrain the height
+ * @preserve_aspect_ratio: %TRUE to preserve the image's aspect ratio
+ * @error: Return location for an error
+ *
+ * Same as gdk_pixbuf_new_from_file_at_scale().
+ *
+ * Return value: A newly-created pixbuf with a reference count of 1, or %NULL
+ * if any of several error conditions occurred:  the file could not be opened,
+ * there was no loader for the file's format, there was not enough memory to
+ * allocate the image buffer, or the image file contained invalid data.
+ *
+ * Since: 2.6
+ **/
 GdkPixbuf *
-gdk_pixbuf_new_from_file_at_scale (const char *filename,
-                                   int         width, 
-                                   int         height,
-                                   gboolean    preserve_aspect_ratio,
-                                   GError    **error)
+gdk_pixbuf_new_from_file_at_scale_utf8 (const char *filename,
+                                        int         width,
+                                        int         height,
+                                        gboolean    preserve_aspect_ratio,
+                                        GError    **error)
 {
-        gchar *utf8_filename =
-                g_locale_to_utf8 (filename, -1, NULL, NULL, error);
-        GdkPixbuf *retval;
-
-        if (utf8_filename == NULL)
-                return NULL;
-
-        retval = gdk_pixbuf_new_from_file_at_scale_utf8 (utf8_filename,
-                                                         width, height,
-                                                         preserve_aspect_ratio,
-                                                         error);
-
-        g_free (utf8_filename);
-
-        return retval;
+    return gdk_pixbuf_new_from_file_at_scale (filename, width, height,
+                                              preserve_aspect_ratio, error);
 }
 #endif
 
@@ -1448,9 +1433,7 @@ load_from_stream (GdkPixbufLoader  *loader,
         GdkPixbuf *pixbuf;
         gssize n_read;
         guchar buffer[LOAD_BUFFER_SIZE];
-        gboolean res;
 
-        res = TRUE;
         while (1) { 
                 n_read = g_input_stream_read (stream, 
                                               buffer, 
@@ -1458,9 +1441,8 @@ load_from_stream (GdkPixbufLoader  *loader,
                                               cancellable, 
                                               error);
                 if (n_read < 0) {
-                        res = FALSE;
-                        error = NULL; /* Ignore further errors */
-                        break;
+                        gdk_pixbuf_loader_close (loader, NULL);
+                        return NULL;
                 }
 
                 if (n_read == 0)
@@ -1470,25 +1452,19 @@ load_from_stream (GdkPixbufLoader  *loader,
                                               buffer, 
                                               n_read, 
                                               error)) {
-                        res = FALSE;
-                        error = NULL;
-                        break;
+                        gdk_pixbuf_loader_close (loader, NULL);
+                        return NULL;
                 }
         }
 
-        if (!gdk_pixbuf_loader_close (loader, error)) {
-                res = FALSE;
-                error = NULL;
-        }
+        if (!gdk_pixbuf_loader_close (loader, error))
+                return NULL;
 
-        pixbuf = NULL;
-        if (res) {
-                pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
-                if (pixbuf)
-                        g_object_ref (pixbuf);
-        }
+        pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+        if (pixbuf == NULL)
+                return NULL;
 
-        return pixbuf;
+        return g_object_ref (pixbuf);
 }
 
 
@@ -1589,7 +1565,7 @@ new_from_stream_thread (GTask              *task,
  * @height: the height the image should have or -1 to not constrain the height
  * @preserve_aspect_ratio: %TRUE to preserve the image's aspect ratio
  * @cancellable: (allow-none): optional #GCancellable object, %NULL to ignore
- * @callback: a #GAsyncReadyCallback to call when the the pixbuf is loaded
+ * @callback: a #GAsyncReadyCallback to call when the pixbuf is loaded
  * @user_data: the data to pass to the callback function
  *
  * Creates a new pixbuf by asynchronously loading an image from an input stream.
@@ -1669,19 +1645,18 @@ gdk_pixbuf_new_from_stream (GInputStream  *stream,
 }
 
 GdkPixbuf *
-_gdk_pixbuf_new_from_resource_try_mmap (const char *resource_path)
+_gdk_pixbuf_new_from_resource_try_pixdata (const char *resource_path)
 {
-	guint32 flags;
 	gsize data_size;
 	GBytes *bytes;
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-	/* We specialize uncompressed GdkPixdata files, making these a reference to the
-	 * compiled-in resource data
+	/* We specialize GdkPixdata files, making these a reference to the
+	 * compiled-in resource data, whether uncompressed and mmap'ed, or
+	 * compressed, and uncompressed on-the-fly.
          */
-	if (g_resources_get_info  (resource_path, 0, &data_size, &flags, NULL) &&
-	    (flags & G_RESOURCE_FLAGS_COMPRESSED) == 0 &&
-	    data_size >= GDK_PIXDATA_HEADER_LENGTH &&
+	if (g_resources_get_info  (resource_path, 0, &data_size, NULL, NULL) &&
+	    data_size > sizeof(guint32) &&
 	    (bytes = g_resources_lookup_data (resource_path, 0, NULL)) != NULL) {
 		GdkPixbuf*pixbuf = NULL;
 		const guint8 *stream = g_bytes_get_data (bytes, NULL);
@@ -1731,7 +1706,7 @@ gdk_pixbuf_new_from_resource (const gchar  *resource_path,
 	GInputStream *stream;
 	GdkPixbuf *pixbuf;
 
-        pixbuf = _gdk_pixbuf_new_from_resource_try_mmap (resource_path);
+        pixbuf = _gdk_pixbuf_new_from_resource_try_pixdata (resource_path);
         if (pixbuf)
                 return pixbuf;
 
@@ -1796,7 +1771,7 @@ gdk_pixbuf_new_from_resource_at_scale (const char *resource_path,
  * gdk_pixbuf_new_from_stream_async:
  * @stream: a #GInputStream from which to load the pixbuf
  * @cancellable: (allow-none): optional #GCancellable object, %NULL to ignore
- * @callback: a #GAsyncReadyCallback to call when the the pixbuf is loaded
+ * @callback: a #GAsyncReadyCallback to call when the pixbuf is loaded
  * @user_data: the data to pass to the callback function
  *
  * Creates a new pixbuf by asynchronously loading an image from an input stream.
@@ -1987,7 +1962,7 @@ get_file_info_thread (GTask                *task,
  * gdk_pixbuf_get_file_info_async:
  * @filename: The name of the file to identify
  * @cancellable: (allow-none): optional #GCancellable object, %NULL to ignore
- * @callback: a #GAsyncReadyCallback to call when the the pixbuf is loaded
+ * @callback: a #GAsyncReadyCallback to call when the file info is available
  * @user_data: the data to pass to the callback function
  *
  * Asynchronously parses an image file far enough to determine its
@@ -2441,50 +2416,6 @@ gdk_pixbuf_save (GdkPixbuf  *pixbuf,
         return result;
 }
 
-#ifdef G_OS_WIN32
-
-#undef gdk_pixbuf_save
-
-gboolean
-gdk_pixbuf_save (GdkPixbuf  *pixbuf, 
-                 const char *filename, 
-                 const char *type, 
-                 GError    **error,
-                 ...)
-{
-        char *utf8_filename;
-        gchar **keys = NULL;
-        gchar **values = NULL;
-        va_list args;
-        gboolean result;
-
-        g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-        
-        utf8_filename = g_locale_to_utf8 (filename, -1, NULL, NULL, error);
-
-        if (utf8_filename == NULL)
-                return FALSE;
-
-        va_start (args, error);
-        
-        collect_save_options (args, &keys, &values);
-        
-        va_end (args);
-
-        result = gdk_pixbuf_savev_utf8 (pixbuf, utf8_filename, type,
-                                        keys, values,
-                                        error);
-
-        g_free (utf8_filename);
-
-        g_strfreev (keys);
-        g_strfreev (values);
-
-        return result;
-}
-
-#endif
-
 /**
  * gdk_pixbuf_savev:
  * @pixbuf: a #GdkPixbuf.
@@ -2512,6 +2443,10 @@ gdk_pixbuf_savev (GdkPixbuf  *pixbuf,
         FILE *f = NULL;
         gboolean result;
        
+        g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), FALSE);
+        g_return_val_if_fail (gdk_pixbuf_get_width (pixbuf) >= 0, FALSE);
+        g_return_val_if_fail (gdk_pixbuf_get_height (pixbuf) >= 0, FALSE);
+        g_return_val_if_fail (gdk_pixbuf_get_n_channels (pixbuf) >= 0, FALSE);
         g_return_val_if_fail (filename != NULL, FALSE);
         g_return_val_if_fail (type != NULL, FALSE);
         g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -2562,32 +2497,29 @@ gdk_pixbuf_savev (GdkPixbuf  *pixbuf,
 
 #ifdef G_OS_WIN32
 
-#undef gdk_pixbuf_savev
-
+/**
+ * gdk_pixbuf_savev_utf8:
+ * @pixbuf: a #GdkPixbuf.
+ * @filename: name of file to save.
+ * @type: name of file format.
+ * @option_keys: (array zero-terminated=1): name of options to set, %NULL-terminated
+ * @option_values: (array zero-terminated=1): values for named options
+ * @error: (allow-none): return location for error, or %NULL
+ *
+ * Same as gdk_pixbuf_savev()
+ *
+ * Return value: whether an error was set
+ **/
 gboolean
-gdk_pixbuf_savev (GdkPixbuf  *pixbuf, 
-                  const char *filename, 
-                  const char *type,
-                  char      **option_keys,
-                  char      **option_values,
-                  GError    **error)
+gdk_pixbuf_savev_utf8 (GdkPixbuf  *pixbuf,
+                       const char *filename,
+                       const char *type,
+                       char      **option_keys,
+                       char      **option_values,
+                       GError    **error)
 {
-        char *utf8_filename;
-        gboolean retval;
-
-        g_return_val_if_fail (filename != NULL, FALSE);
-       
-        utf8_filename = g_locale_to_utf8 (filename, -1, NULL, NULL, error);
-
-        if (utf8_filename == NULL)
-                return FALSE;
-
-        retval = gdk_pixbuf_savev_utf8 (pixbuf, utf8_filename, type,
-                                        option_keys, option_values, error);
-
-        g_free (utf8_filename);
-
-        return retval;
+    return gdk_pixbuf_savev (pixbuf, filename, type, option_keys,
+                             option_values, error);
 }
 
 #endif
@@ -2676,7 +2608,10 @@ gdk_pixbuf_save_to_callbackv   (GdkPixbuf  *pixbuf,
 {
         gboolean result;
         
-       
+        g_return_val_if_fail (GDK_IS_PIXBUF (pixbuf), FALSE);
+        g_return_val_if_fail (gdk_pixbuf_get_width (pixbuf) >= 0, FALSE);
+        g_return_val_if_fail (gdk_pixbuf_get_height (pixbuf) >= 0, FALSE);
+        g_return_val_if_fail (gdk_pixbuf_get_n_channels (pixbuf) >= 0, FALSE);
         g_return_val_if_fail (save_func != NULL, FALSE);
         g_return_val_if_fail (type != NULL, FALSE);
         g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -3025,7 +2960,7 @@ save_to_stream_thread (GTask                 *task,
  * @option_keys: (array zero-terminated=1): name of options to set, %NULL-terminated
  * @option_values: (array zero-terminated=1): values for named options
  * @cancellable: (allow-none): optional #GCancellable object, %NULL to ignore
- * @callback: a #GAsyncReadyCallback to call when the the pixbuf is loaded
+ * @callback: a #GAsyncReadyCallback to call when the pixbuf is saved
  * @user_data: the data to pass to the callback function
  *
  * Saves @pixbuf to an output stream asynchronously.
@@ -3052,6 +2987,9 @@ gdk_pixbuf_save_to_streamv_async (GdkPixbuf           *pixbuf,
         SaveToStreamAsyncData *data;
 
         g_return_if_fail (GDK_IS_PIXBUF (pixbuf));
+        g_return_if_fail (gdk_pixbuf_get_width (pixbuf) >= 0);
+        g_return_if_fail (gdk_pixbuf_get_height (pixbuf) >= 0);
+        g_return_if_fail (gdk_pixbuf_get_n_channels (pixbuf) >= 0);
         g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
         g_return_if_fail (type != NULL);
         g_return_if_fail (callback != NULL);
@@ -3076,7 +3014,7 @@ gdk_pixbuf_save_to_streamv_async (GdkPixbuf           *pixbuf,
  * @stream: a #GOutputStream to which to save the pixbuf
  * @type: name of file format
  * @cancellable: (allow-none): optional #GCancellable object, %NULL to ignore
- * @callback: a #GAsyncReadyCallback to call when the the pixbuf is loaded
+ * @callback: a #GAsyncReadyCallback to call when the pixbuf is saved
  * @user_data: the data to pass to the callback function
  * @...: list of key-value save options
  *
@@ -3104,6 +3042,9 @@ gdk_pixbuf_save_to_stream_async (GdkPixbuf           *pixbuf,
         va_list args;
 
         g_return_if_fail (GDK_IS_PIXBUF (pixbuf));
+        g_return_if_fail (gdk_pixbuf_get_width (pixbuf) >= 0);
+        g_return_if_fail (gdk_pixbuf_get_height (pixbuf) >= 0);
+        g_return_if_fail (gdk_pixbuf_get_n_channels (pixbuf) >= 0);
         g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
         g_return_if_fail (type != NULL);
         g_return_if_fail (callback != NULL);
@@ -3405,6 +3346,41 @@ gdk_pixbuf_format_free (GdkPixbufFormat *format)
 {
         if (G_LIKELY (format != NULL))
                 g_slice_free (GdkPixbufFormat, format);
+}
+
+/**
+ * gdk_pixbuf_format_is_save_option_supported:
+ * @format: a #GdkPixbufFormat
+ * @option_key: the name of an option
+ *
+ * Returns %TRUE if the save option specified by @option_key is supported when
+ * saving a pixbuf using the module implementing @format.
+ * See gdk_pixbuf_save() for more information about option keys.
+ *
+ * Returns: %TRUE if the specified option is supported
+ *
+ * Since: 2.36
+ */
+gboolean
+gdk_pixbuf_format_is_save_option_supported (GdkPixbufFormat *format,
+                                            const gchar *option_key)
+{
+        GdkPixbufModule *module;
+
+        g_return_val_if_fail (format != NULL, FALSE);
+        g_return_val_if_fail (option_key != NULL, FALSE);
+
+        module = _gdk_pixbuf_get_named_module (format->name, NULL);
+        if (!module)
+                return FALSE;
+
+        if (!_gdk_pixbuf_load_module (module, NULL))
+                return FALSE;
+
+        if (!module->is_save_option_supported)
+                return FALSE;
+
+        return (* module->is_save_option_supported) (option_key);
 }
 
 G_DEFINE_BOXED_TYPE (GdkPixbufFormat, gdk_pixbuf_format,

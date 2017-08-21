@@ -1,8 +1,9 @@
 
 /* Generated data (by glib-mkenums) */
 
-#include <gdk-pixbuf/gdk-pixbuf.h>
+#include "config.h"
 
+#include <gdk-pixbuf/gdk-pixbuf.h>
 /* enumerations from "gdk-pixbuf-core.h" */
 GType
 gdk_pixbuf_alpha_mode_get_type (void)
@@ -19,7 +20,6 @@ gdk_pixbuf_alpha_mode_get_type (void)
     }
     return etype;
 }
-
 GType
 gdk_colorspace_get_type (void)
 {
@@ -34,7 +34,6 @@ gdk_colorspace_get_type (void)
     }
     return etype;
 }
-
 GType
 gdk_pixbuf_error_get_type (void)
 {
@@ -55,7 +54,6 @@ gdk_pixbuf_error_get_type (void)
     }
     return etype;
 }
-
 /* enumerations from "gdk-pixbuf-transform.h" */
 GType
 gdk_interp_type_get_type (void)
@@ -74,7 +72,6 @@ gdk_interp_type_get_type (void)
     }
     return etype;
 }
-
 GType
 gdk_pixbuf_rotation_get_type (void)
 {
@@ -92,7 +89,6 @@ gdk_pixbuf_rotation_get_type (void)
     }
     return etype;
 }
-
 
 /* Generated data ends here */
 

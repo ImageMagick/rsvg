@@ -115,7 +115,8 @@ parse_args (gint    *argc_p,
 
   for (i = 1; i < argc; i++)
     {
-      if (strcmp ("--rle", argv[i]) == 0)
+      if (strcmp ("-r", argv[i]) == 0 ||
+	  strcmp ("--rle", argv[i]) == 0)
 	{
 	  use_rle = TRUE;
 	  argv[i] = NULL;
@@ -182,6 +183,7 @@ print_blurb (FILE    *bout,
   else
     {
       g_fprintf (bout, "Usage: %s [options] [input-file] [output-file]\n", PRG_NAME);
+      g_fprintf (bout, "  -r, --rle                  compress the image data using RLE\n");
       g_fprintf (bout, "  -h, --help                 show this help message\n");
       g_fprintf (bout, "  -v, --version              print version informations\n");
       g_fprintf (bout, "  --g-fatal-warnings         make warnings fatal (abort)\n");

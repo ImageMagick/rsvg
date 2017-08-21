@@ -1,6 +1,23 @@
-SUBDIRS = gdk-pixbuf po docs tests contrib build
+SUBDIRS = gdk-pixbuf po docs thumbnailer tests contrib win32
+
+meson_files = \
+	meson.build \
+	meson_options.txt \
+	gdk-pixbuf/meson.build \
+	gdk-pixbuf/pixops/meson.build \
+	docs/reference/gdk-pixbuf/meson.build \
+	contrib/gdk-pixbuf-xlib/meson.build \
+	po/meson.build \
+	tests/meson.build \
+	thumbnailer/meson.build \
+	build-aux/gen-color-table.pl \
+	build-aux/gen-installed-test.py \
+	build-aux/gen-resources.py \
+	build-aux/gen-thumbnailer.py \
+	$()
 
 EXTRA_DIST = 			\
+	$(meson_files)		\
 	config.h.win32 		\
 	glib-tap.mk		\
 	tap-driver.sh		\

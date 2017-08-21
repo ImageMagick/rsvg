@@ -1,3 +1,126 @@
+2.36.9
+======
+* build: meson build improvements
+* OS X: don't require shared-mime-info (#786167)
+* gif: fix a coverity warning (#785696)
+* build: make queryloaders output reproducible (#7835920
+* Translation updates
+
+2.36.8
+======
+* jpeg: restore grayscale image support (#785171)
+* bmp: Tighten image dimension checks (#776694)
+* ico: Fixo icon quality sorting (#785447)
+* Various other leak and overflow fixes (#765094, #783538, #778204)
+* Add some assertion to help static analysis (#778943)
+* Remove support for building on various obsolete platforms
+* Translation updates
+
+2.36.7
+======
+
+* Add tests for recent bug fixes
+* ico, bmp, tiff: avoid integer overflows (#776040, #776694, #780269)
+* jpeg: error out if wrong # of channels (#784866)
+* Misc.bugfixes (#784583)
+* Support mimetypes: image/wmf, image/emf
+* Translation updates
+
+2.36.6
+======
+
+* jpeg: Support the EXIF tag (#143608)
+* ico: Make option parsing locale-independent (#776990)
+* Fix build on Windows
+* Translation updates
+
+2.36.5
+======
+
+* Fix mimetypes for thumbnailer (#778451)
+* Handle fseek failure (#776990)
+* Fix signed/unsigned handling (#777374)
+* Fix an overflow check (#777315)
+* Handle extreme scaling better (#80925)
+* Translation updates
+
+2.36.4
+======
+
+* Add a fastpath for no-op scales
+* Documentation improvements (#442452)
+* Fix some coverity warnings (#776945, #768062)
+* Translation updates
+
+2.36.3
+======
+
+* gif, ico: Fix area-updated coordinates (#581484)
+* tga: Improve error handling (#575217)
+* jasper: Improve error handling (#685543)
+* Test suite improvements (#696331)
+* Minor documentation fixes (#776457)
+* Translation updates
+
+2.36.2
+======
+
+* Fix a NULL pointer dereference (#776026)
+* Fix a memory leak (#776020)
+* Support bmp headers with bitmask (#766890)
+* Add tests for scaling (#80925)
+* Handle compressed pixdata in resources (#776105)
+* Avoid a buffer overrun in the qtif loader ($#775648)
+* Fix a crash in the bmp loader (#775242)
+* Fix crash opening pnm images with large dimensions (#775232)
+* Prevent buffer overflow in the pixdata loader (#775693)
+* Translation updates
+
+2.36.1
+======
+
+* Remove the pixdata loader (#776004)
+* Fix integer overflows in the jpeg loader (#775218)
+* Add an external thumbnailer for images
+* Translation updates
+
+2.36.0
+======
+
+* Translation updates
+
+2.35.5
+======
+
+* Fix undefined behavior in overflow checks (#770986)
+* Fix a typo (#770756)
+* Avoid segfault in some tests (#771026)
+* Translation updates
+
+2.35.4
+======
+
+* Translation updates
+
+2.35.3
+======
+
+* Add API to determine supported save options (#683371)
+* Add helper API for pixbuf options (#768043)
+* Fix invalid gettext use (#758552)
+* Fix a compiler warning in the xpm loader (#768042)
+* Fix integer overflows in the bmp loader (#768688, #768738)
+* Fix a crash in the ico loader (#769170)
+* Translation updates
+
+2.35.2
+======
+
+* Use compiler directives for exporting symbols (#767164)
+* Fix a problem with nearest scaling (#766842)
+* Avoid redundant property notification
+* Translation updates
+
 2.35.1
 ======
 

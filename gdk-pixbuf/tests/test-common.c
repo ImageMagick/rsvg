@@ -26,6 +26,64 @@
 
 #include <string.h>
 
+/* Checkerboard of black and white pxels (actually (1,1,1) and (255,255,255)
+ * so they average to (128,128,128)) */
+GdkPixbuf *
+make_checkerboard (int width, int height)
+{
+  GdkPixbuf *checkerboard;
+  guint x, y;
+  guchar *row;   /* Pointer to start of row of pixels within the image */
+  guchar *pixel; /* Pointer to current pixel data in row */
+
+  checkerboard = gdk_pixbuf_new (GDK_COLORSPACE_RGB, 0, 8, width, height);
+  g_assert_nonnull (checkerboard);
+
+  for (y = 0, row = gdk_pixbuf_get_pixels (checkerboard);
+       y < height;
+       y++, row += gdk_pixbuf_get_rowstride (checkerboard))
+    {
+      for (x = 0, pixel = row;
+           x < width;
+           x++, pixel += gdk_pixbuf_get_n_channels (checkerboard))
+        {
+          pixel[0] = pixel[1] = pixel[2] = (x ^ y) & 1 ? 1 : 255;
+        }
+    }
+
+  return checkerboard;
+}
+
+/* Image where all the pixels have different colours */
+GdkPixbuf *
+make_rg (int width, int height)
+{
+  GdkPixbuf *pixbuf;
+  guint x, y;
+  guchar *row;   /* Pointer to start of row of pixels within the image */
+  guchar *pixel; /* Pointer to current pixel data in row */
+
+  /* Make a source image whose pixels are all of different colors */
+  pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, 0, 8, width, height);
+  g_assert_nonnull (pixbuf);
+
+  for (y = 0, row = gdk_pixbuf_get_pixels (pixbuf);
+       y < height;
+       y++, row += gdk_pixbuf_get_rowstride (pixbuf))
+    {
+      for (x = 0, pixel = row;
+           x < width;
+           x++, pixel += gdk_pixbuf_get_n_channels (pixbuf))
+        {
+          pixel[0] = x & 255; pixel[1] = y & 255;
+          /* If image > 256 pixels wide/high put the extra bits in the last pixel */
+          pixel[2] = ((x >> 8) & 15) | ((( y >> 8) & 15) << 4);
+        }
+    }
+
+  return pixbuf;
+}
+
 gboolean
 format_supported (const gchar *filename)
 {
@@ -136,7 +194,7 @@ pixdata_equal (GdkPixbuf  *test,
   if (memcmp (gdk_pixbuf_get_pixels (test), gdk_pixbuf_get_pixels (ref),
           gdk_pixbuf_get_byte_length (test)) != 0)
     {
-      guint x, y, width, height, n_channels, rowstride;
+      gint x, y, width, height, n_channels, rowstride;
       const guchar *test_pixels, *ref_pixels;
 
       rowstride = gdk_pixbuf_get_rowstride (test);
@@ -145,6 +203,10 @@ pixdata_equal (GdkPixbuf  *test,
       height = gdk_pixbuf_get_height (test);
       test_pixels = gdk_pixbuf_get_pixels (test);
       ref_pixels = gdk_pixbuf_get_pixels (ref);
+
+      g_assert_cmpint (width, >=, 0);
+      g_assert_cmpint (height, >=, 0);
+      g_assert_cmpint (n_channels, >=, 0);
 
       for (y = 0; y < height; y++)
         {
@@ -156,15 +218,15 @@ pixdata_equal (GdkPixbuf  *test,
                     {
                       g_set_error (error, GDK_PIXBUF_ERROR, 0, "Image data at %ux%u is #%02X%02X%02X%02X, but should be #%02X%02X%02X%02X",
                                    x, y,
-                                   test_pixels[0], test_pixels[1], test_pixels[2], test_pixels[3],
-                                   ref_pixels[0], ref_pixels[1], ref_pixels[2], ref_pixels[3]);
+                                   test_pixels[x * n_channels + 0], test_pixels[x * n_channels + 1], test_pixels[x * n_channels + 2], test_pixels[x * n_channels + 3],
+                                   ref_pixels[x * n_channels + 0], ref_pixels[x * n_channels + 1], ref_pixels[x * n_channels + 2], ref_pixels[x * n_channels + 3]);
                     }
                   else if (n_channels == 3)
                     {
                       g_set_error (error, GDK_PIXBUF_ERROR, 0, "Image data at %ux%u is #%02X%02X%02X, but should be #%02X%02X%02X",
                                    x, y,
-                                   test_pixels[0], test_pixels[1], test_pixels[2],
-                                   ref_pixels[0], ref_pixels[1], ref_pixels[2]);
+                                   test_pixels[x * n_channels + 0], test_pixels[x * n_channels + 1], test_pixels[x * n_channels + 2],
+                                   ref_pixels[x * n_channels + 0], ref_pixels[x * n_channels + 1], ref_pixels[x * n_channels + 2]);
                     }
                   else
                     {

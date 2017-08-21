@@ -36,6 +36,7 @@
 #include <tiffio.h>
 #include <errno.h>
 #include "gdk-pixbuf-private.h"
+#include "fallback-c89.c"
 
 #ifdef G_OS_WIN32
 #include <fcntl.h>
@@ -123,24 +124,26 @@ tiff_image_parse (TIFF *tiff, TiffContext *context, GError **error)
                                      _("Width or height of TIFF image is zero"));
                 return NULL;                
         }
-        
+
+        if (width > G_MAXINT / 4) { /* overflow */
+                g_set_error_literal (error,
+                                     GDK_PIXBUF_ERROR,
+                                     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+                                     _("Dimensions of TIFF image too large"));
+                return NULL;                
+        }
+
         rowstride = width * 4;
-        if (rowstride / 4 != width) { /* overflow */
+
+        if (height > G_MAXINT / rowstride) { /* overflow */
                 g_set_error_literal (error,
                                      GDK_PIXBUF_ERROR,
                                      GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
                                      _("Dimensions of TIFF image too large"));
                 return NULL;                
         }
-        
+
         bytes = height * rowstride;
-        if (bytes / rowstride != height) { /* overflow */
-                g_set_error_literal (error,
-                                     GDK_PIXBUF_ERROR,
-                                     GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-                                     _("Dimensions of TIFF image too large"));
-                return NULL;                
-        }
 
 	if (context && context->size_func) {
                 gint w = width;
@@ -453,7 +456,7 @@ gdk_pixbuf__tiff_image_stop_load (gpointer data,
 {
         TiffContext *context = data;
         TIFF *tiff;
-        gboolean retval;
+        gboolean retval = FALSE;
         
         g_return_val_if_fail (data != NULL, FALSE);
 
@@ -469,20 +472,18 @@ gdk_pixbuf__tiff_image_stop_load (gpointer data,
                                      GDK_PIXBUF_ERROR,
                                      GDK_PIXBUF_ERROR_FAILED,
                                      _("Failed to load TIFF image"));
-                retval = FALSE;
         } else {
                 GdkPixbuf *pixbuf;
                 
                 pixbuf = tiff_image_parse (tiff, context, error);
-                if (pixbuf)
-                        g_object_unref (pixbuf);
-                retval = pixbuf != NULL;
+                retval = (pixbuf != NULL);
+                g_clear_object (&pixbuf);
+                /* tiff_image_parse() can return NULL on success in a particular case */
                 if (!retval && error && !*error) {
                         g_set_error_literal (error,
                                              GDK_PIXBUF_ERROR,
                                              GDK_PIXBUF_ERROR_FAILED,
                                              _("Failed to load TIFF image"));
-                                retval = FALSE;
                 }
         }
 
@@ -719,6 +720,11 @@ gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
 
         height = gdk_pixbuf_get_height (pixbuf);
         width = gdk_pixbuf_get_width (pixbuf);
+
+        /* Guaranteed by the caller. */
+        g_assert (width >= 0);
+        g_assert (height >= 0);
+        g_assert (rowstride >= 0);
 
         TIFFSetField (tiff, TIFFTAG_IMAGEWIDTH, width);
         TIFFSetField (tiff, TIFFTAG_IMAGELENGTH, height);
@@ -979,6 +985,19 @@ gdk_pixbuf__tiff_image_save (FILE          *f,
                                                         values, error);
 }
 
+static gboolean
+gdk_pixbuf__tiff_is_save_option_supported (const gchar *option_key)
+{
+        if (g_strcmp0 (option_key, "bits-per-sample") == 0 ||
+            g_strcmp0 (option_key, "compression") == 0 ||
+            g_strcmp0 (option_key, "icc-profile") == 0 ||
+            g_strcmp0 (option_key, "x-dpi") == 0 ||
+            g_strcmp0 (option_key, "y-dpi") == 0)
+                return TRUE;
+
+        return FALSE;
+}
+
 #ifndef INCLUDE_tiff
 #define MODULE_ENTRY(function) G_MODULE_EXPORT void function
 #else
@@ -993,6 +1012,7 @@ MODULE_ENTRY (fill_vtable) (GdkPixbufModule *module)
         module->load_increment = gdk_pixbuf__tiff_image_load_increment;
         module->save = gdk_pixbuf__tiff_image_save;
         module->save_to_callback = gdk_pixbuf__tiff_image_save_to_callback;
+        module->is_save_option_supported = gdk_pixbuf__tiff_is_save_option_supported;
 }
 
 MODULE_ENTRY (fill_info) (GdkPixbufFormat *info)

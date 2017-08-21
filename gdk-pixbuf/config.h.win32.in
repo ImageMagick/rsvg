@@ -41,11 +41,21 @@
 /*#define HAVE_INTTYPES_H*/
 #endif
 
+/* Define to 1 if lrint() is available */
+#if !defined (_MSC_VER) || (_MSC_VER >= 1800)
+#define HAVE_LRINT 1
+#endif
+
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 is libjpeg supports progressive JPEG */
 #define HAVE_PROGRESSIVE_JPEG 1
+
+/* Define to 1 if round() is available */
+#if !defined (_MSC_VER) || (_MSC_VER >= 1800)
+#define HAVE_ROUND 1
+#endif
 
 /* Define to 1 if sigsetjmp is available */
 /*#undef HAVE_SIGSETJMP*/
@@ -145,6 +155,13 @@
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /*#undef _FILE_OFFSET_BITS*/
+
+/* defines how to decorate public symbols while building */
+#ifdef _MSC_VER
+#define _GDK_PIXBUF_EXTERN __declspec(dllexport) extern
+#else
+#define _GDK_PIXBUF_EXTERN __attribute__((visibility("default"))) __declspec(dllexport) extern
+#endif
 
 /* Define for large files, on AIX-style hosts. */
 /*#undef _LARGE_FILES*/
