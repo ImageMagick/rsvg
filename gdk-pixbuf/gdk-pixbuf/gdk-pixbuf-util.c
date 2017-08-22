@@ -21,7 +21,7 @@
 
 #include "config.h"
 #include <string.h>
-#include <libintl.h>
+/* #include <libintl.h> */
 
 #include "gdk-pixbuf-transform.h"
 #include "gdk-pixbuf-private.h"
@@ -382,7 +382,7 @@ get_localedir (void)
 void
 _gdk_pixbuf_init_gettext (void)
 {
-        static gsize gettext_initialized = FALSE;
+        /* static gsize gettext_initialized = FALSE;
 
         if (G_UNLIKELY (g_once_init_enter (&gettext_initialized))) {
                 bindtextdomain (GETTEXT_PACKAGE, GDK_PIXBUF_LOCALEDIR);
@@ -390,7 +390,7 @@ _gdk_pixbuf_init_gettext (void)
                 bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 #endif
                 g_once_init_leave (&gettext_initialized, TRUE);
-        }
+        } */
 }
 
 const gchar *

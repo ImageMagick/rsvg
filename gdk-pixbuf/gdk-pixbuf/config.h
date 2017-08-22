@@ -135,7 +135,7 @@
 #define STDC_HEADERS 1
 
 /* Define to 1 if gmodule works and should be used */
-#define USE_GMODULE 1
+#undef USE_GMODULE 1
 
 /* Whether to load modules via .la files rather than directly */
 /*#undef USE_LA_MODULES*/
@@ -168,3 +168,22 @@
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /*#undef const*/
+
+#define INCLUDE_ani
+#define INCLUDE_bmp
+#define INCLUDE_gif
+#define INCLUDE_ico
+#define INCLUDE_icns
+#define INCLUDE_jasper
+#define INCLUDE_jpeg
+#define INCLUDE_pcx
+#define INCLUDE_png
+#define INCLUDE_pnm
+#define INCLUDE_qtif
+#define INCLUDE_ras
+#define INCLUDE_svg
+#define INCLUDE_tga
+#define INCLUDE_tiff
+#define INCLUDE_xpm
+#define INCLUDE_xbm
+#define INCLUDE_wbmp
