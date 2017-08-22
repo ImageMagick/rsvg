@@ -37,7 +37,7 @@
 #include "rsvg-mask.h"
 #include "rsvg-marker.h"
 
-#include <libcroco.h>
+#include <libcroco/libcroco.h>
 
 #define RSVG_DEFAULT_FONT "Times New Roman"
 
@@ -119,6 +119,10 @@ rsvg_state_init (RsvgState * state)
     state->mask = NULL;
     state->opacity = 0xff;
     state->baseline_shift = 0.;
+    state->current_color = 0xff000000; /* See bgo#764808; we don't inherit CSS
+                                        * from the public API, so start off with
+                                        * opaque black instead of transparent.
+                                        */
     state->fill = rsvg_paint_server_parse (NULL, "#000");
     state->fill_opacity = 0xff;
     state->stroke_opacity = 0xff;
@@ -1237,6 +1241,7 @@ rsvg_parse_transform (cairo_matrix_t *dst, const char *src)
     int n_args;
     guint key_len;
     cairo_matrix_t affine;
+    cairo_matrix_t inverse;
 
     cairo_matrix_init_identity (dst);
 
@@ -1260,7 +1265,8 @@ rsvg_parse_transform (cairo_matrix_t *dst, const char *src)
                 break;
         }
         if (key_len >= sizeof (keyword))
-            return FALSE;
+            goto invalid;
+
         keyword[key_len] = '\0';
 
         /* skip whitespace */
@@ -1268,7 +1274,8 @@ rsvg_parse_transform (cairo_matrix_t *dst, const char *src)
             idx++;
 
         if (src[idx] != '(')
-            return FALSE;
+            goto invalid;
+
         idx++;
 
         for (n_args = 0;; n_args++) {
@@ -1281,7 +1288,8 @@ rsvg_parse_transform (cairo_matrix_t *dst, const char *src)
             c = src[idx];
             if (g_ascii_isdigit (c) || c == '+' || c == '-' || c == '.') {
                 if (n_args == sizeof (args) / sizeof (args[0]))
-                    return FALSE;       /* too many args */
+                    goto invalid;
+
                 args[n_args] = g_ascii_strtod (src + idx, &end_ptr);
                 idx = end_ptr - src;
 
@@ -1294,7 +1302,7 @@ rsvg_parse_transform (cairo_matrix_t *dst, const char *src)
             } else if (c == ')')
                 break;
             else
-                return FALSE;
+                goto invalid;
         }
         idx++;
 
@@ -1309,14 +1317,14 @@ rsvg_parse_transform (cairo_matrix_t *dst, const char *src)
             if (n_args == 1)
                 args[1] = 0;
             else if (n_args != 2)
-                return FALSE;
+                goto invalid;
             cairo_matrix_init_translate (&affine, args[0], args[1]);
             cairo_matrix_multiply (dst, &affine, dst);
         } else if (!strcmp (keyword, "scale")) {
             if (n_args == 1)
                 args[1] = args[0];
             else if (n_args != 2)
-                return FALSE;
+                goto invalid;
             cairo_matrix_init_scale (&affine, args[0], args[1]);
             cairo_matrix_multiply (dst, &affine, dst);
         } else if (!strcmp (keyword, "rotate")) {
@@ -1334,24 +1342,34 @@ rsvg_parse_transform (cairo_matrix_t *dst, const char *src)
                 cairo_matrix_init_translate (&affine, -args[1], -args[2]);
                 cairo_matrix_multiply (dst, &affine, dst);
             } else
-                return FALSE;
+                goto invalid;
         } else if (!strcmp (keyword, "skewX")) {
             if (n_args != 1)
-                return FALSE;
+                goto invalid;
             _rsvg_cairo_matrix_init_shear (&affine, args[0]);
             cairo_matrix_multiply (dst, &affine, dst);
         } else if (!strcmp (keyword, "skewY")) {
             if (n_args != 1)
-                return FALSE;
+                goto invalid;
             _rsvg_cairo_matrix_init_shear (&affine, args[0]);
             /* transpose the affine, given that we know [1] is zero */
             affine.yx = affine.xy;
             affine.xy = 0.;
             cairo_matrix_multiply (dst, &affine, dst);
         } else
-            return FALSE;       /* unknown keyword */
+            goto invalid;       /* unknown keyword */
     }
+
+    inverse = *dst;
+    if (cairo_matrix_invert (&inverse) != CAIRO_STATUS_SUCCESS)
+        goto invalid;
+
     return TRUE;
+
+invalid:
+
+    cairo_matrix_init_identity (dst);
+    return FALSE;
 }
 
 /**

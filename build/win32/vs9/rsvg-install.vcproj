@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9.00"
+	Name="rsvg-install"
+	ProjectGUID="{C416ED91-E000-49D3-9617-CCC473E08EAE}"
+	RootNamespace="rsvginstall"
+	TargetFrameworkVersion="196613"
+	>
+	<Platforms>
+		<Platform
+			Name="Win32"
+		/>
+		<Platform
+			Name="x64"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			ConfigurationType="10"
+			InheritedPropertySheets=".\rsvg-install.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="$(RsvgDoInstall)$(RsvgPostInstall)"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			ConfigurationType="10"
+			InheritedPropertySheets=".\rsvg-install.vsprops"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="$(RsvgDoInstall)$(RsvgPostInstall)"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			ConfigurationType="10"
+			InheritedPropertySheets=".\rsvg-install.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="$(RsvgDoInstall)$(RsvgPostInstall)"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			ConfigurationType="10"
+			InheritedPropertySheets=".\rsvg-install.vsprops"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="$(RsvgDoInstall)$(RsvgPostInstall)"
+			/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
+			<File RelativePath="..\rsvgpc.py">
+				<FileConfiguration Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating .pc files..."
+						CommandLine="$(RsvgGenPC)"
+						Outputs="..\librsvg-2.0.pc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating .pc files..."
+						CommandLine="$(RsvgGenPC)"
+						Outputs="..\librsvg-2.0.pc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration Name="Debug|x64">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating .pc files..."
+						CommandLine="$(RsvgGenPC)"
+						Outputs="..\librsvg-2.0.pc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration Name="Release|x64">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating .pc files..."
+						CommandLine="$(RsvgGenPC)"
+						Outputs="..\librsvg-2.0.pc"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

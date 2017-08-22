@@ -676,7 +676,6 @@ rsvg_filter_get_bg (RsvgFilterContext * ctx)
     return ctx->bg_surface;
 }
 
-/* FIXMEchpe: proper return value and out param! */
 /**
  * rsvg_filter_get_result:
  * @name: The name of the surface
@@ -722,24 +721,21 @@ rsvg_filter_get_result (GString * name, RsvgFilterContext * ctx)
         return output;
     }
 
-    /* g_warning (_("%s not found\n"), name->str); */
-
-    output = ctx->lastresult;
-    cairo_surface_reference (output.surface);
+    output.surface = NULL;
     return output;
 }
 
-/**
- * rsvg_filter_get_in:
- * @name:
- * @ctx:
- * 
- * Returns: (transfer full) (nullable): a new #cairo_surface_t, or %NULL
- */
 static cairo_surface_t *
 rsvg_filter_get_in (GString * name, RsvgFilterContext * ctx)
 {
-    return rsvg_filter_get_result (name, ctx).surface;
+    cairo_surface_t *surface;
+
+    surface = rsvg_filter_get_result (name, ctx).surface;
+    if (surface == NULL || cairo_surface_status (surface) != CAIRO_STATUS_SUCCESS) {
+        return NULL;
+    }
+
+    return surface;
 }
 
 static void
@@ -1331,7 +1327,9 @@ box_blur_line (gint box_width, gint even_offset,
                       kernel; it's the pixel to remove from the accumulator. */
     gint  *ac;     /* Accumulator for each channel                           */
 
-    ac = g_new (gint, bpp);
+    g_assert (box_width > 0);
+
+    ac = g_new0 (gint, bpp);
 
     /* The algorithm differs for even and odd-sized kernels.
      * With the output at the center,
@@ -1688,7 +1686,6 @@ gaussian_blur_surface (cairo_surface_t *in,
                        gdouble sx,
                        gdouble sy)
 {
-    gboolean use_box_blur;
     gint width, height;
     cairo_format_t in_format, out_format;
     gint in_stride;
@@ -1732,14 +1729,6 @@ gaussian_blur_surface (cairo_surface_t *in,
     if (sy < 0.0)
         sy = 0.0;
 
-    /* For small radiuses, use a true gaussian kernel; otherwise use three box blurs with
-     * clever offsets.
-     */
-    if (sx < 10.0 && sy < 10.0)
-        use_box_blur = FALSE;
-    else
-        use_box_blur = TRUE;
-
     /* Bail out by just copying? */
     if ((sx == 0.0 && sy == 0.0)
         || sx > 1000 || sy > 1000) {
@@ -1759,6 +1748,15 @@ gaussian_blur_surface (cairo_surface_t *in,
         int y;
         guchar *row_buffer = NULL;
         guchar *row1, *row2;
+        gboolean use_box_blur;
+
+        /* For small radiuses, use a true gaussian kernel; otherwise use three box blurs with
+         * clever offsets.
+         */
+        if (sx < 10.0)
+            use_box_blur = FALSE;
+        else
+            use_box_blur = TRUE;
 
         if (use_box_blur) {
             box_width = compute_box_blur_width (sx);
@@ -1814,6 +1812,15 @@ gaussian_blur_surface (cairo_surface_t *in,
         guchar *col_buffer;
         guchar *col1, *col2;
         int x;
+        gboolean use_box_blur;
+
+        /* For small radiuses, use a true gaussian kernel; otherwise use three box blurs with
+         * clever offsets.
+         */
+        if (sy < 10.0)
+            use_box_blur = FALSE;
+        else
+            use_box_blur = TRUE;
 
         /* twice the size so we can have the source pixels and the blurred pixels */
         col_buffer = g_new (guchar, height * bpp * 2);
@@ -1870,8 +1877,10 @@ rsvg_filter_primitive_gaussian_blur_render (RsvgFilterPrimitive * self, RsvgFilt
     upself = (RsvgFilterPrimitiveGaussianBlur *) self;
     boundarys = rsvg_filter_primitive_get_bounds (self, ctx);
 
-    op = rsvg_filter_get_result (self->in, ctx);
-    in = op.surface;
+    in = rsvg_filter_get_in (self->in, ctx);
+    if (in == NULL) {
+        return;
+    }
 
     width = cairo_image_surface_get_width (in);
     height = cairo_image_surface_get_height (in);
@@ -2233,16 +2242,16 @@ rsvg_new_filter_primitive_merge_node (void)
 /*************************************************************/
 /*************************************************************/
 
-typedef struct _RsvgFilterPrimitiveColourMatrix
- RsvgFilterPrimitiveColourMatrix;
+typedef struct _RsvgFilterPrimitiveColorMatrix
+ RsvgFilterPrimitiveColorMatrix;
 
-struct _RsvgFilterPrimitiveColourMatrix {
+struct _RsvgFilterPrimitiveColorMatrix {
     RsvgFilterPrimitive super;
     gint *KernelMatrix;
 };
 
 static void
-rsvg_filter_primitive_colour_matrix_render (RsvgFilterPrimitive * self, RsvgFilterContext * ctx)
+rsvg_filter_primitive_color_matrix_render (RsvgFilterPrimitive * self, RsvgFilterContext * ctx)
 {
     guchar ch;
     gint x, y;
@@ -2253,13 +2262,13 @@ rsvg_filter_primitive_colour_matrix_render (RsvgFilterPrimitive * self, RsvgFilt
     guchar *in_pixels;
     guchar *output_pixels;
 
-    RsvgFilterPrimitiveColourMatrix *upself;
+    RsvgFilterPrimitiveColorMatrix *upself;
 
     cairo_surface_t *output, *in;
 
     int sum;
 
-    upself = (RsvgFilterPrimitiveColourMatrix *) self;
+    upself = (RsvgFilterPrimitiveColorMatrix *) self;
     boundarys = rsvg_filter_primitive_get_bounds (self, ctx);
 
     in = rsvg_filter_get_in (self->in, ctx);
@@ -2337,26 +2346,26 @@ rsvg_filter_primitive_colour_matrix_render (RsvgFilterPrimitive * self, RsvgFilt
 }
 
 static void
-rsvg_filter_primitive_colour_matrix_free (RsvgNode * self)
+rsvg_filter_primitive_color_matrix_free (RsvgNode * self)
 {
-    RsvgFilterPrimitiveColourMatrix *matrix;
+    RsvgFilterPrimitiveColorMatrix *matrix;
 
-    matrix = (RsvgFilterPrimitiveColourMatrix *) self;
+    matrix = (RsvgFilterPrimitiveColorMatrix *) self;
     g_free (matrix->KernelMatrix);
     
     rsvg_filter_primitive_free (self);
 }
 
 static void
-rsvg_filter_primitive_colour_matrix_set_atts (RsvgNode * self, RsvgHandle * ctx,
+rsvg_filter_primitive_color_matrix_set_atts (RsvgNode * self, RsvgHandle * ctx,
                                               RsvgPropertyBag * atts)
 {
     gint type;
     guint listlen = 0;
     const char *value;
-    RsvgFilterPrimitiveColourMatrix *filter;
+    RsvgFilterPrimitiveColorMatrix *filter;
 
-    filter = (RsvgFilterPrimitiveColourMatrix *) self;
+    filter = (RsvgFilterPrimitiveColorMatrix *) self;
 
     type = 0;
 
@@ -2461,20 +2470,20 @@ rsvg_filter_primitive_colour_matrix_set_atts (RsvgNode * self, RsvgHandle * ctx,
 }
 
 RsvgNode *
-rsvg_new_filter_primitive_colour_matrix (void)
+rsvg_new_filter_primitive_color_matrix (void)
 {
-    RsvgFilterPrimitiveColourMatrix *filter;
-    filter = g_new (RsvgFilterPrimitiveColourMatrix, 1);
-    _rsvg_node_init (&filter->super.super, RSVG_NODE_TYPE_FILTER_PRIMITIVE_COLOUR_MATRIX);
+    RsvgFilterPrimitiveColorMatrix *filter;
+    filter = g_new (RsvgFilterPrimitiveColorMatrix, 1);
+    _rsvg_node_init (&filter->super.super, RSVG_NODE_TYPE_FILTER_PRIMITIVE_COLOR_MATRIX);
     filter->super.in = g_string_new ("none");
     filter->super.result = g_string_new ("none");
     filter->super.x.factor = filter->super.y.factor = filter->super.width.factor =
         filter->super.height.factor = 'n';
     filter->KernelMatrix = NULL;
-    filter->super.render = rsvg_filter_primitive_colour_matrix_render;
-    filter->super.super.free = rsvg_filter_primitive_colour_matrix_free;
+    filter->super.render = rsvg_filter_primitive_color_matrix_render;
+    filter->super.super.free = rsvg_filter_primitive_color_matrix_free;
 
-    filter->super.super.set_atts = rsvg_filter_primitive_colour_matrix_set_atts;
+    filter->super.super.set_atts = rsvg_filter_primitive_color_matrix_set_atts;
     return (RsvgNode *) filter;
 }
 
@@ -3187,10 +3196,10 @@ rsvg_filter_primitive_flood_render (RsvgFilterPrimitive * self, RsvgFilterContex
     RsvgIRect boundarys;
     guchar *output_pixels;
     cairo_surface_t *output;
-    char pixcolour[4];
+    char pixcolor[4];
     RsvgFilterPrimitiveOutput out;
 
-    guint32 colour = self->super.state->flood_color;
+    guint32 color = self->super.state->flood_color;
     guint8 opacity = self->super.state->flood_opacity;
 
     boundarys = rsvg_filter_primitive_get_bounds (self, ctx);
@@ -3206,14 +3215,14 @@ rsvg_filter_primitive_flood_render (RsvgFilterPrimitive * self, RsvgFilterContex
     output_pixels = cairo_image_surface_get_data (output);
 
     for (i = 0; i < 3; i++)
-        pixcolour[i] = (int) (((unsigned char *)
-                               (&colour))[2 - i]) * opacity / 255;
-    pixcolour[3] = opacity;
+        pixcolor[i] = (int) (((unsigned char *)
+                               (&color))[2 - i]) * opacity / 255;
+    pixcolor[3] = opacity;
 
     for (y = boundarys.y0; y < boundarys.y1; y++)
         for (x = boundarys.x0; x < boundarys.x1; x++)
             for (i = 0; i < 4; i++)
-                output_pixels[4 * x + y * rowstride + ctx->channelmap[i]] = pixcolour[i];
+                output_pixels[4 * x + y * rowstride + ctx->channelmap[i]] = pixcolor[i];
 
     cairo_surface_mark_dirty (output);
 
@@ -4358,7 +4367,7 @@ get_light_direction (RsvgNodeLightSource * source, gdouble x1, gdouble y1, gdoub
 }
 
 static vector3
-get_light_colour (RsvgNodeLightSource * source, vector3 colour,
+get_light_color (RsvgNodeLightSource * source, vector3 color,
                   gdouble x1, gdouble y1, gdouble z, cairo_matrix_t *affine, RsvgDrawingCtx * ctx)
 {
     double base, angle, x, y;
@@ -4368,7 +4377,7 @@ get_light_colour (RsvgNodeLightSource * source, vector3 colour,
     double sx, sy, sz, spx, spy, spz;
 
     if (source->type != SPOTLIGHT)
-        return colour;
+        return color;
 
     sx = _rsvg_css_normalize_length (&source->x, ctx, 'h');
     sy = _rsvg_css_normalize_length (&source->y, ctx, 'v');
@@ -4401,9 +4410,9 @@ get_light_colour (RsvgNodeLightSource * source, vector3 colour,
         return output;
     }
 
-    output.x = colour.x * pow (base, source->specularExponent);
-    output.y = colour.y * pow (base, source->specularExponent);
-    output.z = colour.z * pow (base, source->specularExponent);
+    output.x = color.x * pow (base, source->specularExponent);
+    output.y = color.y * pow (base, source->specularExponent);
+    output.z = color.z * pow (base, source->specularExponent);
 
     return output;
 }
@@ -4471,7 +4480,7 @@ struct _RsvgFilterPrimitiveDiffuseLighting {
     gdouble dx, dy;
     double diffuseConstant;
     double surfaceScale;
-    guint32 lightingcolour;
+    guint32 lightingcolor;
 };
 
 static void
@@ -4482,8 +4491,8 @@ rsvg_filter_primitive_diffuse_lighting_render (RsvgFilterPrimitive * self, RsvgF
     gdouble z;
     gint rowstride, height, width;
     gdouble factor, surfaceScale;
-    vector3 lightcolour, L, N;
-    vector3 colour;
+    vector3 lightcolor, L, N;
+    vector3 color;
     cairo_matrix_t iaffine;
     RsvgNodeLightSource *source = NULL;
     RsvgIRect boundarys;
@@ -4536,9 +4545,9 @@ rsvg_filter_primitive_diffuse_lighting_render (RsvgFilterPrimitive * self, RsvgF
 
     output_pixels = cairo_image_surface_get_data (output);
 
-    colour.x = ((guchar *) (&upself->lightingcolour))[2] / 255.0;
-    colour.y = ((guchar *) (&upself->lightingcolour))[1] / 255.0;
-    colour.z = ((guchar *) (&upself->lightingcolour))[0] / 255.0;
+    color.x = ((guchar *) (&upself->lightingcolor))[2] / 255.0;
+    color.y = ((guchar *) (&upself->lightingcolor))[1] / 255.0;
+    color.z = ((guchar *) (&upself->lightingcolor))[0] / 255.0;
 
     surfaceScale = upself->surfaceScale / 255.0;
 
@@ -4561,15 +4570,15 @@ rsvg_filter_primitive_diffuse_lighting_render (RsvgFilterPrimitive * self, RsvgF
             N = get_surface_normal (in_pixels, boundarys, x, y,
                                     dx, dy, rawdx, rawdy, upself->surfaceScale,
                                     rowstride, ctx->channelmap[3]);
-            lightcolour = get_light_colour (source, colour, x, y, z, &iaffine, ctx->ctx);
+            lightcolor = get_light_color (source, color, x, y, z, &iaffine, ctx->ctx);
             factor = dotproduct (N, L);
 
             output_pixels[y * rowstride + x * 4 + ctx->channelmap[0]] =
-                MAX (0, MIN (255, upself->diffuseConstant * factor * lightcolour.x * 255.0));
+                MAX (0, MIN (255, upself->diffuseConstant * factor * lightcolor.x * 255.0));
             output_pixels[y * rowstride + x * 4 + ctx->channelmap[1]] =
-                MAX (0, MIN (255, upself->diffuseConstant * factor * lightcolour.y * 255.0));
+                MAX (0, MIN (255, upself->diffuseConstant * factor * lightcolor.y * 255.0));
             output_pixels[y * rowstride + x * 4 + ctx->channelmap[2]] =
-                MAX (0, MIN (255, upself->diffuseConstant * factor * lightcolour.z * 255.0));
+                MAX (0, MIN (255, upself->diffuseConstant * factor * lightcolor.z * 255.0));
             output_pixels[y * rowstride + x * 4 + ctx->channelmap[3]] = 255;
         }
 
@@ -4607,7 +4616,7 @@ rsvg_filter_primitive_diffuse_lighting_set_atts (RsvgNode * self, RsvgHandle * c
         if ((value = rsvg_property_bag_lookup (atts, "kernelUnitLength")))
             rsvg_css_parse_number_optional_number (value, &filter->dx, &filter->dy);
         if ((value = rsvg_property_bag_lookup (atts, "lighting-color")))
-            filter->lightingcolour = rsvg_css_parse_color (value, 0);
+            filter->lightingcolor = rsvg_css_parse_color (value, 0);
         if ((value = rsvg_property_bag_lookup (atts, "diffuseConstant")))
             filter->diffuseConstant = g_ascii_strtod (value, NULL);
         if ((value = rsvg_property_bag_lookup (atts, "surfaceScale")))
@@ -4631,7 +4640,7 @@ rsvg_new_filter_primitive_diffuse_lighting (void)
     filter->diffuseConstant = 1;
     filter->dx = 1;
     filter->dy = 1;
-    filter->lightingcolour = 0xFFFFFFFF;
+    filter->lightingcolor = 0xFFFFFFFF;
     filter->super.render = rsvg_filter_primitive_diffuse_lighting_render;
     filter->super.super.free = rsvg_filter_primitive_free;
     filter->super.super.set_atts = rsvg_filter_primitive_diffuse_lighting_set_atts;
@@ -4648,7 +4657,7 @@ struct _RsvgFilterPrimitiveSpecularLighting {
     double specularConstant;
     double specularExponent;
     double surfaceScale;
-    guint32 lightingcolour;
+    guint32 lightingcolor;
 };
 
 static void
@@ -4658,7 +4667,7 @@ rsvg_filter_primitive_specular_lighting_render (RsvgFilterPrimitive * self, Rsvg
     gdouble z, surfaceScale;
     gint rowstride, height, width;
     gdouble factor, max, base;
-    vector3 lightcolour, colour;
+    vector3 lightcolor, color;
     vector3 L;
     cairo_matrix_t iaffine;
     RsvgIRect boundarys;
@@ -4711,9 +4720,9 @@ rsvg_filter_primitive_specular_lighting_render (RsvgFilterPrimitive * self, Rsvg
 
     output_pixels = cairo_image_surface_get_data (output);
 
-    colour.x = ((guchar *) (&upself->lightingcolour))[2] / 255.0;
-    colour.y = ((guchar *) (&upself->lightingcolour))[1] / 255.0;
-    colour.z = ((guchar *) (&upself->lightingcolour))[0] / 255.0;
+    color.x = ((guchar *) (&upself->lightingcolor))[2] / 255.0;
+    color.y = ((guchar *) (&upself->lightingcolor))[1] / 255.0;
+    color.z = ((guchar *) (&upself->lightingcolor))[0] / 255.0;
 
     surfaceScale = upself->surfaceScale / 255.0;
 
@@ -4724,7 +4733,7 @@ rsvg_filter_primitive_specular_lighting_render (RsvgFilterPrimitive * self, Rsvg
             L.z += 1;
             L = normalise (L);
 
-            lightcolour = get_light_colour (source, colour, x, y, z, &iaffine, ctx->ctx);
+            lightcolor = get_light_color (source, color, x, y, z, &iaffine, ctx->ctx);
             base = dotproduct (get_surface_normal (in_pixels, boundarys, x, y,
                                                    1, 1, 1.0 / ctx->paffine.xx,
                                                    1.0 / ctx->paffine.yy, upself->surfaceScale,
@@ -4733,12 +4742,12 @@ rsvg_filter_primitive_specular_lighting_render (RsvgFilterPrimitive * self, Rsvg
             factor = upself->specularConstant * pow (base, upself->specularExponent) * 255;
 
             max = 0;
-            if (max < lightcolour.x)
-                max = lightcolour.x;
-            if (max < lightcolour.y)
-                max = lightcolour.y;
-            if (max < lightcolour.z)
-                max = lightcolour.z;
+            if (max < lightcolor.x)
+                max = lightcolor.x;
+            if (max < lightcolor.y)
+                max = lightcolor.y;
+            if (max < lightcolor.z)
+                max = lightcolor.z;
 
             max *= factor;
             if (max > 255)
@@ -4746,9 +4755,9 @@ rsvg_filter_primitive_specular_lighting_render (RsvgFilterPrimitive * self, Rsvg
             if (max < 0)
                 max = 0;
 
-            output_pixels[y * rowstride + x * 4 + ctx->channelmap[0]] = lightcolour.x * max;
-            output_pixels[y * rowstride + x * 4 + ctx->channelmap[1]] = lightcolour.y * max;
-            output_pixels[y * rowstride + x * 4 + ctx->channelmap[2]] = lightcolour.z * max;
+            output_pixels[y * rowstride + x * 4 + ctx->channelmap[0]] = lightcolor.x * max;
+            output_pixels[y * rowstride + x * 4 + ctx->channelmap[1]] = lightcolor.y * max;
+            output_pixels[y * rowstride + x * 4 + ctx->channelmap[2]] = lightcolor.z * max;
             output_pixels[y * rowstride + x * 4 + ctx->channelmap[3]] = max;
 
         }
@@ -4784,7 +4793,7 @@ rsvg_filter_primitive_specular_lighting_set_atts (RsvgNode * self, RsvgHandle * 
         if ((value = rsvg_property_bag_lookup (atts, "height")))
             filter->super.height = _rsvg_css_parse_length (value);
         if ((value = rsvg_property_bag_lookup (atts, "lighting-color")))
-            filter->lightingcolour = rsvg_css_parse_color (value, 0);
+            filter->lightingcolor = rsvg_css_parse_color (value, 0);
         if ((value = rsvg_property_bag_lookup (atts, "specularConstant")))
             filter->specularConstant = g_ascii_strtod (value, NULL);
         if ((value = rsvg_property_bag_lookup (atts, "specularExponent")))
@@ -4810,7 +4819,7 @@ rsvg_new_filter_primitive_specular_lighting (void)
     filter->surfaceScale = 1;
     filter->specularConstant = 1;
     filter->specularExponent = 1;
-    filter->lightingcolour = 0xFFFFFFFF;
+    filter->lightingcolor = 0xFFFFFFFF;
     filter->super.render = rsvg_filter_primitive_specular_lighting_render;
     filter->super.super.free = rsvg_filter_primitive_free;
     filter->super.super.set_atts = rsvg_filter_primitive_specular_lighting_set_atts;
@@ -4853,7 +4862,16 @@ rsvg_filter_primitive_tile_render (RsvgFilterPrimitive * self, RsvgFilterContext
 
     input = rsvg_filter_get_result (self->in, ctx);
     in = input.surface;
+    if (in == NULL) {
+        return;
+    }
+
     boundarys = input.bounds;
+
+    if ((boundarys.x0 >= boundarys.x1) || (boundarys.y0 >= boundarys.y1)) {
+        cairo_surface_destroy (in);
+        return;
+    }
 
     cairo_surface_flush (in);
 

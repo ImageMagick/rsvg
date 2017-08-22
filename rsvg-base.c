@@ -245,7 +245,7 @@ rsvg_standard_element_start (RsvgHandle * ctx, const char *name, RsvgPropertyBag
     else if (!strcmp (name, "feBlend"))
         newnode = rsvg_new_filter_primitive_blend ();
     else if (!strcmp (name, "feColorMatrix"))
-        newnode = rsvg_new_filter_primitive_colour_matrix ();
+        newnode = rsvg_new_filter_primitive_color_matrix ();
     else if (!strcmp (name, "feComponentTransfer"))
         newnode = rsvg_new_filter_primitive_component_transfer ();
     else if (!strcmp (name, "feComposite"))
@@ -1150,15 +1150,9 @@ rsvg_set_error (GError **error, xmlParserCtxtPtr ctxt)
     }
 }
 
-static gboolean
-rsvg_handle_write_impl (RsvgHandle * handle, const guchar * buf, gsize count, GError ** error)
+static void
+create_xml_push_parser_ctxt (RsvgHandle *handle)
 {
-    GError *real_error = NULL;
-    int result;
-
-    rsvg_return_val_if_fail (handle != NULL, FALSE, error);
-
-    handle->priv->error = &real_error;
     if (handle->priv->ctxt == NULL) {
         handle->priv->ctxt = xmlCreatePushParserCtxt (&rsvgSAXHandlerStruct, handle, NULL, 0,
                                                       rsvg_handle_get_base_uri (handle));
@@ -1169,6 +1163,18 @@ rsvg_handle_write_impl (RsvgHandle * handle, const guchar * buf, gsize count, GE
            regression */
         handle->priv->ctxt->replaceEntities = TRUE;
     }
+}
+
+static gboolean
+rsvg_handle_write_impl (RsvgHandle * handle, const guchar * buf, gsize count, GError ** error)
+{
+    GError *real_error = NULL;
+    int result;
+
+    rsvg_return_val_if_fail (handle != NULL, FALSE, error);
+
+    handle->priv->error = &real_error;
+    create_xml_push_parser_ctxt (handle);
 
     result = xmlParseChunk (handle->priv->ctxt, (char *) buf, count, 0);
     if (result != 0) {
@@ -1670,6 +1676,31 @@ rsvg_handle_set_dpi_x_y (RsvgHandle * handle, double dpi_x, double dpi_y)
  * arguments are set to -1.
  *
  * Deprecated: Set up a cairo matrix and use rsvg_handle_render_cairo() instead.
+ * You can call rsvg_handle_get_dimensions() to figure out the size of your SVG,
+ * and then scale it to the desired size via Cairo.  For example, the following
+ * code renders an SVG at a specified size, scaled proportionally from whatever
+ * original size it may have had:
+ *
+ * |[<!-- language="C" -->
+ * void
+ * render_scaled_proportionally (RsvgHandle *handle, cairo_t cr, int width, int height)
+ * {
+ *     RsvgDimensionData dimensions;
+ *     double x_factor, y_factor;
+ *     double scale_factor;
+ * 
+ *     rsvg_handle_get_dimensions (handle, &dimensions);
+ * 
+ *     x_factor = (double) width / dimensions.width;
+ *     y_factor = (double) height / dimensions.height;
+ * 
+ *     scale_factor = MIN (x_factor, y_factor);
+ * 
+ *     cairo_scale (cr, scale_factor, scale_factor);
+ * 
+ *     rsvg_handle_render_cairo (handle, cr);
+ * }
+ * ]|
  **/
 void
 rsvg_handle_set_size_callback (RsvgHandle * handle,
@@ -1827,17 +1858,7 @@ rsvg_handle_read_stream_sync (RsvgHandle   *handle,
 
     priv->error = &err;
     priv->cancellable = cancellable ? g_object_ref (cancellable) : NULL;
-    if (priv->ctxt == NULL) {
-        priv->ctxt = xmlCreatePushParserCtxt (&rsvgSAXHandlerStruct, handle, NULL, 0,
-                                              rsvg_handle_get_base_uri (handle));
-        _rsvg_set_xml_parse_options(priv->ctxt, handle);
-
-        /* if false, external entities work, but internal ones don't. if true, internal entities
-           work, but external ones don't. favor internal entities, in order to not cause a
-           regression */
-        /* FIXMEchpe: FIX THIS! */
-        priv->ctxt->replaceEntities = TRUE;
-    }
+    create_xml_push_parser_ctxt (handle);
 
     buffer = _rsvg_xml_input_buffer_new_from_stream (stream, cancellable, XML_CHAR_ENCODING_NONE, &err);
     input = xmlNewIOInputStream (priv->ctxt, buffer, XML_CHAR_ENCODING_NONE);
@@ -2185,7 +2206,7 @@ rsvg_bbox_clip (RsvgBbox * dst, RsvgBbox * src)
     if (src->virgin)
         return;
 
-	if (!dst->virgin) {
+    if (!dst->virgin) {
         xmin = dst->rect.x + dst->rect.width, ymin = dst->rect.y + dst->rect.height;
         xmax = dst->rect.x, ymax = dst->rect.y;
     } else {
@@ -2276,8 +2297,6 @@ _rsvg_handle_allow_load (RsvgHandle *handle,
     /* Not a valid URI */
     if (scheme == NULL)
         goto deny;
-
-    goto allow;
 
     /* Allow loads of data: from any location */
     if (g_str_equal (scheme, "data"))

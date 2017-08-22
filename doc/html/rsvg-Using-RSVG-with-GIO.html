@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>RSVG Libary Reference Manual: Using RSVG with GIO</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>Using RSVG with GIO: RSVG Libary Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.0">
 <link rel="home" href="index.html" title="RSVG Libary Reference Manual">
 <link rel="up" href="rsvg.html" title="Part I. API Reference">
 <link rel="prev" href="RsvgHandle.html" title="RsvgHandle">
 <link rel="next" href="rsvg-Using-RSVG-with-cairo.html" title="Using RSVG with cairo">
-<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -34,7 +34,7 @@
 </tr></table></div>
 <div class="refsect1">
 <a name="rsvg-Using-RSVG-with-GIO.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
@@ -50,7 +50,7 @@
 </tr>
 <tr>
 <td class="function_type">
-<a href="https://developer.gnome.org/glib/unstable/glib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+<a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
 </td>
 <td class="function_name">
 <a class="link" href="rsvg-Using-RSVG-with-GIO.html#rsvg-handle-read-stream-sync" title="rsvg_handle_read_stream_sync ()">rsvg_handle_read_stream_sync</a> <span class="c_punctuation">()</span>
@@ -77,7 +77,7 @@
 </div>
 <div class="refsect1">
 <a name="rsvg-Using-RSVG-with-GIO.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="name">
 <col class="description">
@@ -103,15 +103,15 @@
 <a name="rsvg-handle-set-base-gfile"></a><h3>rsvg_handle_set_base_gfile ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 rsvg_handle_set_base_gfile (<em class="parameter"><code><a class="link" href="RsvgHandle.html" title="RsvgHandle"><span class="type">RsvgHandle</span></a> *handle</code></em>,
-                            <em class="parameter"><code><a href="https://developer.gnome.org/gio/unstable/GFile.html"><span class="type">GFile</span></a> *base_file</code></em>);</pre>
+                            <em class="parameter"><code><a href="/usr/share/gtk-doc/html/gioGFile.html#GFile-struct"><span class="type">GFile</span></a> *base_file</code></em>);</pre>
 <p>Set the base URI for <em class="parameter"><code>handle</code></em>
  from <em class="parameter"><code>file</code></em>
 .
 Note: This function may only be called before <a class="link" href="RsvgHandle.html#rsvg-handle-write" title="rsvg_handle_write ()"><code class="function">rsvg_handle_write()</code></a>
 or <a class="link" href="rsvg-Using-RSVG-with-GIO.html#rsvg-handle-read-stream-sync" title="rsvg_handle_read_stream_sync ()"><code class="function">rsvg_handle_read_stream_sync()</code></a> has been called.</p>
 <div class="refsect3">
-<a name="id-1.2.4.7.2.5"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="rsvg-handle-set-base-gfile.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -125,33 +125,33 @@ or <a class="link" href="rsvg-Using-RSVG-with-GIO.html#rsvg-handle-read-stream-s
 </tr>
 <tr>
 <td class="parameter_name"><p>base_file</p></td>
-<td class="parameter_description"><p>a <a href="https://developer.gnome.org/gio/unstable/GFile.html"><span class="type">GFile</span></a></p></td>
+<td class="parameter_description"><p>a <a href="/usr/share/gtk-doc/html/gioGFile.html#GFile-struct"><span class="type">GFile</span></a></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
 </table></div>
 </div>
-<p class="since">Since 2.32</p>
+<p class="since">Since: <a class="link" href="api-index-2-32.html#api-index-2.32">2.32</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="rsvg-handle-read-stream-sync"></a><h3>rsvg_handle_read_stream_sync ()</h3>
-<pre class="programlisting"><a href="https://developer.gnome.org/glib/unstable/glib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
+<pre class="programlisting"><a href="/usr/share/gtk-doc/html/glibglib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
 rsvg_handle_read_stream_sync (<em class="parameter"><code><a class="link" href="RsvgHandle.html" title="RsvgHandle"><span class="type">RsvgHandle</span></a> *handle</code></em>,
-                              <em class="parameter"><code><a href="https://developer.gnome.org/gio/unstable/GInputStream.html"><span class="type">GInputStream</span></a> *stream</code></em>,
-                              <em class="parameter"><code><a href="https://developer.gnome.org/gio/unstable/GCancellable.html"><span class="type">GCancellable</span></a> *cancellable</code></em>,
-                              <em class="parameter"><code><a href="https://developer.gnome.org/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+                              <em class="parameter"><code><a href="/usr/share/gtk-doc/html/gioGInputStream.html#GInputStream-struct"><span class="type">GInputStream</span></a> *stream</code></em>,
+                              <em class="parameter"><code><a href="/usr/share/gtk-doc/html/gioGCancellable.html#GCancellable-struct"><span class="type">GCancellable</span></a> *cancellable</code></em>,
+                              <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
 <p>Reads <em class="parameter"><code>stream</code></em>
  and writes the data from it to <em class="parameter"><code>handle</code></em>
 .</p>
 <p>If <em class="parameter"><code>cancellable</code></em>
- is not <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>, then the operation can be cancelled by
+ is not <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the
-operation was cancelled, the error <a href="https://developer.gnome.org/gio/unstable/gio-GIOError.html#G-IO-ERROR-CANCELLED:CAPS"><code class="literal">G_IO_ERROR_CANCELLED</code></a> will be
+operation was cancelled, the error <a href="/usr/share/gtk-doc/html/giogio-GIOError.html#G-IO-ERROR-CANCELLED:CAPS"><code class="literal">G_IO_ERROR_CANCELLED</code></a> will be
 returned.</p>
 <div class="refsect3">
-<a name="id-1.2.4.7.3.6"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="rsvg-handle-read-stream-sync.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -165,50 +165,49 @@ returned.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>stream</p></td>
-<td class="parameter_description"><p>a <a href="https://developer.gnome.org/gio/unstable/GInputStream.html"><span class="type">GInputStream</span></a></p></td>
+<td class="parameter_description"><p>a <a href="/usr/share/gtk-doc/html/gioGInputStream.html#GInputStream-struct"><span class="type">GInputStream</span></a></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
 <td class="parameter_name"><p>cancellable</p></td>
-<td class="parameter_description"><p> a <a href="https://developer.gnome.org/gio/unstable/GCancellable.html"><span class="type">GCancellable</span></a>, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+<td class="parameter_description"><p> a <a href="/usr/share/gtk-doc/html/gioGCancellable.html#GCancellable-struct"><span class="type">GCancellable</span></a>, or <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 <tr>
 <td class="parameter_name"><p>error</p></td>
-<td class="parameter_description"><p> a location to store a <a href="https://developer.gnome.org/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a>, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+<td class="parameter_description"><p> a location to store a <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a>, or <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.7.3.7"></a><h4>Returns</h4>
-<p> <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if reading <em class="parameter"><code>stream</code></em>
-succeeded, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#FALSE:CAPS"><code class="literal">FALSE</code></a> otherwise
+<a name="rsvg-handle-read-stream-sync.returns"></a><h4>Returns</h4>
+<p> <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if reading <em class="parameter"><code>stream</code></em>
+succeeded, or <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#FALSE:CAPS"><code class="literal">FALSE</code></a> otherwise
 with <em class="parameter"><code>error</code></em>
 filled in</p>
-<p></p>
 </div>
-<p class="since">Since 2.32</p>
+<p class="since">Since: <a class="link" href="api-index-2-32.html#api-index-2.32">2.32</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="rsvg-handle-new-from-gfile-sync"></a><h3>rsvg_handle_new_from_gfile_sync ()</h3>
 <pre class="programlisting"><a class="link" href="RsvgHandle.html" title="RsvgHandle"><span class="returnvalue">RsvgHandle</span></a> *
-rsvg_handle_new_from_gfile_sync (<em class="parameter"><code><a href="https://developer.gnome.org/gio/unstable/GFile.html"><span class="type">GFile</span></a> *file</code></em>,
+rsvg_handle_new_from_gfile_sync (<em class="parameter"><code><a href="/usr/share/gtk-doc/html/gioGFile.html#GFile-struct"><span class="type">GFile</span></a> *file</code></em>,
                                  <em class="parameter"><code><a class="link" href="rsvg-Using-RSVG-with-GIO.html#RsvgHandleFlags" title="enum RsvgHandleFlags"><span class="type">RsvgHandleFlags</span></a> flags</code></em>,
-                                 <em class="parameter"><code><a href="https://developer.gnome.org/gio/unstable/GCancellable.html"><span class="type">GCancellable</span></a> *cancellable</code></em>,
-                                 <em class="parameter"><code><a href="https://developer.gnome.org/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+                                 <em class="parameter"><code><a href="/usr/share/gtk-doc/html/gioGCancellable.html#GCancellable-struct"><span class="type">GCancellable</span></a> *cancellable</code></em>,
+                                 <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
 <p>Creates a new <a class="link" href="RsvgHandle.html" title="RsvgHandle"><span class="type">RsvgHandle</span></a> for <em class="parameter"><code>file</code></em>
 .</p>
 <p>If <em class="parameter"><code>cancellable</code></em>
- is not <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>, then the operation can be cancelled by
+ is not <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the
-operation was cancelled, the error <a href="https://developer.gnome.org/gio/unstable/gio-GIOError.html#G-IO-ERROR-CANCELLED:CAPS"><code class="literal">G_IO_ERROR_CANCELLED</code></a> will be
+operation was cancelled, the error <a href="/usr/share/gtk-doc/html/giogio-GIOError.html#G-IO-ERROR-CANCELLED:CAPS"><code class="literal">G_IO_ERROR_CANCELLED</code></a> will be
 returned.</p>
 <div class="refsect3">
-<a name="id-1.2.4.7.4.6"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="rsvg-handle-new-from-gfile-sync.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -217,7 +216,7 @@ returned.</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>file</p></td>
-<td class="parameter_description"><p>a <a href="https://developer.gnome.org/gio/unstable/GFile.html"><span class="type">GFile</span></a></p></td>
+<td class="parameter_description"><p>a <a href="/usr/share/gtk-doc/html/gioGFile.html#GFile-struct"><span class="type">GFile</span></a></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
@@ -227,44 +226,43 @@ returned.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>cancellable</p></td>
-<td class="parameter_description"><p> a <a href="https://developer.gnome.org/gio/unstable/GCancellable.html"><span class="type">GCancellable</span></a>, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+<td class="parameter_description"><p> a <a href="/usr/share/gtk-doc/html/gioGCancellable.html#GCancellable-struct"><span class="type">GCancellable</span></a>, or <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 <tr>
 <td class="parameter_name"><p>error</p></td>
-<td class="parameter_description"><p> a location to store a <a href="https://developer.gnome.org/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a>, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+<td class="parameter_description"><p> a location to store a <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a>, or <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.7.4.7"></a><h4>Returns</h4>
-<p> a new <a class="link" href="RsvgHandle.html" title="RsvgHandle"><span class="type">RsvgHandle</span></a> on success, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> with <em class="parameter"><code>error</code></em>
+<a name="rsvg-handle-new-from-gfile-sync.returns"></a><h4>Returns</h4>
+<p> a new <a class="link" href="RsvgHandle.html" title="RsvgHandle"><span class="type">RsvgHandle</span></a> on success, or <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> with <em class="parameter"><code>error</code></em>
 filled in</p>
-<p></p>
 </div>
-<p class="since">Since 2.32</p>
+<p class="since">Since: <a class="link" href="api-index-2-32.html#api-index-2.32">2.32</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="rsvg-handle-new-from-stream-sync"></a><h3>rsvg_handle_new_from_stream_sync ()</h3>
 <pre class="programlisting"><a class="link" href="RsvgHandle.html" title="RsvgHandle"><span class="returnvalue">RsvgHandle</span></a> *
-rsvg_handle_new_from_stream_sync (<em class="parameter"><code><a href="https://developer.gnome.org/gio/unstable/GInputStream.html"><span class="type">GInputStream</span></a> *input_stream</code></em>,
-                                  <em class="parameter"><code><a href="https://developer.gnome.org/gio/unstable/GFile.html"><span class="type">GFile</span></a> *base_file</code></em>,
+rsvg_handle_new_from_stream_sync (<em class="parameter"><code><a href="/usr/share/gtk-doc/html/gioGInputStream.html#GInputStream-struct"><span class="type">GInputStream</span></a> *input_stream</code></em>,
+                                  <em class="parameter"><code><a href="/usr/share/gtk-doc/html/gioGFile.html#GFile-struct"><span class="type">GFile</span></a> *base_file</code></em>,
                                   <em class="parameter"><code><a class="link" href="rsvg-Using-RSVG-with-GIO.html#RsvgHandleFlags" title="enum RsvgHandleFlags"><span class="type">RsvgHandleFlags</span></a> flags</code></em>,
-                                  <em class="parameter"><code><a href="https://developer.gnome.org/gio/unstable/GCancellable.html"><span class="type">GCancellable</span></a> *cancellable</code></em>,
-                                  <em class="parameter"><code><a href="https://developer.gnome.org/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+                                  <em class="parameter"><code><a href="/usr/share/gtk-doc/html/gioGCancellable.html#GCancellable-struct"><span class="type">GCancellable</span></a> *cancellable</code></em>,
+                                  <em class="parameter"><code><a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
 <p>Creates a new <a class="link" href="RsvgHandle.html" title="RsvgHandle"><span class="type">RsvgHandle</span></a> for <em class="parameter"><code>stream</code></em>
 .</p>
 <p>If <em class="parameter"><code>cancellable</code></em>
- is not <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>, then the operation can be cancelled by
+ is not <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the
-operation was cancelled, the error <a href="https://developer.gnome.org/gio/unstable/gio-GIOError.html#G-IO-ERROR-CANCELLED:CAPS"><code class="literal">G_IO_ERROR_CANCELLED</code></a> will be
+operation was cancelled, the error <a href="/usr/share/gtk-doc/html/giogio-GIOError.html#G-IO-ERROR-CANCELLED:CAPS"><code class="literal">G_IO_ERROR_CANCELLED</code></a> will be
 returned.</p>
 <div class="refsect3">
-<a name="id-1.2.4.7.5.6"></a><h4>Parameters</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="rsvg-handle-new-from-stream-sync.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
 <col class="parameters_description">
@@ -273,12 +271,12 @@ returned.</p>
 <tbody>
 <tr>
 <td class="parameter_name"><p>input_stream</p></td>
-<td class="parameter_description"><p>a <a href="https://developer.gnome.org/gio/unstable/GInputStream.html"><span class="type">GInputStream</span></a></p></td>
+<td class="parameter_description"><p>a <a href="/usr/share/gtk-doc/html/gioGInputStream.html#GInputStream-struct"><span class="type">GInputStream</span></a></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
 <td class="parameter_name"><p>base_file</p></td>
-<td class="parameter_description"><p> a <a href="https://developer.gnome.org/gio/unstable/GFile.html"><span class="type">GFile</span></a>, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+<td class="parameter_description"><p> a <a href="/usr/share/gtk-doc/html/gioGFile.html#GFile-struct"><span class="type">GFile</span></a>, or <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 <tr>
@@ -288,24 +286,23 @@ returned.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>cancellable</p></td>
-<td class="parameter_description"><p> a <a href="https://developer.gnome.org/gio/unstable/GCancellable.html"><span class="type">GCancellable</span></a>, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+<td class="parameter_description"><p> a <a href="/usr/share/gtk-doc/html/gioGCancellable.html#GCancellable-struct"><span class="type">GCancellable</span></a>, or <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 <tr>
 <td class="parameter_name"><p>error</p></td>
-<td class="parameter_description"><p> a location to store a <a href="https://developer.gnome.org/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a>, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+<td class="parameter_description"><p> a location to store a <a href="/usr/share/gtk-doc/html/glibglib-Error-Reporting.html#GError"><span class="type">GError</span></a>, or <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is OK, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.2.4.7.5.7"></a><h4>Returns</h4>
-<p> a new <a class="link" href="RsvgHandle.html" title="RsvgHandle"><span class="type">RsvgHandle</span></a> on success, or <a href="https://developer.gnome.org/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> with <em class="parameter"><code>error</code></em>
+<a name="rsvg-handle-new-from-stream-sync.returns"></a><h4>Returns</h4>
+<p> a new <a class="link" href="RsvgHandle.html" title="RsvgHandle"><span class="type">RsvgHandle</span></a> on success, or <a href="/usr/share/gtk-doc/html/glibglib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> with <em class="parameter"><code>error</code></em>
 filled in</p>
-<p></p>
 </div>
-<p class="since">Since 2.32</p>
+<p class="since">Since: <a class="link" href="api-index-2-32.html#api-index-2.32">2.32</a></p>
 </div>
 </div>
 <div class="refsect1">
@@ -313,8 +310,8 @@ filled in</p>
 <div class="refsect2">
 <a name="RsvgHandleFlags"></a><h3>enum RsvgHandleFlags</h3>
 <div class="refsect3">
-<a name="id-1.2.4.8.2.3"></a><h4>Members</h4>
-<div class="informaltable"><table width="100%" border="0">
+<a name="RsvgHandleFlags.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="300px" class="enum_members_name">
 <col class="enum_members_description">
@@ -354,7 +351,6 @@ filled in</p>
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21</div>
+<hr>Generated by GTK-Doc V1.25</div>
 </body>
 </html>

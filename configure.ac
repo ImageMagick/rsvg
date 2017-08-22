@@ -1,6 +1,6 @@
 m4_define([rsvg_major_version],[2])
 m4_define([rsvg_minor_version],[40])
-m4_define([rsvg_micro_version],[15])
+m4_define([rsvg_micro_version],[18])
 m4_define([rsvg_extra_version],[])
 m4_define([rsvg_version],[rsvg_major_version.rsvg_minor_version.rsvg_micro_version()rsvg_extra_version])
 m4_define([rsvg_lt_version_info],m4_eval(rsvg_major_version + rsvg_minor_version):rsvg_micro_version:rsvg_minor_version)
@@ -11,7 +11,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([rsvg.h])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.9 foreign no-dist-gzip dist-bzip2])
+AM_INIT_AUTOMAKE([1.9 foreign no-dist-gzip dist-xz])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AM_MAINTAINER_MODE([enable])
@@ -260,6 +260,12 @@ GLIB_LC_MESSAGES
 
 dnl ===========================================================================
 
+# Check whether MSVC toolset is explicitly set
+AM_CONDITIONAL(MSVC_BASE_NO_TOOLSET_SET, [test x$MSVC_BASE_TOOLSET = x])
+AM_CONDITIONAL(MSVC_NO_TOOLSET_SET, [test x$MSVC_TOOLSET = x])
+
+dnl ===========================================================================
+
 AC_SUBST([AM_CPPFLAGS])
 AC_SUBST([AM_CFLAGS])
 AC_SUBST([AM_LDFLAGS])
@@ -277,10 +283,13 @@ config.h.win32
 build/Makefile
 build/win32/Makefile
 build/win32/vs9/Makefile
+build/win32/vs9/rsvg-version-paths.vsprops
 build/win32/vs10/Makefile
+build/win32/vs10/rsvg-version-paths.props
 build/win32/vs11/Makefile
 build/win32/vs12/Makefile
 build/win32/vs14/Makefile
+build/win32/vs15/Makefile
 ])
 
 AC_CONFIG_FILES([librsvg-${RSVG_API_VERSION}.pc:librsvg.pc.in],[],[RSVG_API_VERSION=$RSVG_API_VERSION])

@@ -64,7 +64,7 @@
 #define PACKAGE_NAME "RSVG"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "RSVG 2.40.15"
+#define PACKAGE_STRING "RSVG 2.40.18"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "librsvg"
@@ -73,13 +73,13 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.40.15"
+#define PACKAGE_VERSION "2.40.18"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "2.40.15"
+#define VERSION "2.40.18"
 
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */
@@ -91,10 +91,4 @@
 # ifndef WORDS_BIGENDIAN
 #  undef WORDS_BIGENDIAN
 # endif
-#endif
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1310)
-#  define isnan(a) _isnan(a)
-#else
-#  define isnan(a) (a != a)
 #endif

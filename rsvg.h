@@ -50,18 +50,6 @@ G_BEGIN_DECLS
 #define RSVG_IS_HANDLE_CLASS(klass)       (G_TYPE_CHECK_CLASS_TYPE ((klass), RSVG_TYPE_HANDLE))
 #define RSVG_HANDLE_GET_CLASS(obj)        (G_TYPE_INSTANCE_GET_CLASS ((obj), RSVG_TYPE_HANDLE, RsvgHandleClass))
 
-#ifndef RSVG_EXPORT
-#  if defined(_LIB)
-#    define RSVG_EXPORT extern
-#  else
-#    ifdef RSVG_COMPILATION
-#      define RSVG_EXPORT __declspec(dllexport)
-#    else
-#      define RSVG_EXPORT extern __declspec(dllimport)
-#    endif
-#  endif
-#endif
-
 GType rsvg_handle_get_type (void);
 
 /**
@@ -143,25 +131,18 @@ void rsvg_set_default_dpi	(double dpi);
 void rsvg_set_default_dpi_x_y	(double dpi_x, double dpi_y);
 
 void rsvg_handle_set_dpi	(RsvgHandle * handle, double dpi);
-RSVG_EXPORT
 void rsvg_handle_set_dpi_x_y	(RsvgHandle * handle, double dpi_x, double dpi_y);
 
-RSVG_EXPORT
 RsvgHandle  *rsvg_handle_new		(void);
-RSVG_EXPORT
 gboolean     rsvg_handle_write		(RsvgHandle * handle, const guchar * buf, 
                                      gsize count, GError ** error);
-RSVG_EXPORT
 gboolean     rsvg_handle_close		(RsvgHandle * handle, GError ** error);
 GdkPixbuf   *rsvg_handle_get_pixbuf	(RsvgHandle * handle);
 GdkPixbuf   *rsvg_handle_get_pixbuf_sub (RsvgHandle * handle, const char *id);
 
-RSVG_EXPORT
 const char  *rsvg_handle_get_base_uri (RsvgHandle * handle);
-RSVG_EXPORT
 void         rsvg_handle_set_base_uri (RsvgHandle * handle, const char *base_uri);
 
-RSVG_EXPORT
 void rsvg_handle_get_dimensions (RsvgHandle * handle, RsvgDimensionData * dimension_data);
 
 gboolean rsvg_handle_get_dimensions_sub (RsvgHandle * handle, RsvgDimensionData * dimension_data, const char *id);
@@ -234,6 +215,7 @@ void rsvg_handle_free (RsvgHandle * handle);
  * Function to let a user of the library specify the SVG's dimensions
  *
  * Deprecated: Set up a cairo matrix and use rsvg_handle_render_cairo() instead.
+ * See the documentation for rsvg_handle_set_size_callback() for an example.
  */
 typedef /* RSVG_DEPRECATED */ void (*RsvgSizeFunc) (gint * width, gint * height, gpointer user_data);
 

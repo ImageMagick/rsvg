@@ -1,3 +1,470 @@
+commit 4cf9665d7a00a6b3c134fe1723f2b00a56923391
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Jul 19 20:08:59 2017 -0500
+
+    Bump version to 2.40.18
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 3ec71aa76b34129fdf7db60e01d3ddd395ecd84f
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Jul 19 20:10:50 2017 -0500
+
+    Update NEWS
+
+ NEWS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+commit 26ae646cecb743c5e2dd9031ebc7fdd19b9ab7e0
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Mon Mar 6 15:24:48 2017 +0800
+
+    Visual Studio builds: Generate .pc files upon "install"
+    
+    This makes it easier for build systems that demand for the presence of .pc
+    files (such as Meson) to find packages.
+
+ build/win32/vs10/Makefile.am                  |  1 +
+ build/win32/vs10/rsvg-install.propsin         | 10 +++++++
+ build/win32/vs10/rsvg-install.vcxproj         | 28 +++++++++++--------
+ build/win32/vs10/rsvg-install.vcxproj.filters | 21 ++++++++++++++
+ build/win32/vs10/rsvg-version-paths.props.in  |  4 +++
+ build/win32/vs11/Makefile.am                  |  1 +
+ build/win32/vs12/Makefile.am                  |  1 +
+ build/win32/vs14/Makefile.am                  |  1 +
+ build/win32/vs15/Makefile.am                  |  1 +
+ build/win32/vs9/rsvg-install.vcproj           | 40 +++++++++++++++++++++++++++
+ build/win32/vs9/rsvg-install.vspropsin        |  6 ++++
+ build/win32/vs9/rsvg-version-paths.vsprops.in |  4 +++
+ 12 files changed, 106 insertions(+), 12 deletions(-)
+
+commit 620b8df5bb12d44f94c5b6cf2d6b74f6ed0bdfa3
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Fri Mar 3 17:19:43 2017 +0800
+
+    Visual Studio builds: Add scripts to generate .pc files
+    
+    Integration into the Visual Studio process will follow, this uses Python
+    to generate librsvg-2.0.pc.
+
+ build/win32/Makefile.am |   3 ++
+ build/win32/pc_base.py  | 124 ++++++++++++++++++++++++++++++++++++++++++++++++
+ build/win32/replace.py  | 115 ++++++++++++++++++++++++++++++++++++++++++++
+ build/win32/rsvgpc.py   |  33 +++++++++++++
+ 4 files changed, 275 insertions(+)
+
+commit 208f07daeabcc1966a556860acb06764a9af2d51
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Fri Mar 3 17:53:40 2017 +0800
+
+    MSVC builds: Include Version info in Property Sheets
+    
+    This info can be used later to generate the .pc files directly from the
+    Visual Studio builds.
+
+ ...{rsvg-version-paths.props => rsvg-version-paths.props.in} | 12 ++++++++++++
+ ...g-version-paths.vsprops => rsvg-version-paths.vsprops.in} | 12 ++++++++++++
+ configure.ac                                                 |  2 ++
+ 3 files changed, 26 insertions(+)
+
+commit 80c100d2a51259aee292e32694e8d885ce01a7b6
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Fri Mar 3 17:44:31 2017 +0800
+
+    Visual Studio builds: Support Visual Studio 2017
+    
+    This adds Visual Studio 2017 support for the 2.40.x series by updating the
+    autotools scripts that copy the 2010 projects and updating the items in
+    there as needed.  Since Visual Studio 2017 has a different toolset version
+    string format, a custom toolset version string is allowed and used if one
+    is specified, otherwise it will be generated as it is before.
+    
+    Since Visual Studio 2017 aims to be compatible with Visual Studio 2015 on
+    the CRT level, one should be able to use 2017-built binaries with
+    2015-built binaries.
+
+ build/Makefile-newvs.am      | 18 +++++++++++++-----
+ build/Makefile.msvcproj      |  2 ++
+ build/win32/Makefile.am      |  3 ++-
+ build/win32/vs10/Makefile.am |  3 ++-
+ build/win32/vs15/Makefile.am | 25 +++++++++++++++++++++++++
+ configure.ac                 |  7 +++++++
+ 6 files changed, 51 insertions(+), 7 deletions(-)
+
+commit 30792d0da1939d8f2bf2124f7ed2b1ed0eee32d6
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Jul 7 11:42:35 2017 -0500
+
+    rsvg-filter: Deal with errors in all callers to rsvg_filter_get_result()
+
+ rsvg-filter.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+commit 2f55461824855af06ffd31abf8f8acfd4a42656e
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Jul 7 11:38:56 2017 -0500
+
+    rsvg-filter: Return NULL for invalid surfaces in rsvg_filter_get_{result,in}()
+
+ rsvg-filter.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
+
+commit a35544e4139df47e70e2b2a130e8db00e5fe208b
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Jul 7 11:29:04 2017 -0500
+
+    feGaussianBlur: Don't try to blur an invalid surface
+    
+    This is a stop-gap measure to deal with invalid surfaces being fed
+    to this filter.  We get a surface which is not in
+    CAIRO_STATUS_SUCCESS, and so its width/height are 0.
+    
+    In reality we should be able to bubble up errors from
+    cairo_*_surface_create(), but we don't do that yet.
+
+ rsvg-filter.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+commit 5a64b032d3dfbecd1af0ecea0fc5e636029547b3
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Jul 7 10:40:05 2017 -0500
+
+    rsvg_parse_transform(): Return failure for degenerate matrices
+
+ rsvg-styles.c | 34 ++++++++++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 10 deletions(-)
+
+commit 4c23831871b1bbb2fe569f70f813e2f703ea4eb3
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Thu Jul 6 13:02:03 2017 -0500
+
+    feTile: don't divide by zero if the input surface has empty bounds
+    
+    Thanks to Stefan Cornelius <scorneli@redhat.com> for the test file.
+
+ rsvg-filter.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+commit 735bd813d7657f24dba222fa6e5be8f66491ef77
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Jun 27 17:12:51 2017 -0500
+
+    bgo#783835 - Don't divide by zero in box_blur_line() for gaussian blurs
+    
+    We were making the decision to use box blurs, instead of a true
+    Gaussian kernel, based on the size of *both* x and y dimensions.  Do
+    them individually instead.
+
+ rsvg-filter.c | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
+
+commit f4cf9aca144eeda8f441f839881bcbd492529002
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Apr 7 15:07:17 2017 -0500
+
+    Update NEWS
+
+ NEWS | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+commit 5bf519d5abbf498eb33712d59cdb9caadea242d8
+Author: Jeremy Bicha <jbicha@ubuntu.com>
+Date:   Fri Apr 7 14:59:59 2017 -0500
+
+    bgo#778666 - Use our own thumbnailer specification file
+    
+    GNOME 3.24 requires an external thumbnailer program, so define which
+    MIME-types we support thumbnailing from within gdk-pixbuf-thumbnailer.
+    The relevant commit in gnome-desktop is
+    https://git.gnome.org/browse/gnome-desktop/commit/?id=b69fde6
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=778666
+
+ gdk-pixbuf-loader/Makefile.am            | 9 +++++++++
+ gdk-pixbuf-loader/librsvg.thumbnailer.in | 4 ++++
+ 2 files changed, 13 insertions(+)
+
+commit c3c80d25b5d5b23c0cd1899667ed07289441372b
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 26 18:18:46 2016 -0500
+
+    Update the README
+
+ README | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 54 insertions(+), 2 deletions(-)
+
+commit 026cd60eaa1f7f893cdce4fefa464bab1463e336
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Oct 21 16:48:41 2016 -0500
+
+    Oops, removed unused variable
+
+ test-display.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+commit f2edb0c6dc65318f4ee2c154fb700c74632e81e5
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Oct 21 16:42:07 2016 -0500
+
+    test-display.c: Remove redundant code for zlib decompression
+    
+    Same as for rsvg-convert; librsvg can already deal with .svgz by itself.
+
+ test-display.c | 26 --------------------------
+ 1 file changed, 26 deletions(-)
+
+commit 8b834834abecf9cb492216d29b6d634a8c5aa35d
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Oct 21 12:10:41 2016 -0500
+
+    rsvg-convert: Remove redundant code for zlib decompression
+    
+    The gio streaming machinery inside librsvg already knows how to
+    sniff the incoming data for zlib compression; we don't need
+    to explicitly create a decompressor stream here.
+
+ rsvg-convert.c | 28 ----------------------------
+ 1 file changed, 28 deletions(-)
+
+commit 12cc5ec711e954813cbabb446ff96ad326e728cd
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Oct 21 14:29:45 2016 -0500
+
+    rsvg-base: move duplicated code to a function
+
+ rsvg-base.c | 36 ++++++++++++++++--------------------
+ 1 file changed, 16 insertions(+), 20 deletions(-)
+
+commit 5a88df059eb78b40f4e0bca35632ad96be128562
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Oct 21 13:30:35 2016 -0500
+
+    Normalize test reference PNGs; font rendering changed a little bit
+
+ tests/fixtures/reftests/bugs/340047-ref.png | Bin 4706 -> 4891 bytes
+ tests/fixtures/reftests/bugs/749415-ref.png | Bin 19572 -> 21402 bytes
+ tests/fixtures/reftests/bugs/760180-ref.png | Bin 8120 -> 8884 bytes
+ 3 files changed, 0 insertions(+), 0 deletions(-)
+
+commit e42b622d9c82c2702d3d1f3b981022718cd1084b
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Wed Oct 19 19:34:28 2016 +0800
+
+    Remove rsvg-install.props's during re-generation
+    
+    This is to ensure the changes in the generated
+    build/win32/vs10/rsvg-install.props are applied in
+    build/win32/vs[11|12|14] as well.
+
+ build/win32/vs10/Makefile.am | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit 6ee81cd434c5b0fa04dccf265281249eff7b7b1d
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Wed Oct 19 14:48:08 2016 +0800
+
+    build/: Force MSVC project file generation on Makefile.am changes
+    
+    Make the Makefile.am targets for generating the Visual Studio projects re-generate the
+    project files and the header listings whenever the Makefile.am's that include
+    build/Makefile.msvcproj changes, so that whenever a source/header is added, they will
+    be reflected in the projects and in the property sheets that are used to copy the
+    headers.
+    
+    Also ensure that these are applied to the vs11, vs12 and vs14 projects when this
+    happens, as they are copied and processed from the Visual Studio 2010 projects.
+
+ build/Makefile-newvs.am |  2 +-
+ build/Makefile.msvcproj | 11 +++++++++--
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+commit 8a0af0123ed54ca9925d9739c508267283486be2
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Jun 8 21:33:42 2016 -0500
+
+    Post-release version bump to 2.40.17
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit ea77fccbccdf4d518d64119ce9d6bc7e28a268fb
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Wed Jun 22 10:56:50 2016 +0800
+
+    Visual Studio builds: Look for cairo headers in $(prefix)/include/cairo
+    
+    Cairo headers could be in $(prefix)/include/cairo, so make sure we look
+    for them there as well.  Also rearrange order where headers are looked for
+    in Visua Studio 2008 builds, in the order of dependency hierarchy.
+
+ build/win32/vs10/rsvg-build-defines.props  | 2 +-
+ build/win32/vs9/rsvg-build-defines.vsprops | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit e68ec17827a7116fc418189d474c5fafa08555b5
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Jun 8 21:28:32 2016 -0500
+
+    Update NEWS
+
+ NEWS | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+commit 5183f46532be3b3782341e4132ca8b0416f50704
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Tue May 10 15:11:54 2016 +0800
+
+    Visual Studio builds: Refine "installation" process
+    
+    Split out the part where we generate the cache for GDK-Pixbuf, so that
+    it is easier to ensure the needed parts are in place when Copydir !=
+    GlibEtcInstallDir.
+
+ build/win32/vs10/rsvg-install.propsin  |  8 +++++---
+ build/win32/vs10/rsvg-install.vcxproj  |  8 ++++----
+ build/win32/vs9/rsvg-install.vcproj    |  8 ++++----
+ build/win32/vs9/rsvg-install.vspropsin | 26 ++++++++++++++------------
+ 4 files changed, 27 insertions(+), 23 deletions(-)
+
+commit 42a58e9cc3f7fff2b039b323a7e9a38587518033
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Thu Dec 17 15:50:00 2015 +0800
+
+    MSVC builds: Add support for introspection via NMake
+    
+    This adds a set of NMake Makefiles that is used to build the introspection
+    files for librsvg, along with additions to the autotools file that uses the
+    common autotools module to generate another NMake Makefile module that would
+    contain the full command lines to g-ir-scanner and g-ir-compiler, which would
+    be called by these NMake Makefiles.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=765245
+
+ Makefile.am                             | 21 ++++++++
+ build/win32/Makefile.am                 | 29 ++++++++++
+ build/win32/detectenv-msvc.mak          | 76 ++++++++++++++++++++++++++
+ build/win32/introspection-msvc.mak      | 94 +++++++++++++++++++++++++++++++++
+ build/win32/rsvg-introspection-msvc.mak | 35 ++++++++++++
+ 5 files changed, 255 insertions(+)
+
+commit 09d742735dc1f62798776ce251b3861e31d77c55
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Thu Dec 17 15:42:14 2015 +0800
+
+    build: Add common autotools module for introspection under MSVC
+    
+    This adds a common autotools module that is used to generate the
+    full command line for generating the .gir files for librsvg and
+    under Visual Studio's NMake, as well as the file lists of files that
+    are to be passed into the introspection scanner.  This is exactly the
+    same file (as listed in the file's comment block) found under the
+    same name in $(gi_src_root)/build, so updates for this comes
+    from there.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=765245
+
+ build/Makefile.msvc-introspection | 125 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 125 insertions(+)
+
+commit aec5f5c34a233cae4d21284f55c2af2e4ddb0b3b
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Apr 12 16:52:51 2016 -0500
+
+    bgo#764808 - start off with state->current_color = black
+    
+    When SVG comes in with e.g. fill="currentColor", it means that the content is likely
+    being embedded into other content, and expects the CSS to cascade appropriately.  For
+    example, if there is an SVG for an equation and it gets inserted into an HTML paragraph
+    of text, then the equation should have the same color as the text.
+    
+    However, librsvg doesn't allow passing in a current-state-of-CSS; it always starts
+    off fresh.  So, here we make it start with the current_color being opaque black,
+    instead of transparent (all-bits-zero due to initialization).
+    
+    This will at least make things visible.  Later we can explore inheriting the cairo_t's
+    current colors.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=764808
+
+ rsvg-styles.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+commit 153bcc92746300f5676bc0f32a7dcc1de65b654f
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Apr 12 16:25:18 2016 -0500
+
+    s/colour/color - sorry, but this was all inconsistent
+
+ rsvg-base.c         |   2 +-
+ rsvg-cairo-draw.c   |  14 +++----
+ rsvg-filter.c       | 118 ++++++++++++++++++++++++++--------------------------
+ rsvg-filter.h       |   2 +-
+ rsvg-paint-server.c |  16 +++----
+ rsvg-paint-server.h |  10 ++---
+ rsvg-private.h      |   2 +-
+ tests/styles.c      |   4 +-
+ 8 files changed, 84 insertions(+), 84 deletions(-)
+
+commit 876bdf55044a585192830891c0b8c67f2c08aa91
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Apr 4 14:40:23 2016 -0500
+
+    rsvg_handle_set_size_callback(): Document example code for how to use Cairo directly
+    
+    ... instead of using this deprecated function.
+
+ rsvg-base.c | 25 +++++++++++++++++++++++++
+ rsvg.h      |  1 +
+ 2 files changed, 26 insertions(+)
+
+commit 59e839b18dd27c1c986deceb80d61db5ac89bb9a
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Apr 4 13:18:18 2016 -0500
+
+    Update NEWS
+
+ NEWS | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+commit 7db196eae60cc0dbbe3a262429bfecac3936c5b9
+Author: Menner <mik@gmx.org>
+Date:   Mon Apr 4 13:15:44 2016 -0500
+
+    bgo#760262: rsvg-convert: Actually scale the image if required
+    
+    Commit fecfcce44a959daff80a4e0f9ced83d7cdcb5903 removed a call to the deprecated function
+    rsvg_handle_set_size_callback(), but this is what actually made the program scale
+    the resulting image if required.  Here we use a Cairo transformation matrix instead.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=760262
+    
+    Based on a patch by Menner <mik@gmx.org>
+
+ rsvg-convert.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
+
+commit ed0c56d51a431af5af4ef055e2e8ff5a453c05d0
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Apr 4 13:19:13 2016 -0500
+
+    Post-release version bump to 2.40.16
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 0b878072cb3f7d6a3c5b1e5bf05ff43c61ace094
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Apr 1 18:52:28 2016 -0600
+
+    2.40.15 - I'm an idiot and tagged the repo before updating NEWS
+    
+    Hence this brown-bag tag.
+
+ NEWS         | 13 +++++++++++++
+ configure.ac |  2 +-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
 commit f4296d2b385fd7bf5b369a8ba249fb4c0fb87da8
 Author: Federico Mena Quintero <federico@gnome.org>
 Date:   Wed Mar 30 19:48:56 2016 -0600
@@ -580,29 +1047,19 @@ Date:   Mon Oct 19 02:18:54 2015 +0200
     
     Keep them in a reftests directory.
 
- tests/Makefile.am                           |   2 +
- tests/fixtures/reftests/bugs/403357-ref.png | Bin 0 -> 1366 bytes
- tests/fixtures/reftests/bugs/403357.svg     |  48 ++++++++++++++++
- tests/fixtures/reftests/bugs/476507-ref.png | Bin 0 -> 6018 bytes
- tests/fixtures/reftests/bugs/476507.svg     |  78 +++++++++++++++++++++++++
- tests/fixtures/reftests/bugs/548494-ref.png | Bin 0 -> 751 bytes
- tests/fixtures/reftests/bugs/548494.svg     |   5 ++
- tests/fixtures/reftests/bugs/563933-ref.png | Bin 0 -> 2526 bytes
- tests/fixtures/reftests/bugs/563933.svg     |  86 ++++++++++++++++++++++++++++
- tests/fixtures/reftests/bugs/738367-ref.png | Bin 0 -> 8748 bytes
- tests/fixtures/reftests/bugs/738367.svg     |   7 +++
- tests/reftests/bugs/403357-ref.png          | Bin 1366 -> 0 bytes
- tests/reftests/bugs/403357.svg              |  48 ----------------
- tests/reftests/bugs/476507-ref.png          | Bin 6018 -> 0 bytes
- tests/reftests/bugs/476507.svg              |  78 -------------------------
- tests/reftests/bugs/548494-ref.png          | Bin 751 -> 0 bytes
- tests/reftests/bugs/548494.svg              |   5 --
- tests/reftests/bugs/563933-ref.png          | Bin 2526 -> 0 bytes
- tests/reftests/bugs/563933.svg              |  86 ----------------------------
- tests/reftests/bugs/738367-ref.png          | Bin 8748 -> 0 bytes
- tests/reftests/bugs/738367.svg              |   7 ---
- tests/rsvg-test.txt                         |  10 ++--
- 22 files changed, 231 insertions(+), 229 deletions(-)
+ tests/Makefile.am                                 |   2 ++
+ tests/{ => fixtures}/reftests/bugs/403357-ref.png | Bin
+ tests/{ => fixtures}/reftests/bugs/403357.svg     |   0
+ tests/{ => fixtures}/reftests/bugs/476507-ref.png | Bin
+ tests/{ => fixtures}/reftests/bugs/476507.svg     |   0
+ tests/{ => fixtures}/reftests/bugs/548494-ref.png | Bin
+ tests/{ => fixtures}/reftests/bugs/548494.svg     |   0
+ tests/{ => fixtures}/reftests/bugs/563933-ref.png | Bin
+ tests/{ => fixtures}/reftests/bugs/563933.svg     |   0
+ tests/{ => fixtures}/reftests/bugs/738367-ref.png | Bin
+ tests/{ => fixtures}/reftests/bugs/738367.svg     |   0
+ tests/rsvg-test.txt                               |  10 +++++-----
+ 12 files changed, 7 insertions(+), 5 deletions(-)
 
 commit f4001bcea4e11903cd7ab700e6239e839c5c8f88
 Author: Benjamin Otte <otte@redhat.com>
@@ -622,29 +1079,19 @@ Date:   Mon Oct 19 02:14:07 2015 +0200
 
     tests: Move passing tests into reftests/ dir
 
- tests/bugs/403357-ref.png          | Bin 1366 -> 0 bytes
- tests/bugs/403357.svg              |  48 ---------------------
- tests/bugs/476507-ref.png          | Bin 6018 -> 0 bytes
- tests/bugs/476507.svg              |  78 ---------------------------------
- tests/bugs/548494-ref.png          | Bin 751 -> 0 bytes
- tests/bugs/548494.svg              |   5 ---
- tests/bugs/563933-ref.png          | Bin 2526 -> 0 bytes
- tests/bugs/563933.svg              |  86 -------------------------------------
- tests/bugs/738367-ref.png          | Bin 8748 -> 0 bytes
- tests/bugs/738367.svg              |   7 ---
- tests/reftests/bugs/403357-ref.png | Bin 0 -> 1366 bytes
- tests/reftests/bugs/403357.svg     |  48 +++++++++++++++++++++
- tests/reftests/bugs/476507-ref.png | Bin 0 -> 6018 bytes
- tests/reftests/bugs/476507.svg     |  78 +++++++++++++++++++++++++++++++++
- tests/reftests/bugs/548494-ref.png | Bin 0 -> 751 bytes
- tests/reftests/bugs/548494.svg     |   5 +++
- tests/reftests/bugs/563933-ref.png | Bin 0 -> 2526 bytes
- tests/reftests/bugs/563933.svg     |  86 +++++++++++++++++++++++++++++++++++++
- tests/reftests/bugs/738367-ref.png | Bin 0 -> 8748 bytes
- tests/reftests/bugs/738367.svg     |   7 +++
- tests/rsvg-test.c                  |   2 -
- tests/rsvg-test.txt                |  10 ++---
- 22 files changed, 229 insertions(+), 231 deletions(-)
+ tests/{ => reftests}/bugs/403357-ref.png | Bin
+ tests/{ => reftests}/bugs/403357.svg     |   0
+ tests/{ => reftests}/bugs/476507-ref.png | Bin
+ tests/{ => reftests}/bugs/476507.svg     |   0
+ tests/{ => reftests}/bugs/548494-ref.png | Bin
+ tests/{ => reftests}/bugs/548494.svg     |   0
+ tests/{ => reftests}/bugs/563933-ref.png | Bin
+ tests/{ => reftests}/bugs/563933.svg     |   0
+ tests/{ => reftests}/bugs/738367-ref.png | Bin
+ tests/{ => reftests}/bugs/738367.svg     |   0
+ tests/rsvg-test.c                        |   2 --
+ tests/rsvg-test.txt                      |  10 +++++-----
+ 12 files changed, 5 insertions(+), 7 deletions(-)
 
 commit ff82330685707fcde8406be983b3882501655637
 Author: Benjamin Otte <otte@redhat.com>
@@ -2341,10 +2788,9 @@ Date:   Thu Feb 12 11:29:12 2015 -0600
 
     configure.in -> configure.ac
 
- autogen.sh   |   2 +-
- configure.ac | 294 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- configure.in | 294 -----------------------------------------------------------
- 3 files changed, 295 insertions(+), 295 deletions(-)
+ autogen.sh                   | 2 +-
+ configure.in => configure.ac | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
 commit 0de909abb6312902f738183cda571b08337f118c
 Author: Federico Mena Quintero <federico@gnome.org>
@@ -3492,10 +3938,9 @@ Date:   Sun Apr 8 14:18:24 2012 -0400
     
     https://bugzilla.gnome.org/show_bug.cgi?id=673748
 
- Makefile.am    |  4 +---
- rsvg-convert.1 | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- rsvg.1         | 43 -------------------------------------------
- 3 files changed, 56 insertions(+), 46 deletions(-)
+ Makefile.am              |  4 +---
+ rsvg.1 => rsvg-convert.1 | 28 ++++++++++++++++++++--------
+ 2 files changed, 21 insertions(+), 11 deletions(-)
 
 commit 6eac8e0d6dba40a46942018d4bac56d1c6e29afc
 Author: Robert Ancell <robert.ancell@canonical.com>
@@ -5631,10 +6076,9 @@ Date:   Tue Sep 6 08:52:37 2011 +0200
 
     Automatically generate ChangeLog from git history
 
- ChangeLog     | 3826 ---------------------------------------------------------
- ChangeLog.old | 3826 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- Makefile.am   |   11 +
- 3 files changed, 3837 insertions(+), 3826 deletions(-)
+ ChangeLog => ChangeLog.old |  0
+ Makefile.am                | 11 +++++++++++
+ 2 files changed, 11 insertions(+)
 
 commit 79fe06acefc9cd739802c01423b5bca7810398dc
 Author: Christian Persch <chpe@gnome.org>
@@ -6239,35 +6683,27 @@ Date:   Thu Jun 10 15:15:15 2010 +0200
     
     Bug #618475.
 
- Makefile.am                                    |  62 +++++++-------
- configure.in                                   | 107 ++++++++++++++++---------
- doc/Makefile.am                                |   5 +-
- doc/tmpl/rsvg-file-util.sgml                   |   3 +
- doc/tmpl/rsvg.sgml                             |  39 +++++++++
- gdk-pixbuf-loader/Makefile.am                  |   9 +--
- gtk-engine/Makefile.am                         |   4 +-
- gtk-engine/examples/bubble/Makefile.am         |  14 +++-
- gtk-engine/examples/bubble/blue.svg            |  18 +++++
- gtk-engine/examples/bubble/green.svg           |  18 +++++
- gtk-engine/examples/bubble/gtk-2.0/.cvsignore  |   2 -
- gtk-engine/examples/bubble/gtk-2.0/Makefile.am |  10 ---
- gtk-engine/examples/bubble/gtk-2.0/blue.svg    |  18 -----
- gtk-engine/examples/bubble/gtk-2.0/green.svg   |  18 -----
- gtk-engine/examples/bubble/gtk-2.0/gtkrc       |  77 ------------------
- gtk-engine/examples/bubble/gtk-2.0/orange.svg  |  18 -----
- gtk-engine/examples/bubble/gtk-2.0/purple.svg  |  18 -----
- gtk-engine/examples/bubble/gtk-2.0/red.svg     |  18 -----
- gtk-engine/examples/bubble/gtkrc               |  77 ++++++++++++++++++
- gtk-engine/examples/bubble/orange.svg          |  18 +++++
- gtk-engine/examples/bubble/purple.svg          |  18 +++++
- gtk-engine/examples/bubble/red.svg             |  18 +++++
- librsvg-2.0-uninstalled.pc.in                  |  14 ----
- librsvg-2.0.pc.in                              |  15 ----
- librsvg-uninstalled.pc.in                      |  14 ++++
- librsvg.pc.in                                  |  15 ++++
- tests/Makefile.am                              |   2 +-
- tools/Makefile.am                              |   5 +-
- 28 files changed, 365 insertions(+), 289 deletions(-)
+ Makefile.am                                        |  62 ++++++------
+ configure.in                                       | 107 ++++++++++++++-------
+ doc/Makefile.am                                    |   5 +-
+ doc/tmpl/rsvg-file-util.sgml                       |   3 +
+ doc/tmpl/rsvg.sgml                                 |  39 ++++++++
+ gdk-pixbuf-loader/Makefile.am                      |   9 +-
+ gtk-engine/Makefile.am                             |   4 +-
+ gtk-engine/examples/bubble/Makefile.am             |  14 ++-
+ gtk-engine/examples/bubble/{gtk-2.0 => }/blue.svg  |   0
+ gtk-engine/examples/bubble/{gtk-2.0 => }/green.svg |   0
+ gtk-engine/examples/bubble/gtk-2.0/.cvsignore      |   2 -
+ gtk-engine/examples/bubble/gtk-2.0/Makefile.am     |  10 --
+ gtk-engine/examples/bubble/{gtk-2.0 => }/gtkrc     |   0
+ .../examples/bubble/{gtk-2.0 => }/orange.svg       |   0
+ .../examples/bubble/{gtk-2.0 => }/purple.svg       |   0
+ gtk-engine/examples/bubble/{gtk-2.0 => }/red.svg   |   0
+ ...-uninstalled.pc.in => librsvg-uninstalled.pc.in |   4 +-
+ librsvg-2.0.pc.in => librsvg.pc.in                 |   6 +-
+ tests/Makefile.am                                  |   2 +-
+ tools/Makefile.am                                  |   5 +-
+ 20 files changed, 174 insertions(+), 98 deletions(-)
 
 commit f36d8f016173c05c428fffa6625e74e783d6547c
 Author: Hiroyuki Ikezoe <hiikezoe@gnome.org>
@@ -6976,14 +7412,12 @@ Date:   Sun Apr 18 16:36:50 2010 +0900
 
     Move rsvg-dimensions and test-performance into tools/.
 
- Makefile.am              |  15 +-----
- configure.in             |   1 +
- rsvg-dimensions.c        | 133 -----------------------------------------------
- test-performance.c       | 116 -----------------------------------------
- tools/Makefile.am        |  33 ++++++++++++
- tools/rsvg-dimensions.c  | 133 +++++++++++++++++++++++++++++++++++++++++++++++
- tools/test-performance.c | 116 +++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 284 insertions(+), 263 deletions(-)
+ Makefile.am                                    | 15 +-----------
+ configure.in                                   |  1 +
+ tools/Makefile.am                              | 33 ++++++++++++++++++++++++++
+ rsvg-dimensions.c => tools/rsvg-dimensions.c   |  0
+ test-performance.c => tools/test-performance.c |  0
+ 5 files changed, 35 insertions(+), 14 deletions(-)
 
 commit dfd034d2bec00e0890824991c6eb3b93ad494d78
 Author: Hiroyuki Ikezoe <poincare@ikezoe.net>
@@ -7768,11 +8202,11 @@ Date:   Thu Jan 8 23:45:45 2009 +0000
 
     Add function to check whether the SVG document contains an element by ID.
     
-    	* doc/rsvg-sections.txt:
-    	* librsvg.def:
-    	* rsvg-base.c:
-    	* rsvg.h: Add function to check whether the SVG document contains an
-    	element by ID. Bug #567070.
+            * doc/rsvg-sections.txt:
+            * librsvg.def:
+            * rsvg-base.c:
+            * rsvg.h: Add function to check whether the SVG document contains an
+            element by ID. Bug #567070.
     
     svn path=/trunk/; revision=1196
 
@@ -7789,9 +8223,9 @@ Date:   Mon Jan 5 23:41:45 2009 +0000
 
     Also add feature defines and check macro to librsvg-features.h.in. Bug
     
-    	* configure.in:
-    	* librsvg-features.h.in: Also add feature defines and check macro to
-    	librsvg-features.h.in. Bug #566701.
+            * configure.in:
+            * librsvg-features.h.in: Also add feature defines and check macro to
+            librsvg-features.h.in. Bug #566701.
     
     svn path=/trunk/; revision=1195
 
@@ -7832,7 +8266,7 @@ Date:   Fri Dec 12 20:31:50 2008 +0000
 
     Add version check macro. Bug #564226.
     
-    	* librsvg-features.h.in: Add version check macro. Bug #564226.
+            * librsvg-features.h.in: Add version check macro. Bug #564226.
     
     svn path=/trunk/; revision=1192
 
@@ -7872,21 +8306,21 @@ Date:   Sat Nov 22 16:44:34 2008 +0000
     
     2008-11-22  Dominic Lachowicz  <domlachowicz@gmail.com>
     
-    	* rsvg-cairo-render.h: Feature request:
+            * rsvg-cairo-render.h: Feature request:
     rsvg_handle_get_dimensions_sub()
-    	(#555682). Patches from Hagen Schink (troja84@gmail.com) and
-    	Robert Staudinger (robert.staudinger@gmail.com)
-    	* librsvg.def:
-    	* rsvg-private.h:
-    	* ChangeLog:
-    	* rsvg-structure.c:
-    	* rsvg-base.c:
-    	* rsvg-css.c:
-    	* rsvg.h:
-    	* rsvg-dimensions.c:
-    	* Makefile.am:
-    	* rsvg-cairo-render.c:
-    	* rsvg-gobject.c: ditto
+            (#555682). Patches from Hagen Schink (troja84@gmail.com) and
+            Robert Staudinger (robert.staudinger@gmail.com)
+            * librsvg.def:
+            * rsvg-private.h:
+            * ChangeLog:
+            * rsvg-structure.c:
+            * rsvg-base.c:
+            * rsvg-css.c:
+            * rsvg.h:
+            * rsvg-dimensions.c:
+            * Makefile.am:
+            * rsvg-cairo-render.c:
+            * rsvg-gobject.c: ditto
     
     
     svn path=/trunk/; revision=1190
@@ -7913,11 +8347,11 @@ Date:   Sat Nov 22 16:31:39 2008 +0000
     
     2008-11-22  Dominic Lachowicz  <domlachowicz@gmail.com>
     
-    	* gdk-pixbuf-loader/Makefile.am: -I flag-ordering problem breaks
+            * gdk-pixbuf-loader/Makefile.am: -I flag-ordering problem breaks
     build
-    	if system already has lib installed (#558040). Patch from
-    	dmacks@netspace.org
-    	* Makefile.am: ditto
+            if system already has lib installed (#558040). Patch from
+            dmacks@netspace.org
+            * Makefile.am: ditto
     
     svn path=/trunk/; revision=1189
 
@@ -7934,11 +8368,11 @@ Date:   Sat Nov 22 16:28:45 2008 +0000
     
     2008-11-22  Dominic Lachowicz  <domlachowicz@gmail.com>
     
-    	* Makefile.am: Stray Makefile variables (#558039). Patches from
-    	dmacks@netspace.org
-    	* rsvg-base.c:
-    	* gdk-pixbuf-loader/Makefile.am:
-    	* gtk-engine/Makefile.am: ditto
+            * Makefile.am: Stray Makefile variables (#558039). Patches from
+            dmacks@netspace.org
+            * rsvg-base.c:
+            * gdk-pixbuf-loader/Makefile.am:
+            * gtk-engine/Makefile.am: ditto
     
     svn path=/trunk/; revision=1188
 
@@ -7957,9 +8391,9 @@ Date:   Sat Nov 22 16:22:46 2008 +0000
     
     2008-11-22  Dominic Lachowicz  <domlachowicz@gmail.com>
     
-    	* gtk-engine/svg-rc-style.c: Remove deprecated GLib symbols
+            * gtk-engine/svg-rc-style.c: Remove deprecated GLib symbols
     (#560444).
-    	Patch by Luis Menina (liberforce@freeside.fr)
+            Patch by Luis Menina (liberforce@freeside.fr)
     
     
     svn path=/trunk/; revision=1187
@@ -7976,7 +8410,7 @@ Date:   Wed Nov 5 20:56:43 2008 +0000
     
     2008-11-05  Kjartan Maraas  <kmaraas@gnome.org>
     
-    	* rsvg-private.h: Use G_STRFUNC as suggested by Christian Persch.
+            * rsvg-private.h: Use G_STRFUNC as suggested by Christian Persch.
     
     svn path=/trunk/; revision=1186
 
@@ -7992,7 +8426,7 @@ Date:   Wed Nov 5 19:58:26 2008 +0000
     
     2008-11-05  Kjartan Maraas  <kmaraas@gnome.org>
     
-    	* rsvg-private.h: Don't use deprecated glib symbols.
+            * rsvg-private.h: Don't use deprecated glib symbols.
     
     svn path=/trunk/; revision=1185
 
@@ -8111,7 +8545,7 @@ Date:   Tue Sep 23 00:58:35 2008 +0000
     
     2008-09-23  Vincent Untz  <vuntz@gnome.org>
     
-    	* configure.in: post-release bump to 2.22.4.
+            * configure.in: post-release bump to 2.22.4.
     
     svn path=/trunk/; revision=1179
 
@@ -8127,8 +8561,8 @@ Date:   Tue Sep 23 00:58:00 2008 +0000
     
     2008-09-23  Vincent Untz  <vuntz@gnome.org>
     
-    	* NEWS:
-    	* configure.in: version 2.22.3
+            * NEWS:
+            * configure.in: version 2.22.3
     
     svn path=/trunk/; revision=1177
 
@@ -8332,8 +8766,8 @@ Date:   Mon Aug 4 14:45:18 2008 +0000
     
     2008-08-04  Simon Budig  <simon@gimp.org>
     
-    	* rsvg-styles.[ch]: fix the handling of the stroke-dashoffset
-    	property.
+            * rsvg-styles.[ch]: fix the handling of the stroke-dashoffset
+            property.
     
     
     svn path=/trunk/; revision=1166
@@ -8351,11 +8785,11 @@ Date:   Fri May 23 17:41:28 2008 +0000
     
     2008-05-23  Tor Lillqvist  <tml@novell.com>
     
-    	* tests/samples/artwork.svg: Use "sans-serif" instead of
-    	"sanserif".
+            * tests/samples/artwork.svg: Use "sans-serif" instead of
+            "sanserif".
     
-    	* tests/samples/Picasso.svg: Use "sans-serif" instead of
-    	"sansserif".
+            * tests/samples/Picasso.svg: Use "sans-serif" instead of
+            "sansserif".
     
     
     svn path=/trunk/; revision=1165
@@ -8373,8 +8807,8 @@ Date:   Tue May 20 19:01:25 2008 +0000
     
     2008-05-20  Tor Lillqvist  <tml@novell.com>
     
-    	* librsvg-zip.in: Package rsvg-convert.exe instead of the now
-    	nonexistent rsvg.exe.
+            * librsvg-zip.in: Package rsvg-convert.exe instead of the now
+            nonexistent rsvg.exe.
     
     
     svn path=/trunk/; revision=1164
@@ -8391,7 +8825,7 @@ Date:   Mon Apr 28 09:22:57 2008 +0000
     
     2008-04-28  Wouter Bolsterlee  <wbolster@svn.gnome.org>
     
-    	* rsvg-text.c: Use #elif instead of nested #else #if.
+            * rsvg-text.c: Use #elif instead of nested #else #if.
     
     
     svn path=/trunk/; revision=1163
@@ -8408,8 +8842,8 @@ Date:   Mon Apr 28 09:12:58 2008 +0000
     
     2008-04-28  Wouter Bolsterlee  <wbolster@svn.gnome.org>
     
-    	* rsvg-text.c: Don't use #else if, but #else and an
-    	additional #if. Fixes the build with at least gcc 4.2.3.
+            * rsvg-text.c: Don't use #else if, but #else and an
+            additional #if. Fixes the build with at least gcc 4.2.3.
     
     
     svn path=/trunk/; revision=1162
@@ -8438,12 +8872,12 @@ Date:   Fri Apr 25 14:27:44 2008 +0000
     
     2008-04-25  Hans Breuer  <hans@breuer.org>
     
-    	* rsvg-css.c : use HAVE_STRINGS_H
-    	* rsvg-path.c : #include "rsvg-private.h" to get common definitions
-    	* rsvg-text.c : make the text rendering capability depend on what
-    	cairo provides. If there is no CAIRO_HAS_FT_FONT try to use
-    	CAIRO_HAS_WIN32_FONT. Makes librsvg buildable on windows without
-    	freetype dependency, bug #529889
+            * rsvg-css.c : use HAVE_STRINGS_H
+            * rsvg-path.c : #include "rsvg-private.h" to get common definitions
+            * rsvg-text.c : make the text rendering capability depend on what
+            cairo provides. If there is no CAIRO_HAS_FT_FONT try to use
+            CAIRO_HAS_WIN32_FONT. Makes librsvg buildable on windows without
+            freetype dependency, bug #529889
     
     svn path=/trunk/; revision=1160
 
@@ -8503,9 +8937,9 @@ Date:   Sun Feb 24 16:14:25 2008 +0000
     
     2008-02-24  Dominic Lachowicz <domlachowicz@gmail.com>
     
-    	* rsvg-text.c:
-    	* rsvg-styles.h:
-    	* rsvg-styles.c: Handle xml:space="prserve" (#353609)
+            * rsvg-text.c:
+            * rsvg-styles.h:
+            * rsvg-styles.c: Handle xml:space="prserve" (#353609)
     
     
     svn path=/trunk/; revision=1156
@@ -8565,11 +8999,11 @@ Date:   Sun Feb 24 14:32:59 2008 +0000
     
     2008-02-24  Dominic Lachowicz <domlachowicz@gmail.com>
     
-    	* rsvg-path.c (rsvg_parse_path_do_cmd): If a moveto is followed
+            * rsvg-path.c (rsvg_parse_path_do_cmd): If a moveto is followed
     by
-    	multiple pairs of coordinates, the subsequent pairs are treated
+            multiple pairs of coordinates, the subsequent pairs are treated
     as
-    	implicit lineto commands. (#482787)
+            implicit lineto commands. (#482787)
     
     svn path=/trunk/; revision=1152
 
@@ -8657,9 +9091,9 @@ Date:   Tue Feb 12 15:23:08 2008 +0000
 
     Fix mismatched allocators. Bug #514071.
     
-    	* rsvg-gobject.c: (rsvg_ctx_free_helper): Fix mismatched
-    	allocators.
-    	Bug #514071.
+            * rsvg-gobject.c: (rsvg_ctx_free_helper): Fix mismatched
+            allocators.
+            Bug #514071.
     
     svn path=/trunk/; revision=1146
 
@@ -8687,7 +9121,7 @@ Date:   Sat Feb 2 17:33:39 2008 +0000
     
     2008-02-02  Dominic Lachowicz <domlachowicz@gmail.com>
     
-    	* test-display.c: Get rid of gnome print. Use gtk-print instead
+            * test-display.c: Get rid of gnome print. Use gtk-print instead
     (#508526)
     
     
@@ -8707,7 +9141,7 @@ Date:   Sat Feb 2 16:46:04 2008 +0000
     
     2008-02-02  Dominic Lachowicz <domlachowicz@gmail.com>
     
-    	* configure.in: Bump version #; automake warning about required
+            * configure.in: Bump version #; automake warning about required
     AM_PROG_CC_C_O (#513858)
     
     
@@ -8725,7 +9159,7 @@ Date:   Sat Feb 2 16:43:03 2008 +0000
     
     2008-02-02  Jan Arne Petersen <jpetersen@jpetersen.org>
     
-    	* Migrate to gio (#513778)
+            * Migrate to gio (#513778)
     
     
     svn path=/trunk/; revision=1142
@@ -8745,8 +9179,8 @@ Date:   Tue Jan 29 15:37:59 2008 +0000
     
     2008-01-29  Christian Persch  <chpe@gnome.org>
     
-    	* test-display.c: (view_pixbuf): Add the filename to the window title.
-    	Bug #512797.
+            * test-display.c: (view_pixbuf): Add the filename to the window title.
+            Bug #512797.
     
     svn path=/trunk/; revision=1141
 
@@ -8774,7 +9208,7 @@ Date:   Sat Jan 19 16:47:05 2008 +0000
     
     2008-01-19  Bertram Felgenhauer <bertram.felgenhauer@googlemail.com>
     
-    	* Bug 500787 - translation gets ignored when rendering an svg
+            * Bug 500787 - translation gets ignored when rendering an svg
     with cairo in the context of a cairo_push_group()
     
     
@@ -8852,7 +9286,7 @@ Date:   Tue Aug 21 13:10:58 2007 +0000
     
     2007-08-21  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	* rsvg-styles.c: fix a typo preventing the compilation.
+            * rsvg-styles.c: fix a typo preventing the compilation.
     
     svn path=/trunk/; revision=1134
 
@@ -9033,7 +9467,7 @@ Date:   Sun Jul 1 13:45:25 2007 +0000
     
     2007-07-01  Dom Lachowicz <domlachowicz@gmail.com>
     
-    	* io-svg.c: Support compressed SVG from the GdkPixbufLoader
+            * io-svg.c: Support compressed SVG from the GdkPixbufLoader
     (#452823)
     
     svn path=/trunk/; revision=1123
@@ -9050,165 +9484,86 @@ Date:   Fri Jun 22 16:39:42 2007 +0000
     
     svn path=/trunk/; revision=1122
 
- tests/104201.svg                                  |   93 -
- tests/CHEMICALS.svg                               |   34 -
- tests/Mop_Bucket.svg                              |   50 -
- tests/Picasso.svg                                 | 2839 ---------------------
- tests/Poultice_1.svg                              |   30 -
- tests/Surface_Wipe.svg                            |   36 -
- tests/Units.svg                                   |   45 -
- tests/ViewBox-bak.svg                             |   27 -
- tests/ViewBox.svg                                 |   27 -
- tests/Wall_Wipe.svg                               |   51 -
- tests/background.svg                              |   39 -
- tests/chem1.svg                                   |  599 -----
- tests/circle-gradient-2.svg                       |   52 -
- tests/circle01.svg                                |   11 -
- tests/combo-3.svg                                 |   58 -
- tests/cubic01.svg                                 |   39 -
- tests/defs1.svg                                   |   38 -
- tests/double-square.svg                           |   47 -
- tests/ellipse01.svg                               |   11 -
- tests/ellipse02.svg                               |   22 -
- tests/file-directory.svg                          |   51 -
- tests/filters00.svg                               |   53 -
- tests/folder_home-2.2.svg                         |  901 -------
- tests/gnome-sodi2.svg                             |   73 -
- tests/gnomefoot.svg                               |   67 -
- tests/i-directory.svg                             |   50 -
- tests/image1.svg                                  |   10 -
- tests/intersect_bezier2_ellipse.svg               |   78 -
- tests/librsvg-logo.svg                            |  450 ----
- tests/line01.svg                                  |   21 -
- tests/lingrad01.svg                               |   25 -
- tests/lion.svg                                    |  163 --
- tests/obj_bbox.svg                                |  195 --
- tests/opac.svg                                    |   40 -
- tests/opacity01.svg                               |   47 -
- tests/polygon01.svg                               |   20 -
- tests/polyline01.svg                              |   21 -
- tests/radgrad01.svg                               |   27 -
- tests/rect-fill.svg                               |    9 -
- tests/rect-grad-new.svg                           |   13 -
- tests/rect-linear-grad.svg                        |   13 -
- tests/rect-radial-grad.svg                        |   13 -
- tests/rect-stroke-grad-linear.svg                 |   13 -
- tests/rect-stroke-grad-radial.svg                 |   13 -
- tests/rect01.svg                                  |   14 -
- tests/rect02.svg                                  |   19 -
- tests/rectangle-dashes.svg                        |   15 -
- tests/rectangle-gradient-rainbow.svg              |   29 -
- tests/rectangle-style-blizzaro-dashes.svg         |   30 -
- tests/samples/104201.svg                          |   93 +
- tests/samples/CHEMICALS.svg                       |   34 +
- tests/samples/Mop_Bucket.svg                      |   50 +
- tests/samples/Picasso.svg                         | 2839 +++++++++++++++++++++
- tests/samples/Poultice_1.svg                      |   30 +
- tests/samples/Surface_Wipe.svg                    |   36 +
- tests/samples/Units.svg                           |   45 +
- tests/samples/ViewBox-bak.svg                     |   27 +
- tests/samples/ViewBox.svg                         |   27 +
- tests/samples/Wall_Wipe.svg                       |   51 +
- tests/samples/background.svg                      |   39 +
- tests/samples/chem1.svg                           |  599 +++++
- tests/samples/circle-gradient-2.svg               |   52 +
- tests/samples/circle01.svg                        |   11 +
- tests/samples/combo-3.svg                         |   58 +
- tests/samples/cubic01.svg                         |   39 +
- tests/samples/defs1.svg                           |   38 +
- tests/samples/double-square.svg                   |   47 +
- tests/samples/ellipse01.svg                       |   11 +
- tests/samples/ellipse02.svg                       |   22 +
- tests/samples/file-directory.svg                  |   51 +
- tests/samples/filters00.svg                       |   53 +
- tests/samples/folder_home-2.2.svg                 |  901 +++++++
- tests/samples/gnome-sodi2.svg                     |   73 +
- tests/samples/gnomefoot.svg                       |   67 +
- tests/samples/i-directory.svg                     |   50 +
- tests/samples/image1.svg                          |   10 +
- tests/samples/intersect_bezier2_ellipse.svg       |   78 +
- tests/samples/librsvg-logo.svg                    |  450 ++++
- tests/samples/line01.svg                          |   21 +
- tests/samples/lingrad01.svg                       |   25 +
- tests/samples/lion.svg                            |  163 ++
- tests/samples/obj_bbox.svg                        |  195 ++
- tests/samples/opac.svg                            |   40 +
- tests/samples/opacity01.svg                       |   47 +
- tests/samples/polygon01.svg                       |   20 +
- tests/samples/polyline01.svg                      |   21 +
- tests/samples/radgrad01.svg                       |   27 +
- tests/samples/rect-fill.svg                       |    9 +
- tests/samples/rect-grad-new.svg                   |   13 +
- tests/samples/rect-linear-grad.svg                |   13 +
- tests/samples/rect-radial-grad.svg                |   13 +
- tests/samples/rect-stroke-grad-linear.svg         |   13 +
- tests/samples/rect-stroke-grad-radial.svg         |   13 +
- tests/samples/rect01.svg                          |   14 +
- tests/samples/rect02.svg                          |   19 +
- tests/samples/rectangle-dashes.svg                |   15 +
- tests/samples/rectangle-gradient-rainbow.svg      |   29 +
- tests/samples/rectangle-style-blizzaro-dashes.svg |   30 +
- tests/samples/stock_home.svg                      |  339 +++
- tests/samples/stock_paste.svg                     |  194 ++
- tests/samples/telephone.svg                       |  141 +
- tests/samples/test-20020212.svg                   |   87 +
- tests/samples/test-60544.svg                      |   19 +
- tests/samples/test-61082.svg                      |    7 +
- tests/samples/test-61223.svg                      |    9 +
- tests/samples/test-62614.svg                      |   94 +
- tests/samples/test-62620.svg                      |    4 +
- tests/samples/test-62699.svg                      |  127 +
- tests/samples/test-64684-1.svg                    |   90 +
- tests/samples/test-64684-2.svg                    |   97 +
- tests/samples/test-71297.svg                      |    8 +
- tests/samples/test-71622.svg                      |  370 +++
- tests/samples/test-nested-transform.svg           |   43 +
- tests/samples/test-opacity.svg                    |   41 +
- tests/samples/test-rgb.svg                        |    9 +
- tests/samples/test.svg                            |   21 +
- tests/samples/text-gradient-3.svg                 |   78 +
- tests/samples/text-outline-3b.svg                 |   54 +
- tests/samples/text-sizes-NimbusSans.svg           |   38 +
- tests/samples/text01.svg                          |   17 +
- tests/samples/textdecoration01.svg                |   22 +
- tests/samples/tspan.svg                           |   14 +
- tests/samples/tspan01.svg                         |   20 +
- tests/samples/undo-128-d-sodipodi.svg             |   63 +
- tests/samples/undo-128-d-sodipodi.svg.gz          |  Bin 0 -> 1066 bytes
- tests/samples/undo-128-new.svg                    |    4 +
- tests/samples/undo-v2.1-sodipodi0.26.svg          |   51 +
- tests/samples/window.svg                          |  158 ++
- tests/stock_home.svg                              |  339 ---
- tests/stock_paste.svg                             |  194 --
- tests/telephone.svg                               |  141 -
- tests/test-20020212.svg                           |   87 -
- tests/test-60544.svg                              |   19 -
- tests/test-61082.svg                              |    7 -
- tests/test-61223.svg                              |    9 -
- tests/test-62614.svg                              |   94 -
- tests/test-62620.svg                              |    4 -
- tests/test-62699.svg                              |  127 -
- tests/test-64684-1.svg                            |   90 -
- tests/test-64684-2.svg                            |   97 -
- tests/test-71297.svg                              |    8 -
- tests/test-71622.svg                              |  370 ---
- tests/test-nested-transform.svg                   |   43 -
- tests/test-opacity.svg                            |   41 -
- tests/test-rgb.svg                                |    9 -
- tests/test.svg                                    |   21 -
- tests/text-gradient-3.svg                         |   78 -
- tests/text-outline-3b.svg                         |   54 -
- tests/text-sizes-NimbusSans.svg                   |   38 -
- tests/text01.svg                                  |   17 -
- tests/textdecoration01.svg                        |   22 -
- tests/tspan.svg                                   |   14 -
- tests/tspan01.svg                                 |   20 -
- tests/undo-128-d-sodipodi.svg                     |   63 -
- tests/undo-128-d-sodipodi.svg.gz                  |  Bin 1066 -> 0 bytes
- tests/undo-128-new.svg                            |    4 -
- tests/undo-v2.1-sodipodi0.26.svg                  |   51 -
- tests/window.svg                                  |  158 --
- 158 files changed, 8840 insertions(+), 8840 deletions(-)
+ tests/{ => samples}/104201.svg                          |   0
+ tests/{ => samples}/CHEMICALS.svg                       |   0
+ tests/{ => samples}/Mop_Bucket.svg                      |   0
+ tests/{ => samples}/Picasso.svg                         |   0
+ tests/{ => samples}/Poultice_1.svg                      |   0
+ tests/{ => samples}/Surface_Wipe.svg                    |   0
+ tests/{ => samples}/Units.svg                           |   0
+ tests/{ => samples}/ViewBox-bak.svg                     |   0
+ tests/{ => samples}/ViewBox.svg                         |   0
+ tests/{ => samples}/Wall_Wipe.svg                       |   0
+ tests/{ => samples}/background.svg                      |   0
+ tests/{ => samples}/chem1.svg                           |   0
+ tests/{ => samples}/circle-gradient-2.svg               |   0
+ tests/{ => samples}/circle01.svg                        |   0
+ tests/{ => samples}/combo-3.svg                         |   0
+ tests/{ => samples}/cubic01.svg                         |   0
+ tests/{ => samples}/defs1.svg                           |   0
+ tests/{ => samples}/double-square.svg                   |   0
+ tests/{ => samples}/ellipse01.svg                       |   0
+ tests/{ => samples}/ellipse02.svg                       |   0
+ tests/{ => samples}/file-directory.svg                  |   0
+ tests/{ => samples}/filters00.svg                       |   0
+ tests/{ => samples}/folder_home-2.2.svg                 |   0
+ tests/{ => samples}/gnome-sodi2.svg                     |   0
+ tests/{ => samples}/gnomefoot.svg                       |   0
+ tests/{ => samples}/i-directory.svg                     |   0
+ tests/{ => samples}/image1.svg                          |   0
+ tests/{ => samples}/intersect_bezier2_ellipse.svg       |   0
+ tests/{ => samples}/librsvg-logo.svg                    |   0
+ tests/{ => samples}/line01.svg                          |   0
+ tests/{ => samples}/lingrad01.svg                       |   0
+ tests/{ => samples}/lion.svg                            |   0
+ tests/{ => samples}/obj_bbox.svg                        |   0
+ tests/{ => samples}/opac.svg                            |   0
+ tests/{ => samples}/opacity01.svg                       |   0
+ tests/{ => samples}/polygon01.svg                       |   0
+ tests/{ => samples}/polyline01.svg                      |   0
+ tests/{ => samples}/radgrad01.svg                       |   0
+ tests/{ => samples}/rect-fill.svg                       |   0
+ tests/{ => samples}/rect-grad-new.svg                   |   0
+ tests/{ => samples}/rect-linear-grad.svg                |   0
+ tests/{ => samples}/rect-radial-grad.svg                |   0
+ tests/{ => samples}/rect-stroke-grad-linear.svg         |   0
+ tests/{ => samples}/rect-stroke-grad-radial.svg         |   0
+ tests/{ => samples}/rect01.svg                          |   0
+ tests/{ => samples}/rect02.svg                          |   0
+ tests/{ => samples}/rectangle-dashes.svg                |   0
+ tests/{ => samples}/rectangle-gradient-rainbow.svg      |   0
+ tests/{ => samples}/rectangle-style-blizzaro-dashes.svg |   0
+ tests/{ => samples}/stock_home.svg                      |   0
+ tests/{ => samples}/stock_paste.svg                     |   0
+ tests/{ => samples}/telephone.svg                       |   0
+ tests/{ => samples}/test-20020212.svg                   |   0
+ tests/{ => samples}/test-60544.svg                      |   0
+ tests/{ => samples}/test-61082.svg                      |   0
+ tests/{ => samples}/test-61223.svg                      |   0
+ tests/{ => samples}/test-62614.svg                      |   0
+ tests/{ => samples}/test-62620.svg                      |   0
+ tests/{ => samples}/test-62699.svg                      |   0
+ tests/{ => samples}/test-64684-1.svg                    |   0
+ tests/{ => samples}/test-64684-2.svg                    |   0
+ tests/{ => samples}/test-71297.svg                      |   0
+ tests/{ => samples}/test-71622.svg                      |   0
+ tests/{ => samples}/test-nested-transform.svg           |   0
+ tests/{ => samples}/test-opacity.svg                    |   0
+ tests/{ => samples}/test-rgb.svg                        |   0
+ tests/{ => samples}/test.svg                            |   0
+ tests/{ => samples}/text-gradient-3.svg                 |   0
+ tests/{ => samples}/text-outline-3b.svg                 |   0
+ tests/{ => samples}/text-sizes-NimbusSans.svg           |   0
+ tests/{ => samples}/text01.svg                          |   0
+ tests/{ => samples}/textdecoration01.svg                |   0
+ tests/{ => samples}/tspan.svg                           |   0
+ tests/{ => samples}/tspan01.svg                         |   0
+ tests/{ => samples}/undo-128-d-sodipodi.svg             |   0
+ tests/{ => samples}/undo-128-d-sodipodi.svg.gz          | Bin
+ tests/{ => samples}/undo-128-new.svg                    |   0
+ tests/{ => samples}/undo-v2.1-sodipodi0.26.svg          |   0
+ tests/{ => samples}/window.svg                          |   0
+ 79 files changed, 0 insertions(+), 0 deletions(-)
 
 commit 2e1e06855c9cb585eeda75c8d8171ea9b3883a1f
 Author: Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
@@ -9218,7 +9573,7 @@ Date:   Fri Jun 22 16:25:08 2007 +0000
     
     2007-06-22  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	* tests: Enable additional tests and add reference images.
+            * tests: Enable additional tests and add reference images.
     
     svn path=/trunk/; revision=1121
 
@@ -9243,20 +9598,20 @@ Date:   Fri Jun 22 15:36:24 2007 +0000
     
     2007-06-22  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	* test-display.c: fix modeline.
+            * test-display.c: fix modeline.
     
     2007-06-22  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	Fix for Bug 448327
+            Fix for Bug 448327
     
-    	* rsvg-base.c (rsvg_path_is_uri): new.
-    	(rsvg_get_base_uri_from_filename): really return a URI.
-    	(rsvg_handle_set_base_uri): accept a non URI as parameter, converting
-    	it to local URI.
-    	* rsvg-convert.c: fix rsvg_handle_set_base_uri call.
-    	* rsvg-image.c (rsvg_get_file_path): adpat the code to the fact
-    	base_uri is now really an URI.
-    	(rsvg_acquire_file_resource): handle path==NULL.
+            * rsvg-base.c (rsvg_path_is_uri): new.
+            (rsvg_get_base_uri_from_filename): really return a URI.
+            (rsvg_handle_set_base_uri): accept a non URI as parameter, converting
+            it to local URI.
+            * rsvg-convert.c: fix rsvg_handle_set_base_uri call.
+            * rsvg-image.c (rsvg_get_file_path): adpat the code to the fact
+            base_uri is now really an URI.
+            (rsvg_acquire_file_resource): handle path==NULL.
     
     
     svn path=/trunk/; revision=1120
@@ -9276,9 +9631,9 @@ Date:   Sat Jun 16 14:48:37 2007 +0000
     
     2007-06-16  Dom Lachowicz <domlachowicz@gmail.com>
     
-    	* rsvg-structure.c: Bug 444462 - x & y attributes shouldn't
+            * rsvg-structure.c: Bug 444462 - x & y attributes shouldn't
     affect the
-    	outermost <svg> element
+            outermost <svg> element
     
     svn path=/trunk/; revision=1119
 
@@ -9378,8 +9733,8 @@ Date:   Tue May 1 21:39:32 2007 +0000
     
     2007-05-01  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	* tests/rsvg-test.c: change generated png filename suffix from .png to
-    	-out.png. That makes thing cleaner for svn:ignore.
+            * tests/rsvg-test.c: change generated png filename suffix from .png to
+            -out.png. That makes thing cleaner for svn:ignore.
     
     
     svn path=/trunk/; revision=1112
@@ -9422,9 +9777,9 @@ Date:   Mon Apr 23 22:45:03 2007 +0000
     
     2007-04-23  Dom Lachowicz <domlachowicz@gmail.com>
     
-    	* rsvg-base.c: Incorrect rendering of certain SVG files because
+            * rsvg-base.c: Incorrect rendering of certain SVG files because
     of
-    	SVG namespaces. Patch from Bertram Felgenhauer (#375649)
+            SVG namespaces. Patch from Bertram Felgenhauer (#375649)
     
     svn path=/trunk/; revision=1108
 
@@ -9464,7 +9819,7 @@ Date:   Fri Apr 13 00:38:36 2007 +0000
     
     2007-04-12  Dom Lachowicz <domlachowicz@gmail.com>
     
-    	* rsvg-image.c: Bug 421697 - rsvg_handle_new_from_file overwrites GError
+            * rsvg-image.c: Bug 421697 - rsvg_handle_new_from_file overwrites GError
     
     svn path=/trunk/; revision=1105
 
@@ -9480,8 +9835,8 @@ Date:   Fri Apr 13 00:35:14 2007 +0000
     
     2007-04-12  Dom Lachowicz <domlachowicz@gmail.com>
     
-    	* configure.in: Bug 421710 - want a way to detect whether
-    	gnome-vfs support is enabled (Christian Perch)
+            * configure.in: Bug 421710 - want a way to detect whether
+            gnome-vfs support is enabled (Christian Perch)
     
     svn path=/trunk/; revision=1104
 
@@ -9498,10 +9853,10 @@ Date:   Fri Apr 13 00:33:43 2007 +0000
     
     2007-04-12  Dom Lachowicz <domlachowicz@gmail.com>
     
-    	* rsvg-base.c: If dst->virgin is set, dst->x, y, w and h are
-    	uninitialised. The result of the addition is already not used,
-    	but the addition itself can trigger floating point exceptions,
-    	so make sure it's not performed. Bug 427031 (Harald van Dijk)
+            * rsvg-base.c: If dst->virgin is set, dst->x, y, w and h are
+            uninitialised. The result of the addition is already not used,
+            but the addition itself can trigger floating point exceptions,
+            so make sure it's not performed. Bug 427031 (Harald van Dijk)
     
     svn path=/trunk/; revision=1103
 
@@ -9528,8 +9883,8 @@ Date:   Thu Feb 22 15:56:49 2007 +0000
     
     2007-02-22  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	Update reference files. They are generated using MS fonts.
-    	(http://corefonts.sourceforge.net/)
+            Update reference files. They are generated using MS fonts.
+            (http://corefonts.sourceforge.net/)
     
     
     svn path=/trunk/; revision=1101
@@ -9617,10 +9972,10 @@ Date:   Wed Feb 21 21:35:52 2007 +0000
     
     2007-02-21  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	Implement letter-spacing property.
-    	http://bugzilla.gnome.org/show_bug.cgi?id=410509
-    	* rsvg-styles.c: parse and handle letter-spacing.
-    	* rsvg-text.c (rsvg_text_create_layout): set letter spacing attribute.
+            Implement letter-spacing property.
+            http://bugzilla.gnome.org/show_bug.cgi?id=410509
+            * rsvg-styles.c: parse and handle letter-spacing.
+            * rsvg-text.c (rsvg_text_create_layout): set letter spacing attribute.
     
     
     svn path=/trunk/; revision=1100
@@ -9650,9 +10005,9 @@ Date:   Wed Feb 14 20:46:35 2007 +0000
     
     2007-02-14  Dom Lachowicz <domlachowicz@gmail.com>
     
-    	* tests/Makefile.am: Bug 407230 - make check fails when builddir
-    	!= srcdir in that certain headers are not found
-    	* tests/rsvg-test.c: Ditto
+            * tests/Makefile.am: Bug 407230 - make check fails when builddir
+            != srcdir in that certain headers are not found
+            * tests/rsvg-test.c: Ditto
     
     svn path=/trunk/; revision=1098
 
@@ -9669,9 +10024,9 @@ Date:   Mon Feb 12 20:55:13 2007 +0000
     
     2007-02-12  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	Add the W3C test files.
+            Add the W3C test files.
     
-    	* tests/rsvg-test.c: generates a html file with test failures.
+            * tests/rsvg-test.c: generates a html file with test failures.
     
     svn path=/trunk/; revision=1097
 
@@ -10060,9 +10415,9 @@ Date:   Fri Feb 2 07:40:34 2007 +0000
     
     2007-02-01  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	* rsvg-marker.c (rsvg_marker_render): Don't clip if overflow style
-    	property is set to visible. Fix display of markers generated with
-    	inkscape.
+            * rsvg-marker.c (rsvg_marker_render): Don't clip if overflow style
+            property is set to visible. Fix display of markers generated with
+            inkscape.
     
     
     svn path=/trunk/; revision=1096
@@ -10120,45 +10475,43 @@ Date:   Sat Jan 27 22:39:45 2007 +0000
     
     2007-01-27  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	Regression test suite (use make check).
+            Regression test suite (use make check).
     
-    	* tests/rsvg-test.c: new.
-    	* tests/rsvg-test.txt: new. Contains the list of test files.
-    	* tests/bugs: directory for bug test files.
-    	* tests/samples: directory for random test files.
-    	* tests/svg1.2: directory for SVG 1.2 feature test files.
+            * tests/rsvg-test.c: new.
+            * tests/rsvg-test.txt: new. Contains the list of test files.
+            * tests/bugs: directory for bug test files.
+            * tests/samples: directory for random test files.
+            * tests/svg1.2: directory for SVG 1.2 feature test files.
     
     
     svn path=/trunk/; revision=1093
 
- ChangeLog                               |   10 +
- Makefile.am                             |    2 +-
- configure.in                            |    2 +
- tests/Artwork.svg                       | 1816 -------------------------------
- tests/Makefile.am                       |   16 +
- tests/bugs/388545-ref.png               |  Bin 0 -> 19038 bytes
- tests/bugs/388545.svg                   |  445 ++++++++
- tests/butterfly.svg                     |   12 -
- tests/pdiff/CMakeLists.txt              |   55 +
- tests/pdiff/Makefile.am                 |   16 +
- tests/pdiff/README.txt                  |   45 +
- tests/pdiff/args.c                      |  119 ++
- tests/pdiff/args.h                      |   46 +
- tests/pdiff/gpl.txt                     |  340 ++++++
- tests/pdiff/lpyramid.c                  |  111 ++
- tests/pdiff/lpyramid.h                  |   32 +
- tests/pdiff/pdiff.c                     |  374 +++++++
- tests/pdiff/pdiff.h                     |   40 +
- tests/pdiff/perceptualdiff.c            |  102 ++
- tests/rsvg-test.c                       |  378 +++++++
- tests/rsvg-test.txt                     |    8 +
- tests/samples/artwork-ref.png           |  Bin 0 -> 48010 bytes
- tests/samples/artwork.svg               | 1816 +++++++++++++++++++++++++++++++
- tests/samples/butterfly-ref.png         |  Bin 0 -> 59530 bytes
- tests/samples/butterfly.svg             |   12 +
- tests/svg1.2/comp-op-porterduff-ref.png |  Bin 0 -> 26432 bytes
- tests/svg1.2/comp-op-porterduff.svg     |  298 +++++
- 27 files changed, 4266 insertions(+), 1829 deletions(-)
+ ChangeLog                                  |  10 +
+ Makefile.am                                |   2 +-
+ configure.in                               |   2 +
+ tests/Makefile.am                          |  16 ++
+ tests/bugs/388545-ref.png                  | Bin 0 -> 19038 bytes
+ tests/bugs/388545.svg                      | 445 +++++++++++++++++++++++++++++
+ tests/pdiff/CMakeLists.txt                 |  55 ++++
+ tests/pdiff/Makefile.am                    |  16 ++
+ tests/pdiff/README.txt                     |  45 +++
+ tests/pdiff/args.c                         | 119 ++++++++
+ tests/pdiff/args.h                         |  46 +++
+ tests/pdiff/gpl.txt                        | 340 ++++++++++++++++++++++
+ tests/pdiff/lpyramid.c                     | 111 +++++++
+ tests/pdiff/lpyramid.h                     |  32 +++
+ tests/pdiff/pdiff.c                        | 374 ++++++++++++++++++++++++
+ tests/pdiff/pdiff.h                        |  40 +++
+ tests/pdiff/perceptualdiff.c               | 102 +++++++
+ tests/rsvg-test.c                          | 378 ++++++++++++++++++++++++
+ tests/rsvg-test.txt                        |   8 +
+ tests/samples/artwork-ref.png              | Bin 0 -> 48010 bytes
+ tests/{Artwork.svg => samples/artwork.svg} |   0
+ tests/samples/butterfly-ref.png            | Bin 0 -> 59530 bytes
+ tests/{ => samples}/butterfly.svg          |   0
+ tests/svg1.2/comp-op-porterduff-ref.png    | Bin 0 -> 26432 bytes
+ tests/svg1.2/comp-op-porterduff.svg        | 298 +++++++++++++++++++
+ 25 files changed, 2438 insertions(+), 1 deletion(-)
 
 commit abbd9bdfe3aabf41284e77eeac1001c5556080ba
 Author: Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
@@ -10168,10 +10521,10 @@ Date:   Sat Jan 27 17:43:24 2007 +0000
     
     2007-01-27  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	* rvsg-cairo-draw.c (_rsvg_cairo_set_operator): add support for 'plus'
-    	comp-op.
-    	* rsvg-styles.c (rsvg_parse_style_arg): ditto.
-    	* rsvg-styles.h: ditto.
+            * rvsg-cairo-draw.c (_rsvg_cairo_set_operator): add support for 'plus'
+            comp-op.
+            * rsvg-styles.c (rsvg_parse_style_arg): ditto.
+            * rsvg-styles.h: ditto.
     
     
     svn path=/trunk/; revision=1092
@@ -10207,7 +10560,7 @@ Date:   Sat Jan 13 15:22:25 2007 +0000
     
     2007-01-13  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	Fix Emacs modeline. Tab is 8 characters.
+            Fix Emacs modeline. Tab is 8 characters.
     
     
     svn path=/trunk/; revision=1090
@@ -10242,8 +10595,8 @@ Date:   Fri Jan 12 21:39:32 2007 +0000
     
     2007-01-12  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	Fix indentation of *.h files. Running indent on them was not a good
-    	idea. Also add sts setting to vim modeline.
+            Fix indentation of *.h files. Running indent on them was not a good
+            idea. Also add sts setting to vim modeline.
     
     
     svn path=/trunk/; revision=1089
@@ -10299,7 +10652,7 @@ Date:   Fri Jan 12 19:38:55 2007 +0000
     
     2007-01-12  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	Indentation fix, using: indent -kr -nut -pcs -psl -i4 -l100
+            Indentation fix, using: indent -kr -nut -pcs -psl -i4 -l100
     
     
     svn path=/trunk/; revision=1088
@@ -10361,23 +10714,23 @@ Date:   Fri Jan 12 17:45:13 2007 +0000
     
     2007-01-12  Emmanuel Pacaud <emmanuel.pacaud@lapp.in2p3.fr>
     
-    	Add support for porterduff comp-op operators and for enable-background.
+            Add support for porterduff comp-op operators and for enable-background.
     
-    	* rsvg-cairo-draw.c (_rsvg_cairo_set_operator): new.
-    	(rsvg_cairo_render_path): request a temporary buffer when operator is
-    	not src-over.
-    	(rsvg_cairo_render_image): set composite operator before painting.
-    	(rsvg_cairo_push_render_stack): don't exit for operator != src-over
-    	or enable-background != accumulate.
-    	(rsvg_cairo_pop_render_stack): ditto. Set composite operator.
-    	* rsvg-styles.c (rsvg_state_init): added comp_op and
-    	enable_background.
-    	(rsvg_state_inherit_run): force inherit for comp_op and
-    	enable_background.
-    	(rsvg_parse_style_arg): parse for comp_op and enable_background.
+            * rsvg-cairo-draw.c (_rsvg_cairo_set_operator): new.
+            (rsvg_cairo_render_path): request a temporary buffer when operator is
+            not src-over.
+            (rsvg_cairo_render_image): set composite operator before painting.
+            (rsvg_cairo_push_render_stack): don't exit for operator != src-over
+            or enable-background != accumulate.
+            (rsvg_cairo_pop_render_stack): ditto. Set composite operator.
+            * rsvg-styles.c (rsvg_state_init): added comp_op and
+            enable_background.
+            (rsvg_state_inherit_run): force inherit for comp_op and
+            enable_background.
+            (rsvg_parse_style_arg): parse for comp_op and enable_background.
     
-    	* rsvg-structure.c (rsvg_node_symbol_set_atts): move
-    	rsvg_parse_style_attrs inside the conditionnal block.
+            * rsvg-structure.c (rsvg_node_symbol_set_atts): move
+            rsvg_parse_style_attrs inside the conditionnal block.
     
     
     svn path=/trunk/; revision=1087
@@ -10397,9 +10750,9 @@ Date:   Fri Jan 5 22:17:31 2007 +0000
     
     2007-01-05  Christian Persch  <chpe@svn.gnome.org>
     
-    	* gtk-engine/svg-draw.c: (rsvg_style_register_type):
-    	* gtk-engine/svg-rc-style.c: (rsvg_rc_style_register_type):
-    	* rsvg-gobject.c: Bug #393297: no need to make GTypeInfo static.
+            * gtk-engine/svg-draw.c: (rsvg_style_register_type):
+            * gtk-engine/svg-rc-style.c: (rsvg_rc_style_register_type):
+            * rsvg-gobject.c: Bug #393297: no need to make GTypeInfo static.
     
     svn path=/trunk/; revision=1086
 
@@ -10427,10 +10780,10 @@ Date:   Thu Nov 9 00:31:18 2006 +0000
     
     2006-11-09  Tor Lillqvist  <tml@novell.com>
     
-    	* librsvg-zip.in: DLLs are always in "bin" nowadays, no need to
-    	ponder that in the script. Use pkg-config to find out
-    	gtk_binary_version to use it in the pathnames to the engine and
-    	loader DLLs.
+            * librsvg-zip.in: DLLs are always in "bin" nowadays, no need to
+            ponder that in the script. Use pkg-config to find out
+            gtk_binary_version to use it in the pathnames to the engine and
+            loader DLLs.
 
  ChangeLog      |  7 +++++++
  librsvg-zip.in | 15 +++++----------
@@ -10451,8 +10804,8 @@ Date:   Fri Nov 3 01:52:00 2006 +0000
 
     Bug 361267 - SVGs with duplicate IDs cause Nautilus/eog to crash.
     
-    	* rsvg-structure.c: Bug 361267 - SVGs with duplicate IDs cause Nautilus/eog to
-    	crash. Basically, a <use> used itself, causing infinite drawing recursion.
+            * rsvg-structure.c: Bug 361267 - SVGs with duplicate IDs cause Nautilus/eog to
+            crash. Basically, a <use> used itself, causing infinite drawing recursion.
 
  ChangeLog        |  5 +++++
  rsvg-gobject.c   |  2 +-
@@ -10475,14 +10828,14 @@ Date:   Fri Nov 3 01:32:16 2006 +0000
 
     Introduce PRIVATE API to get around bugs 357406 and 362217. IMHO,
     
-    	* rsvg-gobject.c: Introduce PRIVATE API to get around bugs 357406 and 362217.
-    	IMHO, gobject's type registration and quark/error system is fundamentally
-    	broken with respect to (un)loadable modules such as GTK+ theme engines. This
-    	is the best I can do for now without breaking librsvg's API. This may cause
-    	as many headaches as it fixes, though.
-    	* rsvg-private.h: Declare new _rsvg_register_types() function
-    	* gtk-engine/svg-main.c: Invoke new type registration function
-    	* librsvg.def: export this function
+            * rsvg-gobject.c: Introduce PRIVATE API to get around bugs 357406 and 362217.
+            IMHO, gobject's type registration and quark/error system is fundamentally
+            broken with respect to (un)loadable modules such as GTK+ theme engines. This
+            is the best I can do for now without breaking librsvg's API. This may cause
+            as many headaches as it fixes, though.
+            * rsvg-private.h: Declare new _rsvg_register_types() function
+            * gtk-engine/svg-main.c: Invoke new type registration function
+            * librsvg.def: export this function
 
  ChangeLog             | 11 +++++++++++
  gtk-engine/svg-main.c |  2 ++
@@ -10509,8 +10862,8 @@ Date:   Fri Oct 13 12:19:22 2006 +0000
     
     2006-10-13  Kouhei Sutou <kou@cozmixng.org>
     
-    	* rsvg-cairo-clip.c: Fix bug with scaling + clipping reported on
-    	cairo-devel.
+            * rsvg-cairo-clip.c: Fix bug with scaling + clipping reported on
+            cairo-devel.
 
  ChangeLog         |  5 +++++
  rsvg-cairo-clip.c | 19 -------------------
@@ -10525,8 +10878,8 @@ Date:   Fri Sep 8 08:36:48 2006 +0000
     
     2006-09-08  Wouter Bolsterlee  <uws+gnome@xs4all.nl>
     
-    	* configure.in: Build the mozilla plugin using libxul in
-    	addition to mozilla and firefox.
+            * configure.in: Build the mozilla plugin using libxul in
+            addition to mozilla and firefox.
 
  ChangeLog    | 5 +++++
  configure.in | 2 +-
@@ -10560,8 +10913,8 @@ Date:   Wed Aug 23 13:15:59 2006 +0000
     
     2006-08-23  Dom Lachowicz <cinamod@hotmail.com>
     
-    	* rsvg-text.c: Bug 344116. The 5 crashes I mentioned before aren't
-    	reproducible. I'm enabling this code, and watching out for regressions.
+            * rsvg-text.c: Bug 344116. The 5 crashes I mentioned before aren't
+            reproducible. I'm enabling this code, and watching out for regressions.
 
  ChangeLog   | 5 +++++
  rsvg-text.c | 2 +-
@@ -10575,8 +10928,8 @@ Date:   Wed Aug 23 12:55:30 2006 +0000
     
     2006-08-23  Dom Lachowicz <cinamod@hotmail.com>
     
-    	* configure.in: Hopefully fix --disable-gtk-doc (341421)
-    	* doc/Makefile.am: Ditto
+            * configure.in: Hopefully fix --disable-gtk-doc (341421)
+            * doc/Makefile.am: Ditto
 
  ChangeLog       |  5 +++++
  configure.in    | 18 ++++--------------
@@ -10600,8 +10953,8 @@ Date:   Wed Aug 23 12:17:30 2006 +0000
     
     2006-08-23  Dom Lachowicz <cinamod@hotmail.com>
     
-    	* librsvg.def: Make export symbols work on OSX (bug 352512)
-    	* rsvg-private.h: Some preparation work for color normalization
+            * librsvg.def: Make export symbols work on OSX (bug 352512)
+            * rsvg-private.h: Some preparation work for color normalization
 
  ChangeLog      |  5 +++++
  librsvg.def    | 68 +++++++++++++++++++++++++++++-----------------------------
@@ -10616,10 +10969,10 @@ Date:   Tue Aug 22 13:04:09 2006 +0000
     
     2006-08-22  Dom Lachowicz <cinamod@hotmail.com>
     
-    	* Bug 344116: Committed patch from Kouhei Sutou <kou@cozmixng.org>
-    	that makes librsvg use Pango-Cairo instead of PangoFT2+rendering
-    	text as a path. This patch is disabled for now, as it crashes on
-    	at least 5 known SVGs (see bug 344116)
+            * Bug 344116: Committed patch from Kouhei Sutou <kou@cozmixng.org>
+            that makes librsvg use Pango-Cairo instead of PangoFT2+rendering
+            text as a path. This patch is disabled for now, as it crashes on
+            at least 5 known SVGs (see bug 344116)
 
  ChangeLog           |  7 +++++
  configure.in        |  3 ++
@@ -10638,10 +10991,10 @@ Date:   Tue Aug 22 12:39:25 2006 +0000
     
     2006-08-22  Dom Lachowicz <cinamod@hotmail.com>
     
-    	* rsvg-base.c (rsvg_handle_write_impl): Have libxml2 replace entities
-    	for us. This fixes a bug where style definitions don't get properly
-    	expanded, but causes a (2.15.x-only feature) regression when importing
-    	external ENTITIES.
+            * rsvg-base.c (rsvg_handle_write_impl): Have libxml2 replace entities
+            for us. This fixes a bug where style definitions don't get properly
+            expanded, but causes a (2.15.x-only feature) regression when importing
+            external ENTITIES.
 
  ChangeLog   |  7 +++++++
  rsvg-base.c | 15 ++++++++++-----
@@ -10676,8 +11029,8 @@ Date:   Sat Jul 22 18:48:22 2006 +0000
 
     Don't leak PangoFt2 fonts (bug 344235). This is a work-around for Pango
     
-    	* rsvg-text.c: Don't leak PangoFt2 fonts (bug 344235). This is a
-    	work-around for Pango bug 143542.
+            * rsvg-text.c: Don't leak PangoFt2 fonts (bug 344235). This is a
+            work-around for Pango bug 143542.
 
  ChangeLog   |  2 ++
  rsvg-text.c | 12 ++++++++++++
@@ -10725,8 +11078,8 @@ Date:   Thu Jun 29 03:33:44 2006 +0000
 
     Remove trailing slash so that install.sh works on Solaris. It seems that
     
-    	* gdk-pixbuf-loader/Makefile.am: Remove trailing slash so that
-    	install.sh works on Solaris. It seems that it doesn't like test -d dir/
+            * gdk-pixbuf-loader/Makefile.am: Remove trailing slash so that
+            install.sh works on Solaris. It seems that it doesn't like test -d dir/
 
  ChangeLog              | 3 +++
  moz-plugin/Makefile.am | 2 +-
@@ -10740,8 +11093,8 @@ Date:   Thu Jun 29 01:53:34 2006 +0000
     
     2006-06-28  Dom Lachowicz <cinamod@hotmail.com>
     
-    	* rsvg-private.h: Use G_GNUC_PRETTY_FUNCTION so as to not depend on
-    	GCC extensions (3461163)
+            * rsvg-private.h: Use G_GNUC_PRETTY_FUNCTION so as to not depend on
+            GCC extensions (3461163)
 
  ChangeLog      | 5 +++++
  rsvg-private.h | 4 ++--
@@ -10755,10 +11108,10 @@ Date:   Sun May 14 19:52:29 2006 +0000
     
     2006-05-14  Dom Lachowicz <cinamod@hotmail.com>
     
-    	* configure.in: New better way to invoke gtk-doc (see 341421)
-    	* Makefile.am: Ditto
-    	* doc/Makefile.am: Ditto
-    	* gtk-doc.make: Removed. Auto-generated
+            * configure.in: New better way to invoke gtk-doc (see 341421)
+            * Makefile.am: Ditto
+            * doc/Makefile.am: Ditto
+            * gtk-doc.make: Removed. Auto-generated
 
  ChangeLog       |   7 +++
  Makefile.am     |   7 ++-
@@ -10785,7 +11138,7 @@ Date:   Sun May 7 15:48:41 2006 +0000
     
     2006-05-07  Dom Lachowicz <cinamod@hotmail.com>
     
-    	* gdk-pixbuf-loader/io-svg.c: Fix build on GTK+ >= 2.9. (329850)
+            * gdk-pixbuf-loader/io-svg.c: Fix build on GTK+ >= 2.9. (329850)
 
  ChangeLog                  |  4 ++++
  gdk-pixbuf-loader/io-svg.c | 16 ++++++++++++++++
@@ -10854,13 +11207,13 @@ Date:   Wed May 3 15:09:00 2006 +0000
     
     2006-05-03  Paolo Borelli  <pborelli@katamail.com>
     
-    	* rsvg-filter.c:
-    	* rsvg-marker.c:
-    	* rsvg-mask.c:
-    	* rsvg-paint-server.c:
-    	* rsvg-private.h:
+            * rsvg-filter.c:
+            * rsvg-marker.c:
+            * rsvg-mask.c:
+            * rsvg-paint-server.c:
+            * rsvg-private.h:
     
-    	Factor out rsvg_get_url_string. Bug 340505.
+            Factor out rsvg_get_url_string. Bug 340505.
 
  ChangeLog           | 718 ++++++++++++++++++++++++++--------------------------
  rsvg-filter.c       |  30 +--
@@ -10878,9 +11231,9 @@ Date:   Wed May 3 14:56:16 2006 +0000
     
     2006-05-03  Paolo Borelli  <pborelli@katamail.com>
     
-    	* rsvg-text.[ch]: pass the lenght to rsvg_make_valid_utf8.
-    	* rsvg-base.c: avoid some strdups and avoid a leak in the !utf8
-    	case of rsvg_characters(). Bug 340471.
+            * rsvg-text.[ch]: pass the lenght to rsvg_make_valid_utf8.
+            * rsvg-base.c: avoid some strdups and avoid a leak in the !utf8
+            case of rsvg_characters(). Bug 340471.
 
  ChangeLog   |  6 +++++
  rsvg-base.c | 83 +++++++++++++++++++++++++++++--------------------------------
@@ -10918,10 +11271,10 @@ Date:   Sun Apr 30 15:49:44 2006 +0000
 
     Implement the XInclude spec to some large-ish degree. Currently doesn't
     
-    	* rsvg-base.c: Implement the XInclude spec to some large-ish degree. Currently
-    	doesn't support the "xpointer" bit.
-    	* rsvg-gobject.c: Only initialize the SAX handler once (on class init)
-    	rather than at object-init
+            * rsvg-base.c: Implement the XInclude spec to some large-ish degree. Currently
+            doesn't support the "xpointer" bit.
+            * rsvg-gobject.c: Only initialize the SAX handler once (on class init)
+            rather than at object-init
 
  ChangeLog      |   7 +++
  rsvg-base.c    | 184 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
@@ -10948,7 +11301,7 @@ Date:   Sat Apr 29 14:04:21 2006 +0000
 
     Fix a "type-punned pointer" issue found by Thomas VS
     
-    	* rsvg-paint-server.c: Fix a "type-punned pointer" issue found by Thomas VS
+            * rsvg-paint-server.c: Fix a "type-punned pointer" issue found by Thomas VS
 
  ChangeLog           | 4 ++++
  rsvg-paint-server.c | 9 +++++++--
@@ -10969,8 +11322,8 @@ Date:   Fri Apr 28 03:58:38 2006 +0000
 
     Add support for the CSS @import directive. Probably isn't 100% conformant,
     
-    	* rsvg-styles.c: Add support for the CSS @import directive. Probably isn't 100%
-    	conformant, but probably better than not doing it at all.
+            * rsvg-styles.c: Add support for the CSS @import directive. Probably isn't 100%
+            conformant, but probably better than not doing it at all.
 
  ChangeLog     |  3 +++
  rsvg-styles.c | 31 ++++++++++++++++++++++++++++++-
@@ -10984,9 +11337,9 @@ Date:   Fri Apr 28 03:24:10 2006 +0000
     
     2006-04-27 Dom Lachowicz <cinamod@hotmail.com>
     
-    	* rsvg-base.c: Handle system, public, and unparsed entity declarations
-    	better. Probably not 100% conformant, but probably better than not
-    	doing it at all.
+            * rsvg-base.c: Handle system, public, and unparsed entity declarations
+            better. Probably not 100% conformant, but probably better than not
+            doing it at all.
 
  ChangeLog   |  6 ++++++
  rsvg-base.c | 55 ++++++++++++++++++++++++++++++++++++++++++++-----------
@@ -11034,7 +11387,7 @@ Date:   Tue Apr 25 12:42:55 2006 +0000
     
     2006-04-25 Dom Lachowicz <cinamod@hotmail.com>
     
-    	* rsvg-image.c: Initialize node->super, to avoid a crash (#339637)
+            * rsvg-image.c: Initialize node->super, to avoid a crash (#339637)
 
  ChangeLog    | 4 ++++
  rsvg-image.c | 1 +
@@ -11076,9 +11429,9 @@ Date:   Wed Apr 19 23:45:26 2006 +0000
     
     2006-04-19 Dom Lachowicz <cinamod@hotmail.com>
     
-    	* *.[ch]: Use rsvg_return_if_fail where appropriate, to make life
-    	easier for language bindings and to report errors more consistently
-    	(bug #338881)
+            * *.[ch]: Use rsvg_return_if_fail where appropriate, to make life
+            easier for language bindings and to report errors more consistently
+            (bug #338881)
 
  ChangeLog             |  6 ++++++
  rsvg-base-file-util.c |  6 +++---
@@ -11121,7 +11474,7 @@ Date:   Wed Mar 22 13:35:13 2006 +0000
     rsvg_handle_set_base_uri() in rsvg_handle_new_from_file() is too late
     
     * rsvg-base-file-util.c: rsvg_handle_set_base_uri() in rsvg_handle_new_from_file()
-    	  is too late (#335450)
+              is too late (#335450)
 
  ChangeLog             |  5 +++++
  rsvg-base-file-util.c | 36 +++++++++++++++++++++++++-----------
@@ -11343,8 +11696,8 @@ Date:   Mon Feb 6 04:41:56 2006 +0000
 
     Export RsvgHandle and RsvgHandleClass to the outside world so you can
     
-    	* rsvg.h: Export RsvgHandle and RsvgHandleClass to the outside world so you can subclass them
-    	* *.c: Changes necessary for ^^^
+            * rsvg.h: Export RsvgHandle and RsvgHandleClass to the outside world so you can subclass them
+            * *.c: Changes necessary for ^^^
 
  ChangeLog           |   5 ++
  rsvg-base.c         | 212 ++++++++++++++++++++++++++--------------------------
@@ -11524,9 +11877,9 @@ Date:   Sat Feb 4 17:46:32 2006 +0000
 
     Rename rsvg_cairo_render to rsvg_handle_render_cairo, for better GObject
     
-    	* *.c: Rename rsvg_cairo_render to rsvg_handle_render_cairo, for
-    	better GObject consistency
-    	* configure.in: 2.13.91
+            * *.c: Rename rsvg_cairo_render to rsvg_handle_render_cairo, for
+            better GObject consistency
+            * configure.in: 2.13.91
 
  ChangeLog                 |  6 ++++++
  configure.in              |  2 +-
@@ -11575,13 +11928,13 @@ Date:   Sat Feb 4 15:21:48 2006 +0000
     
     2006-02-04 Dom Lachowicz <cinamod@hotmail.com>
     
-    	* doc/*: Update documentation. I'm pretty happy with how things look
-    	and are arranged now.
+            * doc/*: Update documentation. I'm pretty happy with how things look
+            and are arranged now.
     
     2006-02-04 Robert Staudinger <robert.staudinger@gmail.com>
     
-    	* rsvg-gobject.c: RsvgHandle now derives from GObject. This doesn't
-    	break API/ABI.
+            * rsvg-gobject.c: RsvgHandle now derives from GObject. This doesn't
+            break API/ABI.
 
  ChangeLog                    |  10 ++
  Makefile.am                  |   1 +
@@ -11813,9 +12166,9 @@ Date:   Sat Jan 7 19:25:59 2006 +0000
 
     List of symbols that we export Use libtool's -export-symbols to try to
     
-    	* librsvg.def: List of symbols that we export
-    	* Makefile.am: Use libtool's -export-symbols to try to only export
-    	the above symbols (on platforms where it's supported).
+            * librsvg.def: List of symbols that we export
+            * Makefile.am: Use libtool's -export-symbols to try to only export
+            the above symbols (on platforms where it's supported).
 
  ChangeLog   |  6 ++++++
  Makefile.am |  3 ++-
@@ -11849,8 +12202,8 @@ Date:   Tue Dec 20 12:05:08 2005 +0000
 
     Mozilla-config fixes so that it works with more config scripts Fix some
     
-    	* configure.in: Mozilla-config fixes so that it works with more config scripts
-    	* rsvg-convert.c: Fix some GCC 4.0 build warnings (323936)
+            * configure.in: Mozilla-config fixes so that it works with more config scripts
+            * rsvg-convert.c: Fix some GCC 4.0 build warnings (323936)
 
  ChangeLog      | 5 +++++
  configure.in   | 3 +--
@@ -11881,8 +12234,8 @@ Date:   Sat Dec 10 18:00:41 2005 +0000
 
     Remove Reimplement 'rsvg' command-line utility in terms of the newer
     
-    	* test-rsvg.c: Remove
-    	* rsvg.in: Reimplement 'rsvg' command-line utility in terms of the newer rsvg-convert
+            * test-rsvg.c: Remove
+            * rsvg.in: Reimplement 'rsvg' command-line utility in terms of the newer rsvg-convert
 
  ChangeLog    |   2 +
  Makefile.am  |  11 +++--
@@ -11897,10 +12250,10 @@ Date:   Sat Dec 10 17:15:35 2005 +0000
 
     Remove New utility called 'rsvg-convert'. Can convert a SVG to a PS, PDF,
     
-    	* rsvg-cairo.c: Remove
-    	* rsvg-convert.c: New utility called 'rsvg-convert'. Can convert a SVG to a PS, PDF, or PNG. Can accept
-    	SVG input from STDIN and output to STDOUT. Has a lot more flexibility and functionality than the old 'rsvg'
-    	program.
+            * rsvg-cairo.c: Remove
+            * rsvg-convert.c: New utility called 'rsvg-convert'. Can convert a SVG to a PS, PDF, or PNG. Can accept
+            SVG input from STDIN and output to STDOUT. Has a lot more flexibility and functionality than the old 'rsvg'
+            program.
 
  ChangeLog        |  10 +-
  Makefile.am      |   7 +-
@@ -11928,12 +12281,12 @@ Date:   Wed Dec 7 13:25:05 2005 +0000
     
     2005-12-07 Ray Strode <rstrode@redhat.com>
     
-    	* rsvg-base.c: remove the push call that's more probably wrong and
-    	clean up leaked viewbox list node (bug 323436)
-    	* rsvg-shapes.c: call finalize cleanup function of node parent class in
-    	path_node and poly_node free functions (bug 323435)
-    	* rsvg-structure.c: Ditto
-    	* rsvg-structure.h: Ditto
+            * rsvg-base.c: remove the push call that's more probably wrong and
+            clean up leaked viewbox list node (bug 323436)
+            * rsvg-shapes.c: call finalize cleanup function of node parent class in
+            path_node and poly_node free functions (bug 323435)
+            * rsvg-structure.c: Ditto
+            * rsvg-structure.h: Ditto
 
  ChangeLog        | 9 +++++++++
  rsvg-base.c      | 4 +---
@@ -12053,11 +12406,11 @@ Date:   Tue Nov 1 03:27:16 2005 +0000
     Revert API changes to make the Gimp folk happier Reflect that change
     
     
-    	* rsvg.h: Revert API changes to make the Gimp folk happier
-    	* rsvg-base.c: Reflect that change elsewhere
-    	* test-display.c: Ditto
-    	* test-rsvg.c: Ditto
-    	* rsvg-cairo.c: Ditto
+            * rsvg.h: Revert API changes to make the Gimp folk happier
+            * rsvg-base.c: Reflect that change elsewhere
+            * test-display.c: Ditto
+            * test-rsvg.c: Ditto
+            * rsvg-cairo.c: Ditto
 
  ChangeLog      |  8 ++++++++
  rsvg-base.c    | 37 +++++++++++++++++++++++++++++++++++--
@@ -12238,8 +12591,8 @@ Date:   Sat Oct 22 20:10:27 2005 +0000
 
     setlocale(LC_ALL) may return "C". Evaluate $LANG first, equate "C" with
     
-    	* rsvg-cond.c (rsvg_cond_parse_system_language): setlocale(LC_ALL)
-    	may return "C". Evaluate $LANG first, equate "C" with "en".
+            * rsvg-cond.c (rsvg_cond_parse_system_language): setlocale(LC_ALL)
+            may return "C". Evaluate $LANG first, equate "C" with "en".
 
  ChangeLog   |  5 +++++
  rsvg-cond.c | 11 ++++++++---
@@ -12251,8 +12604,8 @@ Date:   Sat Oct 22 17:21:53 2005 +0000
 
     Cache RsvgHandles rather than GByteArrays containing SVG data. Preparation
     
-    	* gtk-engine/svg-render.c: Cache RsvgHandles rather than GByteArrays
-    	containing SVG data. Preparation for move to cairo-only theme engine.
+            * gtk-engine/svg-render.c: Cache RsvgHandles rather than GByteArrays
+            containing SVG data. Preparation for move to cairo-only theme engine.
 
  ChangeLog               |  5 +++++
  gtk-engine/svg-render.c | 49 +++++++++++++++++++------------------------------
@@ -12266,12 +12619,12 @@ Date:   Sat Oct 22 17:03:27 2005 +0000
     Rip out libart backend; require the cairo backend, and require cairo >=
     
     
-    	* configure.in: Rip out libart backend; require the cairo backend, and require cairo >= 1.0.2
-    	* Makefile.am: re-enable the gtk-engine and gdk-pixbuf-loader. Ditto, library re-org
-    	* librsvg-2.0.pc.in: Ditto
-    	* librsvg.spec.in: Ditto
-    	* rsvg.c: Ditto
-    	* gtk-engine/Makefile.am: Ditto
+            * configure.in: Rip out libart backend; require the cairo backend, and require cairo >= 1.0.2
+            * Makefile.am: re-enable the gtk-engine and gdk-pixbuf-loader. Ditto, library re-org
+            * librsvg-2.0.pc.in: Ditto
+            * librsvg.spec.in: Ditto
+            * rsvg.c: Ditto
+            * gtk-engine/Makefile.am: Ditto
 
  ChangeLog                     |   9 +++
  Makefile.am                   |  69 ++++-----------------
@@ -13874,18 +14227,18 @@ Date:   Tue Jun 14 16:18:51 2005 +0000
     
     2005-06-14  Tor Lillqvist  <tml@novell.com>
     
-    	* configure.in: Get CFLAGS and LIBS also for fontconfig and
-    	freetype. Don't use -Wsign-promo, gcc 3.4 says that's only for C++
-    	and Objective-C.
+            * configure.in: Get CFLAGS and LIBS also for fontconfig and
+            freetype. Don't use -Wsign-promo, gcc 3.4 says that's only for C++
+            and Objective-C.
     
-    	* Makefile.am (INCLUDES): Use LIBRSVG_DATADIR instead of just
-    	DATADIR as that clashes with some Windows header that gets dragged
-    	in into some compilations. (Not that any of the source files refer
-    	to DATADIR.)
-    	(librsvg_2_la_LIBADD): Link with freetype libs.
+            * Makefile.am (INCLUDES): Use LIBRSVG_DATADIR instead of just
+            DATADIR as that clashes with some Windows header that gets dragged
+            in into some compilations. (Not that any of the source files refer
+            to DATADIR.)
+            (librsvg_2_la_LIBADD): Link with freetype libs.
     
-    	* librsvg-zip.in: Distribute also rsvg-view.exe and rsvg.exe. Get
-    	the engine and loader DLLs from correct places.
+            * librsvg-zip.in: Distribute also rsvg-view.exe and rsvg.exe. Get
+            the engine and loader DLLs from correct places.
 
  ChangeLog      | 15 +++++++++++++++
  Makefile.am    |  4 ++--
@@ -15805,10 +16158,10 @@ Date:   Mon Jul 12 14:09:14 2004 +0000
 
     Update documentation Fix build Refactor a bit - allow for saving to ICO or
     
-    	* rsvg.1: Update documentation
-    	* configure.in: Fix build
-    	* test-rsvg.c: Refactor a bit - allow for saving to ICO or anything
-    	else that GdkPixbuf supports
+            * rsvg.1: Update documentation
+            * configure.in: Fix build
+            * test-rsvg.c: Refactor a bit - allow for saving to ICO or anything
+            else that GdkPixbuf supports
 
  ChangeLog    |  7 +++++++
  configure.in |  2 +-
@@ -16242,9 +16595,9 @@ Date:   Tue Jun 8 23:21:53 2004 +0000
     
     2004-06-09  Dodji Seketeli  <dodji@gnome.org>
     
-    	* configure.in: several versions of libcroco can now be
-    	installed in parallel. We compile and link against the 0.6.xx
-    	serie.
+            * configure.in: several versions of libcroco can now be
+            installed in parallel. We compile and link against the 0.6.xx
+            serie.
 
  ChangeLog    | 5 +++++
  configure.in | 4 ++--
@@ -16552,9 +16905,9 @@ Date:   Sun Apr 18 15:32:09 2004 +0000
     
     2004-04-18  Dodji Seketeli  <dodji@gnome.org>
     
-    	* configure.in: use libcroco 0.6.0
-    	* rsvg-styles.c:
-    	(ccss_property): libcroco use CRString now, no GString.
+            * configure.in: use libcroco 0.6.0
+            * rsvg-styles.c:
+            (ccss_property): libcroco use CRString now, no GString.
 
  ChangeLog     |  6 ++++++
  configure.in  |  2 +-
@@ -17222,8 +17575,8 @@ Date:   Wed Mar 3 19:15:48 2004 +0000
     
     2004-03-04  Glynn Foster  <glynn.foster@sun.com>
     
-    	* Makefile.am, configure.in, librsvg-2.0-uninstalled.pc.in:
-    	Add uninstalled pkg-config file.
+            * Makefile.am, configure.in, librsvg-2.0-uninstalled.pc.in:
+            Add uninstalled pkg-config file.
 
  ChangeLog                     |  5 +++++
  Makefile.am                   | 15 ++++++++-------
@@ -17443,7 +17796,7 @@ Date:   Wed Dec 10 20:11:59 2003 +0000
     
     2003-12-10  Federico Mena Quintero  <federico@ximian.com>
     
-    	* rsvg-defs.c: #include <glib/gmessages.h>
+            * rsvg-defs.c: #include <glib/gmessages.h>
 
  ChangeLog   | 4 ++++
  rsvg-defs.c | 1 +
@@ -17578,12 +17931,12 @@ Date:   Thu Oct 16 17:56:44 2003 +0000
     
     2003-10-16  Sven Neumann  <sven@gimp.org>
     
-    	* rsvg.c: fixed inline docs.
+            * rsvg.c: fixed inline docs.
     
-    	* doc/Makefile.am: ignore internal header files.
+            * doc/Makefile.am: ignore internal header files.
     
-    	* doc/rsvg-sections.txt
-    	* doc/tmpl/rsvg.sgml: added new functions.
+            * doc/rsvg-sections.txt
+            * doc/tmpl/rsvg.sgml: added new functions.
 
  ChangeLog             |  9 +++++++++
  doc/Makefile.am       | 16 +++++++++++++++-
@@ -17610,8 +17963,8 @@ Date:   Tue Sep 23 13:37:22 2003 +0000
     
     2003-09-23  Sven Neumann  <sven@gimp.org>
     
-    	* rsvg.c (rsvg_start_svg): respect viewBox offsets by applying an
-    	appropriate translation.
+            * rsvg.c (rsvg_start_svg): respect viewBox offsets by applying an
+            appropriate translation.
 
  ChangeLog |  5 +++++
  rsvg.c    | 51 ++++++++++++++++++++++++---------------------------
@@ -17625,11 +17978,11 @@ Date:   Sun Sep 21 23:52:41 2003 +0000
     
     2003-09-21  Tor Lillqvist  <tml@iki.fi>
     
-    	* librsvg-zip.in: New file.
+            * librsvg-zip.in: New file.
     
-    	* configure.in: Expand librsvg-zip.
+            * configure.in: Expand librsvg-zip.
     
-    	* Makefile.am: Distribute librsvg-zip.in.
+            * Makefile.am: Distribute librsvg-zip.in.
 
  ChangeLog      |  6 ++++--
  Makefile.am    |  1 +
@@ -17645,15 +17998,15 @@ Date:   Sun Sep 21 23:35:09 2003 +0000
     
     2003-09-21  Tor Lillqvist  <tml@iki.fi>
     
-    	* configure.in: Check for Win32, set OS_WIN32 automake
-    	variable. Check for strtok_r.
+            * configure.in: Check for Win32, set OS_WIN32 automake
+            variable. Check for strtok_r.
     
-    	* Makefile.am: Use -lm only on Unix. Add LIBGSF_LIBS and
-    	LIBCROCO_LIBS to librsvg_2_la_LIBADD.
+            * Makefile.am: Use -lm only on Unix. Add LIBGSF_LIBS and
+            LIBCROCO_LIBS to librsvg_2_la_LIBADD.
     
-    	* rsvg-css.c: Use G_PI instead of M_PI.
-    	(strtok_r): Implement strtok_r here if not available. (Very
-    	suboptimal implementation.)
+            * rsvg-css.c: Use G_PI instead of M_PI.
+            (strtok_r): Implement strtok_r here if not available. (Very
+            suboptimal implementation.)
 
  ChangeLog    | 12 ++++++++++++
  Makefile.am  | 13 +++++++++----
@@ -17678,8 +18031,8 @@ Date:   Fri Sep 19 15:59:07 2003 +0000
     
     2003-09-19  Sven Neumann  <sven@gimp.org>
     
-    	* rsvg-file-util.c: implemented missing GError handling for file
-    	operations.
+            * rsvg-file-util.c: implemented missing GError handling for file
+            operations.
 
  ChangeLog        |  5 +++++
  rsvg-file-util.c | 12 ++++++++++--
@@ -17693,11 +18046,11 @@ Date:   Thu Sep 18 01:44:42 2003 +0000
     
     2003-09-18  Sven Neumann  <sven@gimp.org>
     
-    	* Makefile.am
-    	* configure.in
-    	* gimp-plugin/Makefile.am
-    	* gimp-plugin/svg.c: removed GIMP plug-in; it now lives in the
-    	GIMP source tree. Thanks a lot for the nice work you've done!
+            * Makefile.am
+            * configure.in
+            * gimp-plugin/Makefile.am
+            * gimp-plugin/svg.c: removed GIMP plug-in; it now lives in the
+            GIMP source tree. Thanks a lot for the nice work you've done!
 
  ChangeLog               |   8 +
  Makefile.am             |   2 +-
@@ -17715,9 +18068,9 @@ Date:   Fri Sep 12 15:42:06 2003 +0000
     
     2003-09-12  Sven Neumann  <sven@gimp.org>
     
-    	* configure.in
-    	* rsvg-styles.c (rsvg_real_parse_cssbuffer): removed the #warning
-    	here and instead output it when configure is run (bug #122119).
+            * configure.in
+            * rsvg-styles.c (rsvg_real_parse_cssbuffer): removed the #warning
+            here and instead output it when configure is run (bug #122119).
 
  ChangeLog     | 8 +++++++-
  configure.in  | 5 +++++
@@ -17732,15 +18085,15 @@ Date:   Fri Sep 12 14:43:46 2003 +0000
     
     2003-09-12  Sven Neumann  <sven@gimp.org>
     
-    	* configure.in: depend on Pango version 1.2.0 or newer.
+            * configure.in: depend on Pango version 1.2.0 or newer.
     
-    	* rsvg-text.c (rsvg_text_handler_characters): don't use
-    	pango_ft2_get_context() which is deprecated in Pango HEAD, but
-    	create the Pango context from the fontmap instead (bug #122121).
+            * rsvg-text.c (rsvg_text_handler_characters): don't use
+            pango_ft2_get_context() which is deprecated in Pango HEAD, but
+            create the Pango context from the fontmap instead (bug #122121).
     
-    	* rsvg-path.c (rsvg_parse_path_do_cmd): fixed storage of
-    	reflection point in Q command which caused the next T command to
-    	create a wrong stroke (bug #122118).
+            * rsvg-path.c (rsvg_parse_path_do_cmd): fixed storage of
+            reflection point in Q command which caused the next T command to
+            create a wrong stroke (bug #122118).
 
  ChangeLog    | 12 ++++++++++++
  configure.in |  2 +-
@@ -17756,9 +18109,9 @@ Date:   Mon Sep 8 12:47:35 2003 +0000
     
     2003-09-11  Sven Neumann  <sven@gimp.org>
     
-    	* gimp-plugin/svg.c: Sprinkled the code with const qualifiers.
-    	Fixed transfer of pixel data from pixbuf to pixel region. The
-    	old code was wrong for pixbufs with rowstride != width * bpp.
+            * gimp-plugin/svg.c: Sprinkled the code with const qualifiers.
+            Fixed transfer of pixel data from pixbuf to pixel region. The
+            old code was wrong for pixbufs with rowstride != width * bpp.
 
  ChangeLog | 6 ++++++
  1 file changed, 6 insertions(+)
@@ -17780,9 +18133,9 @@ Date:   Mon Sep 8 12:34:11 2003 +0000
     
     2003-09-08  Alexander Larsson  <alexl@redhat.com>
     
-    	* configure.in:
-    	* NEWS:
-    	version 2.4.0
+            * configure.in:
+            * NEWS:
+            version 2.4.0
 
  ChangeLog    | 6 ++++++
  NEWS         | 5 +++++
@@ -17817,9 +18170,9 @@ Date:   Sat Aug 2 13:45:47 2003 +0000
     
     2003-09-11  Sven Neumann  <sven@gimp.org>
     
-    	* gimp-plugin/svg.c: Sprinkled the code with const qualifiers.
-    	Fixed transfer of pixel data from pixbuf to pixel region. The
-    	old code was wrong for pixbufs with rowstride != width * bpp.
+            * gimp-plugin/svg.c: Sprinkled the code with const qualifiers.
+            Fixed transfer of pixel data from pixbuf to pixel region. The
+            old code was wrong for pixbufs with rowstride != width * bpp.
 
  gimp-plugin/svg.c | 88 +++++++++++++++++++++++++++++++++----------------------
  1 file changed, 53 insertions(+), 35 deletions(-)
@@ -17938,8 +18291,8 @@ Date:   Tue Apr 8 20:40:29 2003 +0000
     
     2003-04-08  Alex Duggan  <aldug@astrolinux.com>
     
-    	* configure.in: print out a summary displaying what
-    	parts of librsvg are to be built.
+            * configure.in: print out a summary displaying what
+            parts of librsvg are to be built.
 
  ChangeLog    |  5 +++++
  configure.in | 14 ++++++++++++++
@@ -17963,9 +18316,9 @@ Date:   Tue Apr 8 20:20:08 2003 +0000
     
     2003-04-08  Alex Duggan  <aldug@astrolinux.com>
     
-    	* doc/.cvsignore:
-    	* gimp-plugin/.cvsignore: create .cvsignore files for these
-    	two directories.
+            * doc/.cvsignore:
+            * gimp-plugin/.cvsignore: create .cvsignore files for these
+            two directories.
 
  ChangeLog              | 6 ++++++
  doc/.cvsignore         | 2 ++
@@ -18135,9 +18488,9 @@ Author: Dom Lachowicz <doml@src.gnome.org>
 Date:   Wed Mar 19 18:51:01 2003 +0000
 
     Disable libcroco support unti libcroco implements
-    	the 1 remaining fn that I need from it
+            the 1 remaining fn that I need from it
     Handle tag#id, tag.klazz#id,
-    	and tag.klazz much more properly
+            and tag.klazz much more properly
 
  ChangeLog     |  7 ++++++
  configure.in  |  3 ++-
@@ -18702,8 +19055,8 @@ Author: Dom Lachowicz <doml@src.gnome.org>
 Date:   Mon Jan 27 23:33:14 2003 +0000
 
     Allow multiple declarations to be
-    	additive ( H1 { font-weight: bold } H1 { font-family: Times } now
-    	evaluate properly to H1 { font-weight: bold ; font-family: Times })
+            additive ( H1 { font-weight: bold } H1 { font-family: Times } now
+            evaluate properly to H1 { font-weight: bold ; font-family: Times })
 
  ChangeLog     |  8 ++++++++
  rsvg-styles.c | 14 +++++++++++---
@@ -18724,8 +19077,8 @@ Author: Dom Lachowicz <doml@src.gnome.org>
 Date:   Mon Jan 27 17:36:54 2003 +0000
 
     Patheticly handle conical gradients (not part of SVG spec,
-    	but that doesn't stop KIllustrator/Kontour...), work on
-    	gradientTransform as well as spreads on radialGradients
+            but that doesn't stop KIllustrator/Kontour...), work on
+            gradientTransform as well as spreads on radialGradients
 
  ChangeLog           |  6 +++++
  rsvg-paint-server.c |  9 +++++---
@@ -18780,8 +19133,8 @@ Date:   Tue Jan 21 08:07:08 2003 +0000
     
     2003-01-21  Alexander Larsson  <alexl@redhat.com>
     
-    	* Makefile.am:
-    	Better manpage installation.
+            * Makefile.am:
+            Better manpage installation.
 
  ChangeLog   | 7 +++++++
  Makefile.am | 6 ++----
@@ -18795,9 +19148,9 @@ Date:   Mon Jan 20 18:07:53 2003 +0000
     
     2003-01-20  Alexander Larsson  <alexl@redhat.com>
     
-    	* NEWS:
-    	* configure.in:
-    	Update to 2.2.0
+            * NEWS:
+            * configure.in:
+            Update to 2.2.0
 
  ChangeLog    | 6 ++++++
  NEWS         | 4 +++-
@@ -18948,12 +19301,12 @@ Date:   Mon Jan 13 15:03:52 2003 +0000
     
     2003-01-13  Alexander Larsson  <alexl@redhat.com>
     
-    	* Makefile.am:
-    	Added rsvg-private.h
+            * Makefile.am:
+            Added rsvg-private.h
     
-    	* NEWS:
-    	* configure.in:
-    	2.1.5
+            * NEWS:
+            * configure.in:
+            2.1.5
 
  ChangeLog    | 11 +++++++++++
  Makefile.am  |  1 +
@@ -18969,9 +19322,9 @@ Date:   Mon Jan 13 14:17:12 2003 +0000
     
     2003-01-13  Alexander Larsson  <alexl@redhat.com>
     
-    	* NEWS:
-    	* configure.in:
-    	Update to 2.1.4
+            * NEWS:
+            * configure.in:
+            Update to 2.1.4
 
  ChangeLog    | 8 ++++++++
  NEWS         | 6 ++++++
@@ -19152,8 +19505,8 @@ Date:   Mon Nov 25 15:50:35 2002 +0000
     
     2002-11-25  Alexander Larsson  <alexl@redhat.com>
     
-    	* configure.in:
-    	Bump version to 2.1.2
+            * configure.in:
+            Bump version to 2.1.2
 
  ChangeLog    | 5 +++++
  NEWS         | 4 ++++
@@ -19168,9 +19521,9 @@ Date:   Tue Nov 5 11:45:40 2002 +0000
     
     2002-11-05  Alexander Larsson  <alexl@redhat.com>
     
-    	* rsvg.c (rsvg_text_handler_characters, make_valid_utf8):
-    	Don't crash if there is invalid utf8 in the file, or if
-    	encoding is not specified.
+            * rsvg.c (rsvg_text_handler_characters, make_valid_utf8):
+            Don't crash if there is invalid utf8 in the file, or if
+            encoding is not specified.
 
  ChangeLog |  6 ++++++
  rsvg.c    | 45 ++++++++++++++++++++++++++++++++++++++++++++-
@@ -19232,9 +19585,9 @@ Date:   Mon Oct 14 08:47:13 2002 +0000
     
     2002-10-14  Alexander Larsson  <alexl@redhat.com>
     
-    	* gdk-pixbuf-loader/Makefile.am (INCLUDES):
-    	* gdk-pixbuf-loader/io-svg.c:
-    	Fix includes with srcdir != builddir
+            * gdk-pixbuf-loader/Makefile.am (INCLUDES):
+            * gdk-pixbuf-loader/io-svg.c:
+            Fix includes with srcdir != builddir
 
  ChangeLog                     | 4 ++++
  gdk-pixbuf-loader/Makefile.am | 2 +-
@@ -19249,8 +19602,8 @@ Date:   Mon Oct 14 08:29:18 2002 +0000
     
     2002-10-14  Alexander Larsson  <alexl@redhat.com>
     
-    	* NEWS:
-    	Add news items
+            * NEWS:
+            Add news items
 
  ChangeLog |  5 +++++
  NEWS      | 16 ++++++++++++++++
@@ -19407,82 +19760,67 @@ Date:   Sat Oct 5 20:49:41 2002 +0000
     todo 1: bug in gdk-pixbuf's alpha handling
     todo 2: once #1 is fixed, properly implement rotate()
 
- ChangeLog                           |    6 +
- gdk-pixbuf-loader/.cvsignore        |    2 +
- rsvg.c                              |   83 +-
- test-20020212.svg                   |   87 --
- test-60544.svg                      |   19 -
- test-61082.svg                      |    7 -
- test-61223.svg                      |    9 -
- test-62614.svg                      |   94 --
- test-62620.svg                      |    4 -
- test-62699.svg                      |  127 --
- test-64684-1.svg                    |   90 --
- test-64684-2.svg                    |  118 --
- test-71297.svg                      |    8 -
- test-71622.svg                      |  370 -----
- test-display.c                      |   71 +
- test-nested-transform.svg           |   43 -
- test-opacity.svg                    |   41 -
- test-rgb.svg                        |    9 -
- test.svg                            |   21 -
- tests/Artwork.svg                   | 1816 ++++++++++++++++++++++
- tests/CHEMICALS.svg                 |   34 +
- tests/Mop_Bucket.svg                |   50 +
- tests/Picasso.svg                   | 2839 +++++++++++++++++++++++++++++++++++
- tests/Poultice_1.svg                |   30 +
- tests/Surface_Wipe.svg              |   36 +
- tests/Units.svg                     |   45 +
- tests/ViewBox-bak.svg               |   27 +
- tests/ViewBox.svg                   |   27 +
- tests/Wall_Wipe.svg                 |   51 +
- tests/circle-gradient-2.svg         |   13 +
- tests/circle01.svg                  |   11 +
- tests/combo-3.svg                   |    9 +
- tests/double-square.svg             |   10 +
- tests/ellipse01.svg                 |   11 +
- tests/ellipse02.svg                 |   22 +
- tests/file-directory.svg            |   51 +
- tests/filters00.svg                 |   53 +
- tests/image1.svg                    |   10 +
- tests/intersect_bezier2_ellipse.svg |   46 +
- tests/line01.svg                    |   21 +
- tests/lingrad01.svg                 |   25 +
- tests/lion.svg                      |  163 ++
- tests/opac.svg                      |   13 +
- tests/opacity01.svg                 |   47 +
- tests/polygon01.svg                 |   20 +
- tests/polyline01.svg                |   21 +
- tests/radgrad01.svg                 |   27 +
- tests/rect-fill.svg                 |    9 +
- tests/rect-grad-new.svg             |   13 +
- tests/rect-linear-grad.svg          |   13 +
- tests/rect-radial-grad.svg          |   13 +
- tests/rect-stroke-grad-linear.svg   |   13 +
- tests/rect-stroke-grad-radial.svg   |   13 +
- tests/rect01.svg                    |   14 +
- tests/rect02.svg                    |   19 +
- tests/telephone.svg                 |  141 ++
- tests/test-20020212.svg             |   87 ++
- tests/test-60544.svg                |   19 +
- tests/test-61082.svg                |    7 +
- tests/test-61223.svg                |    9 +
- tests/test-62614.svg                |   94 ++
- tests/test-62620.svg                |    4 +
- tests/test-62699.svg                |  127 ++
- tests/test-64684-1.svg              |   90 ++
- tests/test-64684-2.svg              |  118 ++
- tests/test-71297.svg                |    8 +
- tests/test-71622.svg                |  370 +++++
- tests/test-nested-transform.svg     |   43 +
- tests/test-opacity.svg              |   41 +
- tests/test-rgb.svg                  |    9 +
- tests/test.svg                      |   21 +
- tests/text-sizes-NimbusSans.svg     |   28 +
- tests/tspan.svg                     |   14 +
- tests/undo-128-d-sodipodi.svg       |   63 +
- tests/undo-128-new.svg              |    4 +
- 75 files changed, 7078 insertions(+), 1063 deletions(-)
+ ChangeLog                                          |    6 +
+ gdk-pixbuf-loader/.cvsignore                       |    2 +
+ rsvg.c                                             |   83 +-
+ test-display.c                                     |   71 +
+ tests/Artwork.svg                                  | 1816 +++++++++++++
+ tests/CHEMICALS.svg                                |   34 +
+ tests/Mop_Bucket.svg                               |   50 +
+ tests/Picasso.svg                                  | 2839 ++++++++++++++++++++
+ tests/Poultice_1.svg                               |   30 +
+ tests/Surface_Wipe.svg                             |   36 +
+ tests/Units.svg                                    |   45 +
+ tests/ViewBox-bak.svg                              |   27 +
+ tests/ViewBox.svg                                  |   27 +
+ tests/Wall_Wipe.svg                                |   51 +
+ tests/circle-gradient-2.svg                        |   13 +
+ tests/circle01.svg                                 |   11 +
+ tests/combo-3.svg                                  |    9 +
+ tests/double-square.svg                            |   10 +
+ tests/ellipse01.svg                                |   11 +
+ tests/ellipse02.svg                                |   22 +
+ tests/file-directory.svg                           |   51 +
+ tests/filters00.svg                                |   53 +
+ tests/image1.svg                                   |   10 +
+ tests/intersect_bezier2_ellipse.svg                |   46 +
+ tests/line01.svg                                   |   21 +
+ tests/lingrad01.svg                                |   25 +
+ tests/lion.svg                                     |  163 ++
+ tests/opac.svg                                     |   13 +
+ tests/opacity01.svg                                |   47 +
+ tests/polygon01.svg                                |   20 +
+ tests/polyline01.svg                               |   21 +
+ tests/radgrad01.svg                                |   27 +
+ tests/rect-fill.svg                                |    9 +
+ tests/rect-grad-new.svg                            |   13 +
+ tests/rect-linear-grad.svg                         |   13 +
+ tests/rect-radial-grad.svg                         |   13 +
+ tests/rect-stroke-grad-linear.svg                  |   13 +
+ tests/rect-stroke-grad-radial.svg                  |   13 +
+ tests/rect01.svg                                   |   14 +
+ tests/rect02.svg                                   |   19 +
+ tests/telephone.svg                                |  141 +
+ test-20020212.svg => tests/test-20020212.svg       |    0
+ test-60544.svg => tests/test-60544.svg             |    0
+ test-61082.svg => tests/test-61082.svg             |    0
+ test-61223.svg => tests/test-61223.svg             |    0
+ test-62614.svg => tests/test-62614.svg             |    0
+ test-62620.svg => tests/test-62620.svg             |    0
+ test-62699.svg => tests/test-62699.svg             |    0
+ test-64684-1.svg => tests/test-64684-1.svg         |    0
+ test-64684-2.svg => tests/test-64684-2.svg         |    0
+ test-71297.svg => tests/test-71297.svg             |    0
+ test-71622.svg => tests/test-71622.svg             |    0
+ .../test-nested-transform.svg                      |    0
+ test-opacity.svg => tests/test-opacity.svg         |    0
+ test-rgb.svg => tests/test-rgb.svg                 |    0
+ test.svg => tests/test.svg                         |    0
+ tests/text-sizes-NimbusSans.svg                    |   28 +
+ tests/tspan.svg                                    |   14 +
+ tests/undo-128-d-sodipodi.svg                      |   63 +
+ tests/undo-128-new.svg                             |    4 +
+ 60 files changed, 6031 insertions(+), 16 deletions(-)
 
 commit f2e0bf82eda899387bd44a6862e839e4e02a6989
 Author: Sven Neumann <neo@src.gnome.org>
@@ -19513,8 +19851,8 @@ Date:   Sat Oct 5 11:03:48 2002 +0000
     
     2002-10-05  Alexander Larsson  <alexl@redhat.com>
     
-    	* gdk-pixbuf-loader/io-svg.c:
-    	Declare fill_vtable and fill_info to avoid warning.
+            * gdk-pixbuf-loader/io-svg.c:
+            Declare fill_vtable and fill_info to avoid warning.
 
  ChangeLog                  | 5 +++++
  gdk-pixbuf-loader/io-svg.c | 3 +++
@@ -19548,10 +19886,10 @@ Date:   Fri Oct 4 07:23:45 2002 +0000
     
     2002-10-04  Alexander Larsson  <alexl@redhat.com>
     
-    	* Makefile.am:
-    	* configure.in:
-    	Install test-rsvg as rsvg
-    	Fix gdk-pixbuf-loader build when you have an old version of gdk-pixbuf.
+            * Makefile.am:
+            * configure.in:
+            Install test-rsvg as rsvg
+            Fix gdk-pixbuf-loader build when you have an old version of gdk-pixbuf.
 
  ChangeLog    |  7 +++++++
  Makefile.am  | 14 ++++++++------
@@ -19574,9 +19912,9 @@ Date:   Fri Oct 4 03:34:03 2002 +0000
 
     Fix error that was hurting nautilus icon themes
     
-    	* rsvg.c (start_svg): Fix error that was hurting nautilus icon themes
+            * rsvg.c (start_svg): Fix error that was hurting nautilus icon themes
     
-    	* test-rsvg.c (main): fix segfaults, add width, height arguments, configurable output format
+            * test-rsvg.c (main): fix segfaults, add width, height arguments, configurable output format
 
  ChangeLog   |  6 ++++++
  rsvg.c      |  2 +-
@@ -19620,12 +19958,12 @@ Date:   Thu Oct 3 04:09:35 2002 +0000
 
     Remove VERBOSE statements Remove VERBOSE statements
     
-    	* rsvg-path.c (*): Remove VERBOSE statements
-    	* rsvg.c (*): Remove VERBOSE statements
-    	(rsvg_pixbuf_from_file_with_size_data): New FN for parsing through SVG files. Optionally Gnome-VFS aware (no configure joo-joo yet)
-    	(rsvg_pixbuf_from_file_*): use above function
-    	(rsvg_text_handler_characters): fix segfault, handle <tspan> to a large degree
-    	(rsvg_text_handler_end): ditto
+            * rsvg-path.c (*): Remove VERBOSE statements
+            * rsvg.c (*): Remove VERBOSE statements
+            (rsvg_pixbuf_from_file_with_size_data): New FN for parsing through SVG files. Optionally Gnome-VFS aware (no configure joo-joo yet)
+            (rsvg_pixbuf_from_file_*): use above function
+            (rsvg_text_handler_characters): fix segfault, handle <tspan> to a large degree
+            (rsvg_text_handler_end): ditto
 
  ChangeLog   |  11 ++-
  rsvg-path.c |  72 +++----------------
@@ -19690,8 +20028,8 @@ Date:   Tue Oct 1 19:41:24 2002 +0000
     
     2002-10-01  jacob berkman  <jacob@ximian.com>
     
-    	* rsvg-css.c (rsvg_css_parse_normalized_length): fix to build with
-    	a C compiler
+            * rsvg-css.c (rsvg_css_parse_normalized_length): fix to build with
+            a C compiler
 
  ChangeLog  | 5 +++++
  rsvg-css.c | 3 ++-
@@ -19713,14 +20051,14 @@ Date:   Tue Oct 1 17:27:29 2002 +0000
 
     handle %, em units now. ex can easily be handled once we have a way to get
     
-    	* rsvg-css.c (rsvg_css_parse_length): handle %, em units now. ex can easily be handled once we have a way to get the font's XHeight
-    	(rsvg_css_parse_normalized_length): updated for above ^^^
+            * rsvg-css.c (rsvg_css_parse_length): handle %, em units now. ex can easily be handled once we have a way to get the font's XHeight
+            (rsvg_css_parse_normalized_length): updated for above ^^^
     
-    	* rsvg.c (rsvg_handle_set_dpi): new function for setting the DPI
-    	(macro) RSVG_DPI: assume default of 90 DPI instead of 72
-    	(rsvg_viewport_percentage): new fn for calculating percentages relative to viewports
-    	(*): update to use new CSS length routines
-    	(rsvg_start_text): handle -x and -y values for text offsets
+            * rsvg.c (rsvg_handle_set_dpi): new function for setting the DPI
+            (macro) RSVG_DPI: assume default of 90 DPI instead of 72
+            (rsvg_viewport_percentage): new fn for calculating percentages relative to viewports
+            (*): update to use new CSS length routines
+            (rsvg_start_text): handle -x and -y values for text offsets
 
  ChangeLog  |  13 +++++-
  rsvg-css.c |  39 ++++++++++------
@@ -19770,8 +20108,8 @@ Date:   Fri Sep 27 16:10:53 2002 +0000
     
     2002-09-27  Alexander Larsson  <alexl@redhat.com>
     
-    	* NEWS:
-    	Add some news about 2.1.0
+            * NEWS:
+            Add some news about 2.1.0
 
  COPYING   | 620 ++++++++++++++++++++++++--------------------------------------
  ChangeLog |   5 +
@@ -19787,8 +20125,8 @@ Date:   Fri Sep 27 15:51:57 2002 +0000
     
     2002-09-27  Alexander Larsson  <alexl@redhat.com>
     
-    	* configure.in:
-    	Bump version to 2.1.0
+            * configure.in:
+            Bump version to 2.1.0
 
  ChangeLog    | 5 +++++
  configure.in | 4 ++--
@@ -19802,13 +20140,13 @@ Date:   Wed Sep 25 22:28:11 2002 +0000
     
     2002-09-25  jacob berkman  <jacob@ximian.com>
     
-    	* gtk-engine/Makefile.am: add $(top_srcdir) to $INCLUDES, remove
-    	broken and non-portable dist-hook in favor of real SUBDIRS (which
-    	only get built if the engine is enabled)
+            * gtk-engine/Makefile.am: add $(top_srcdir) to $INCLUDES, remove
+            broken and non-portable dist-hook in favor of real SUBDIRS (which
+            only get built if the engine is enabled)
     
-    	* gtk-engine/ChangeLog: rename to ChangeLog-old
+            * gtk-engine/ChangeLog: rename to ChangeLog-old
     
-    	* configure.in (AC_OUTPUT): add new Makefiles
+            * configure.in (AC_OUTPUT): add new Makefiles
 
  .cvsignore                                     |   5 +
  ChangeLog                                      |  10 +
@@ -19872,22 +20210,15 @@ Date:   Wed Sep 25 17:48:22 2002 +0000
 
     rename files to get a bit of uniqueness and a clearer starting point
 
- gtk-engine/Makefile.am       |   14 +-
- gtk-engine/pixbuf-draw.c     | 1035 ------------------------------------------
- gtk-engine/pixbuf-main.c     |   58 ---
- gtk-engine/pixbuf-rc-style.c |  816 ---------------------------------
- gtk-engine/pixbuf-rc-style.h |   50 --
- gtk-engine/pixbuf-render.c   |  805 --------------------------------
- gtk-engine/pixbuf-style.h    |   50 --
- gtk-engine/pixbuf.h          |  193 --------
- gtk-engine/svg-draw.c        | 1035 ++++++++++++++++++++++++++++++++++++++++++
- gtk-engine/svg-main.c        |   58 +++
- gtk-engine/svg-rc-style.c    |  816 +++++++++++++++++++++++++++++++++
- gtk-engine/svg-rc-style.h    |   50 ++
- gtk-engine/svg-render.c      |  805 ++++++++++++++++++++++++++++++++
- gtk-engine/svg-style.h       |   50 ++
- gtk-engine/svg.h             |  193 ++++++++
- 15 files changed, 3014 insertions(+), 3014 deletions(-)
+ gtk-engine/Makefile.am                           | 14 +++++++-------
+ gtk-engine/{pixbuf-draw.c => svg-draw.c}         |  6 +++---
+ gtk-engine/{pixbuf-main.c => svg-main.c}         |  6 +++---
+ gtk-engine/{pixbuf-rc-style.c => svg-rc-style.c} |  6 +++---
+ gtk-engine/{pixbuf-rc-style.h => svg-rc-style.h} |  0
+ gtk-engine/{pixbuf-render.c => svg-render.c}     |  2 +-
+ gtk-engine/{pixbuf-style.h => svg-style.h}       |  0
+ gtk-engine/{pixbuf.h => svg.h}                   |  0
+ 8 files changed, 17 insertions(+), 17 deletions(-)
 
 commit 9fbc541a531871b5ee9abfe897db0e9895365055
 Author: Dom Lachowicz <doml@src.gnome.org>
@@ -20086,15 +20417,15 @@ Date:   Fri Sep 13 01:55:24 2002 +0000
 
     a while back, darin told me to commit a patch like this. here it is, tested against abiword, test-rsvg, and nautilus
     
-    	* rsvg-css.c (rsvg_css_parse_length):
-    	Handle errors, handle more units, reduce number of string compares
-    	(rsvg_css_parse_normalized_length): New function, like rsvg_parse_length, except normalizes output to a width or height argument
-    	(rsvg_css_parse_color): fix 2 memory leaks in color parsing routine
+            * rsvg-css.c (rsvg_css_parse_length):
+            Handle errors, handle more units, reduce number of string compares
+            (rsvg_css_parse_normalized_length): New function, like rsvg_parse_length, except normalizes output to a width or height argument
+            (rsvg_css_parse_color): fix 2 memory leaks in color parsing routine
     
-    	* rsvg.c (rsvg_start_svg): Use rsvg_css_parse_length
-    	(rsvg_parse_style_arg): ditto
-    	(rsvg_start_linear_gradient): ditto
-    	(rsvg_start_radial_gradient): ditto
+            * rsvg.c (rsvg_start_svg): Use rsvg_css_parse_length
+            (rsvg_parse_style_arg): ditto
+            (rsvg_start_linear_gradient): ditto
+            (rsvg_start_radial_gradient): ditto
 
  ChangeLog  | 12 ++++++++
  rsvg-css.c | 99 +++++++++++++++++++++++++++++++++++++++++++++++---------------
@@ -20119,9 +20450,9 @@ Date:   Mon Jul 22 18:16:48 2002 +0000
     
     2002-07-22  Alexander Larsson  <alexl@redhat.com>
     
-    	* NEWS:
-    	* configure.in:
-    	Bump to 2.0.1
+            * NEWS:
+            * configure.in:
+            Bump to 2.0.1
 
  ChangeLog    | 6 ++++++
  NEWS         | 4 ++++
@@ -20136,9 +20467,9 @@ Date:   Tue Jul 9 09:22:39 2002 +0000
     
     2002-07-09  Alexander Larsson  <alexl@redhat.com>
     
-    	* librsvg.spec.in:
-    	s/@ART_REQUIRED@/@LIBART_REQUIRED@/
-    	Patch from Pierre Sarrazin <sarrazip@sympatico.ca>
+            * librsvg.spec.in:
+            s/@ART_REQUIRED@/@LIBART_REQUIRED@/
+            Patch from Pierre Sarrazin <sarrazip@sympatico.ca>
 
  ChangeLog       | 6 ++++++
  librsvg.spec.in | 2 +-
@@ -20152,12 +20483,12 @@ Date:   Mon Jul 1 10:01:12 2002 +0000
     
     2002-07-01  Alexander Larsson  <alexl@redhat.com>
     
-    	* configure.in:
-    	Require libart 2.3.10 for bugfix
+            * configure.in:
+            Require libart 2.3.10 for bugfix
     
-    	* rsvg.c (rsvg_render_bpath):
-    	Back out michaels workaround, now that the real bug has been fixed.
-    	The gorilla trashcan still works.
+            * rsvg.c (rsvg_render_bpath):
+            Back out michaels workaround, now that the real bug has been fixed.
+            The gorilla trashcan still works.
 
  ChangeLog    | 9 +++++++++
  configure.in | 2 +-
@@ -20172,12 +20503,12 @@ Date:   Thu Jun 20 12:00:26 2002 +0000
     
     2002-06-19  Alexander Larsson  <alla@lysator.liu.se>
     
-    	* NEWS:
-    	Add news
+            * NEWS:
+            Add news
     
-    	* configure.in:
-    	Bump version to 2.0.0
-    	Update requirements
+            * configure.in:
+            Bump version to 2.0.0
+            Update requirements
 
  ChangeLog    |  9 +++++++++
  NEWS         |  4 ++++
@@ -20192,9 +20523,9 @@ Date:   Sat Jun 8 14:03:16 2002 +0000
     
     2002-06-08  Michael Meeks  <michael@ximian.com>
     
-    	* rsvg.c (rsvg_render_bpath): perturb the
-    	close vpath so we don't get numerical stability
-    	problems.
+            * rsvg.c (rsvg_render_bpath): perturb the
+            close vpath so we don't get numerical stability
+            problems.
 
  ChangeLog | 6 ++++++
  rsvg.c    | 9 +++++++--
@@ -20208,10 +20539,10 @@ Date:   Wed May 1 14:30:21 2002 +0000
     
     2002-05-01  Anders Carlsson  <andersca@gnu.org>
     
-    	* rsvg.c: (rsvg_handle_close):
-    	Check for a NULL context in case we haven't called
-    	rsvg_handle_write to create it. Fixes #80374, reported by
-    	Jakub Steiner.
+            * rsvg.c: (rsvg_handle_close):
+            Check for a NULL context in case we haven't called
+            rsvg_handle_write to create it. Fixes #80374, reported by
+            Jakub Steiner.
 
  ChangeLog | 7 +++++++
  rsvg.c    | 9 +++++++--
@@ -20223,7 +20554,7 @@ Date:   Thu Apr 18 22:44:47 2002 +0000
 
     Removed myself from list.
     
-    	* MAINTAINERS: Removed myself from list.
+            * MAINTAINERS: Removed myself from list.
 
  ChangeLog   | 4 ++++
  MAINTAINERS | 1 -
@@ -20237,7 +20568,7 @@ Date:   Thu Mar 14 00:44:05 2002 +0000
     
     2002-03-13  Gregory Leblanc  <gleblanc@linuxweasel.com>
     
-    	* librsvg.spec.in: rather big rework, from Chris Chabot
+            * librsvg.spec.in: rather big rework, from Chris Chabot
 
  ChangeLog       |   6 ++
  librsvg.spec.in | 176 +++++++++++++++++++++++++++++++++++---------------------
@@ -20258,8 +20589,8 @@ Date:   Thu Mar 7 20:28:07 2002 +0000
 
     News for 1.1.6. Bump version.
     
-    	* NEWS: News for 1.1.6.
-    	* configure.in: Bump version.
+            * NEWS: News for 1.1.6.
+            * configure.in: Bump version.
 
  ChangeLog    | 5 +++++
  NEWS         | 4 ++++
@@ -20272,13 +20603,13 @@ Date:   Thu Mar 7 20:23:58 2002 +0000
 
     Check for width 0 and height 0 cases. Make warnings clearer.
     
-    	* rsvg.c: (rsvg_start_svg): Check for width 0 and height 0
-    	cases. Make warnings clearer.
-    	(rsvg_size_callback): Explicitly check for bad width and
-    	height. Before, we sometimes did math starting with -1 and
-    	yielding 0, which led to a divide by zero.
+            * rsvg.c: (rsvg_start_svg): Check for width 0 and height 0
+            cases. Make warnings clearer.
+            (rsvg_size_callback): Explicitly check for bad width and
+            height. Before, we sometimes did math starting with -1 and
+            yielding 0, which led to a divide by zero.
     
-    	* test-71622.svg: New test case.
+            * test-71622.svg: New test case.
 
  ChangeLog      |  10 ++
  rsvg.c         | 132 ++++++++++++--------
@@ -20300,7 +20631,7 @@ Date:   Mon Mar 4 19:11:04 2002 +0000
 
     News for 1.1.5.
     
-    	* NEWS: News for 1.1.5.
+            * NEWS: News for 1.1.5.
 
  ChangeLog | 4 ++++
  NEWS      | 4 ++++
@@ -20312,7 +20643,7 @@ Date:   Thu Feb 28 16:56:27 2002 +0000
 
     Bump version.
     
-    	* configure.in: Bump version.
+            * configure.in: Bump version.
 
  ChangeLog    | 4 ++++
  configure.in | 2 +-
@@ -20326,12 +20657,12 @@ Date:   Thu Feb 28 05:51:51 2002 +0000
     
     2002-02-28  Alexander Larsson  <alla@lysator.liu.se>
     
-    	* rsvg.h: (rsvg_pixbuf_from_file_at_zoom_with_max): New function.
-    	* rsvg.c: (RsvgSizeType, struct RsvgSizeCallbackData):
-    	Use enum instead of booleans to store the type of size callback.
-    	(rsvg_size_callback): Implement ZOOM_MAX, other changes due to the
-    	usage of the RsvgSizeType enum.
-    	(rsvg_pixbuf_from_file_at_zoom_with_max): Implement new function.
+            * rsvg.h: (rsvg_pixbuf_from_file_at_zoom_with_max): New function.
+            * rsvg.c: (RsvgSizeType, struct RsvgSizeCallbackData):
+            Use enum instead of booleans to store the type of size callback.
+            (rsvg_size_callback): Implement ZOOM_MAX, other changes due to the
+            usage of the RsvgSizeType enum.
+            (rsvg_pixbuf_from_file_at_zoom_with_max): Implement new function.
 
  ChangeLog |   9 +++++
  rsvg.c    | 134 +++++++++++++++++++++++++++++++++++++++++++++++++-------------
@@ -20353,7 +20684,7 @@ Date:   Mon Feb 25 21:42:15 2002 +0000
 
     News for 1.1.4.
     
-    	* NEWS: News for 1.1.4.
+            * NEWS: News for 1.1.4.
 
  ChangeLog | 7 +++++--
  NEWS      | 7 +++++++
@@ -20365,8 +20696,8 @@ Date:   Mon Feb 25 17:30:48 2002 +0000
 
     Ignore new test program binary. Bump version.
     
-    	* .cvsignore: Ignore new test program binary.
-    	* configure.in: Bump version.
+            * .cvsignore: Ignore new test program binary.
+            * configure.in: Bump version.
 
  .cvsignore   | 1 +
  ChangeLog    | 5 +++++
@@ -20381,13 +20712,13 @@ Date:   Sun Feb 24 18:24:51 2002 +0000
     
     2002-02-24  Alexander Larsson  <alla@lysator.liu.se>
     
-    	* rsvg.c: (rsvg_pixbuf_from_file_at_max_size): New function
-    	for scaling an svg uniformly to fit in a rectangle.
-    	(rsvg_size_callback): Handle max_size_set
-    	(rsvg_pixbuf_from_file_at_zoom),(rsvg_pixbuf_from_file_at_size):
-    	Set max_size_set to false.
+            * rsvg.c: (rsvg_pixbuf_from_file_at_max_size): New function
+            for scaling an svg uniformly to fit in a rectangle.
+            (rsvg_size_callback): Handle max_size_set
+            (rsvg_pixbuf_from_file_at_zoom),(rsvg_pixbuf_from_file_at_size):
+            Set max_size_set to false.
     
-    	* rsvg.h: Add rsvg_pixbuf_from_file_at_max_size()
+            * rsvg.h: Add rsvg_pixbuf_from_file_at_max_size()
 
  ChangeLog | 10 +++++++++
  rsvg.c    | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----
@@ -20402,19 +20733,19 @@ Date:   Wed Feb 20 19:39:25 2002 +0000
     
     2002-02-20  Michael Meeks  <michael@ximian.com>
     
-    	* Makefile.am: add test-performance.c
+            * Makefile.am: add test-performance.c
     
-    	* test-performance.c: impl.
+            * test-performance.c: impl.
     
     2002-02-17  Michael Meeks  <michael@ximian.com>
     
-    	* rsvg.c (rsvg_handle_write): make sure we set
-    	replaceEntities before we parse any of the buffer.
-    	(rsvg_pixbuf_from_file_at_size),
-    	(rsvg_pixbuf_from_file_at_zoom): read / parse
-    	SVG_BUFFER_SIZE bytes at a time, not 3.
-    	(rsvgSAXHandler): kill bogus module global.
-    	(rsvg_error_cb): impl.
+            * rsvg.c (rsvg_handle_write): make sure we set
+            replaceEntities before we parse any of the buffer.
+            (rsvg_pixbuf_from_file_at_size),
+            (rsvg_pixbuf_from_file_at_zoom): read / parse
+            SVG_BUFFER_SIZE bytes at a time, not 3.
+            (rsvgSAXHandler): kill bogus module global.
+            (rsvg_error_cb): impl.
 
  ChangeLog          | 16 +++++++++++++++
  Makefile.am        |  7 ++++++-
@@ -20430,7 +20761,7 @@ Date:   Mon Feb 18 00:42:24 2002 +0000
     
     2002-02-18  Gediminas Paulauskas <menesis@delfi.lt>
     
-    	* configure.in: remove GNOME_COMMON_INIT, GNOME_PLATFORM_GNOME_2
+            * configure.in: remove GNOME_COMMON_INIT, GNOME_PLATFORM_GNOME_2
 
  ChangeLog    | 4 ++++
  configure.in | 4 ----
@@ -20444,8 +20775,8 @@ Date:   Sun Feb 17 02:02:57 2002 +0000
     
     2002-02-16  Alexander Larsson  <alla@lysator.liu.se>
     
-    	* test-71297.svg:
-    	Add test case.
+            * test-71297.svg:
+            Add test case.
 
  ChangeLog      | 5 +++++
  test-71297.svg | 8 ++++++++
@@ -20466,20 +20797,20 @@ Date:   Tue Feb 12 17:52:26 2002 +0000
 
     Add a return_if_fail.
     
-    	* rsvg-paint-server.c: (rsvg_render_paint_server): Add a
-    	return_if_fail.
+            * rsvg-paint-server.c: (rsvg_render_paint_server): Add a
+            return_if_fail.
     
-    	* rsvg.c: (rsvg_start_svg): Handle .svg files without width and
-    	height values better. This was actually better in librsvg 1.0,
-    	and got lost in the rework of the API.
-    	(rsvg_push_opacity_group): Handle the case where ctx->pixbuf is NULL.
-    	(rsvg_pop_opacity_group): Handle NULL pixbuf cases.
-    	(rsvg_render_svp): Handle NULL pixbuf case better.
-    	(rsvg_render_bpath): Handle NULL pixbuf case.
-    	(rsvg_text_handler_characters): Handle NULL pixbuf case.
+            * rsvg.c: (rsvg_start_svg): Handle .svg files without width and
+            height values better. This was actually better in librsvg 1.0,
+            and got lost in the rework of the API.
+            (rsvg_push_opacity_group): Handle the case where ctx->pixbuf is NULL.
+            (rsvg_pop_opacity_group): Handle NULL pixbuf cases.
+            (rsvg_render_svp): Handle NULL pixbuf case better.
+            (rsvg_render_bpath): Handle NULL pixbuf case.
+            (rsvg_text_handler_characters): Handle NULL pixbuf case.
     
-    	* test-20020212.svg: Add a test file from Sodipodo without a width
-    	or height.
+            * test-20020212.svg: Add a test file from Sodipodo without a width
+            or height.
 
  ChangeLog           |  17 +++++
  rsvg-paint-server.c |   2 +
@@ -20502,8 +20833,8 @@ Date:   Sun Feb 10 03:18:51 2002 +0000
 
     Release notes for 1.1.3. Bump version number.
     
-    	* NEWS: Release notes for 1.1.3.
-    	* configure.in: Bump version number.
+            * NEWS: Release notes for 1.1.3.
+            * configure.in: Bump version number.
 
  ChangeLog    | 5 +++++
  NEWS         | 4 ++++
@@ -20518,11 +20849,11 @@ Date:   Fri Feb 8 10:07:28 2002 +0000
     
     2002-02-08  Anders Carlsson  <andersca@gnu.org>
     
-    	* rsvg.c (rsvg_pixmap_destroy): Add from GNOME 1 version.
-    	(rsvg_start_svg): Use rsvg_pixmap_destroy as finalize function.
-    	(rsvg_push_opacity_group): Likewise.
-    	(rsvg_pixbuf_from_file_at_size): Call rsvg_handle_close.
-    	(rsvg_pixbuf_from_file_at_zoom): Likewise.
+            * rsvg.c (rsvg_pixmap_destroy): Add from GNOME 1 version.
+            (rsvg_start_svg): Use rsvg_pixmap_destroy as finalize function.
+            (rsvg_push_opacity_group): Likewise.
+            (rsvg_pixbuf_from_file_at_size): Call rsvg_handle_close.
+            (rsvg_pixbuf_from_file_at_zoom): Likewise.
 
  ChangeLog |  8 ++++++++
  rsvg.c    | 15 ++++++++++++---
@@ -20543,9 +20874,9 @@ Date:   Mon Feb 4 17:05:15 2002 +0000
 
     Release notes for 1.1.2. Bump version number, give better error message
     
-    	* NEWS: Release notes for 1.1.2.
-    	* configure.in: Bump version number, give better error message
-    	when popt is missing.
+            * NEWS: Release notes for 1.1.2.
+            * configure.in: Bump version number, give better error message
+            when popt is missing.
 
  .cvsignore   | 2 --
  ChangeLog    | 6 ++++++
@@ -20561,9 +20892,9 @@ Date:   Fri Feb 1 16:44:20 2002 +0000
     
     2002-02-01  Laszlo Peter  <laca@ireland.sun.com>
     
-    	*  rsvg-bpath-util.c rsvg-bpath-util.h rsvg-css.c rsvg-css.c
-    	   rsvg-defs.c rsvg-paint-server.c rsvg-path.c rsvg-path.h
-    	   rsvg.c rsvg.h test-rsvg.c: correct licensing information
+            *  rsvg-bpath-util.c rsvg-bpath-util.h rsvg-css.c rsvg-css.c
+               rsvg-defs.c rsvg-paint-server.c rsvg-path.c rsvg-path.h
+               rsvg.c rsvg.h test-rsvg.c: correct licensing information
                in the headers by permission of the Copyright holder.
 
  ChangeLog           | 7 +++++++
@@ -20587,8 +20918,8 @@ Date:   Mon Jan 21 20:03:14 2002 +0000
     
     2002-01-21  Alex Larsson  <alexl@redhat.com>
     
-    	* rsvg.c (rsvg_render_bpath):
-    	Use the new libart intersector.
+            * rsvg.c (rsvg_render_bpath):
+            Use the new libart intersector.
 
  ChangeLog |  5 +++++
  rsvg.c    | 24 +++++++++++-------------
@@ -20609,7 +20940,7 @@ Date:   Tue Jan 8 19:25:47 2002 +0000
 
     Release notes for 1.1.1.
     
-    	* NEWS: Release notes for 1.1.1.
+            * NEWS: Release notes for 1.1.1.
 
  ChangeLog |  4 ++++
  NEWS      | 17 +++++++++++++++++
@@ -20621,10 +20952,10 @@ Date:   Fri Jan 4 18:29:58 2002 +0000
 
     More tweaking. I just can't stop myself.
     
-    	* README:
-    	* configure.in:
-    	* librsvg.spec.in:
-    	More tweaking. I just can't stop myself.
+            * README:
+            * configure.in:
+            * librsvg.spec.in:
+            More tweaking. I just can't stop myself.
 
  ChangeLog       |  7 +++++++
  README          |  4 +---
@@ -20638,8 +20969,8 @@ Date:   Fri Jan 4 17:53:11 2002 +0000
 
     Bump required libart version to the one with art_render_mask.
     
-    	* configure.in: Bump required libart version to the one
-    	with art_render_mask.
+            * configure.in: Bump required libart version to the one
+            with art_render_mask.
 
  ChangeLog    | 5 +++++
  configure.in | 2 +-
@@ -20697,15 +21028,15 @@ Date:   Thu Jan 3 22:30:02 2002 +0000
 
     Use art_render_mask in libart.
     
-    	* rsvg.c: Use art_render_mask in libart.
+            * rsvg.c: Use art_render_mask in libart.
     
-    	* Makefile.am:
-    	* art_render_mask.c: Remove.
-    	* art_render_mask.h: Remove.
-    	Get rid of our own copy of art_render_mask.
+            * Makefile.am:
+            * art_render_mask.c: Remove.
+            * art_render_mask.h: Remove.
+            Get rid of our own copy of art_render_mask.
     
-    	* configure.in: Change back so compatible with older autoconf
-    	and automake. We'll go back to the future when glib does.
+            * configure.in: Change back so compatible with older autoconf
+            and automake. We'll go back to the future when glib does.
 
  ChangeLog         |  12 ++++
  Makefile.am       |   2 -
@@ -20749,8 +21080,8 @@ Date:   Thu Jan 3 21:09:32 2002 +0000
 
     Remove. We don't need the NAUTILUS_FREETYPE2 macro any more.
     
-    	* acinclude.m4: Remove.
-    	We don't need the NAUTILUS_FREETYPE2 macro any more.
+            * acinclude.m4: Remove.
+            We don't need the NAUTILUS_FREETYPE2 macro any more.
 
  ChangeLog    |   5 ++
  acinclude.m4 | 165 -----------------------------------------------------------
@@ -20762,20 +21093,20 @@ Date:   Thu Jan 3 21:03:25 2002 +0000
 
     Some cleanup on the test program.
     
-    	* TODO:
-    	* test-rsvg.c: (main):
-    	Some cleanup on the test program.
+            * TODO:
+            * test-rsvg.c: (main):
+            Some cleanup on the test program.
     
-    	* configure.in:
-    	* librsvg.spec.in:
-    	Remove gtk requirement and remove remnants of the old
-    	freetype requirement. Also get rid of gmodule and gthread
-    	since we only use glib itself.
+            * configure.in:
+            * librsvg.spec.in:
+            Remove gtk requirement and remove remnants of the old
+            freetype requirement. Also get rid of gmodule and gthread
+            since we only use glib itself.
     
-    	* makefile-simple:
-    	* subpixel-text-test:
-    	Remove some no-longer-useful files (these were never
-    	in the tarball anyway).
+            * makefile-simple:
+            * subpixel-text-test:
+            Remove some no-longer-useful files (these were never
+            in the tarball anyway).
 
  ChangeLog          | 17 +++++++++++++++++
  NEWS               |  4 ----
@@ -20794,9 +21125,9 @@ Date:   Thu Jan 3 19:49:28 2002 +0000
 
     Don't set font_family to NULL since pangoft2 doesn't currnetly handle this
     
-    	* rsvg.c: (rsvg_text_handler_characters):
-    	Don't set font_family to NULL since pangoft2 doesn't
-    	currnetly handle this properly.
+            * rsvg.c: (rsvg_text_handler_characters):
+            Don't set font_family to NULL since pangoft2 doesn't
+            currnetly handle this properly.
 
  ChangeLog | 6 ++++++
  rsvg.c    | 3 ++-
@@ -20808,8 +21139,8 @@ Date:   Thu Jan 3 06:59:07 2002 +0000
 
     Remove spurious 2.0 from pango package name.
     
-    	* librsvg-2.0.pc.in: Remove spurious 2.0 from pango
-    	package name.
+            * librsvg-2.0.pc.in: Remove spurious 2.0 from pango
+            package name.
 
  ChangeLog         | 5 +++++
  librsvg-2.0.pc.in | 2 +-
@@ -20821,24 +21152,24 @@ Date:   Thu Jan 3 06:54:05 2002 +0000
 
     Remove. Remove.
     
-    	* Makefile.am:
-    	* configure.in:
-    	* librsvg-2.0.pc.in:
-    	* librsvg.spec.in:
-    	* rsvg-ft.c: Remove.
-    	* rsvg-ft.h: Remove.
-    	* rsvg.h:
-    	* test-ft-gtk.c: Remove.
-    	* test-ft.c: Remove.
-    	* test-rsvg.c:
-    	Remove direct FreeType dependency and also remove
-    	dependency on libpng. No more rsvg_set_fonts_dir
-    	or rsvg-ft.h header.
+            * Makefile.am:
+            * configure.in:
+            * librsvg-2.0.pc.in:
+            * librsvg.spec.in:
+            * rsvg-ft.c: Remove.
+            * rsvg-ft.h: Remove.
+            * rsvg.h:
+            * test-ft-gtk.c: Remove.
+            * test-ft.c: Remove.
+            * test-rsvg.c:
+            Remove direct FreeType dependency and also remove
+            dependency on libpng. No more rsvg_set_fonts_dir
+            or rsvg-ft.h header.
     
-    	* rsvg.c: (rsvg_state_clone), (rsvg_state_finalize),
-    	(rsvg_parse_style_arg), (rsvg_pop_opacity_group),
-    	(rsvg_text_handler_characters), (rsvg_handle_free):
-    	Port from direct FreeType use to Pango.
+            * rsvg.c: (rsvg_state_clone), (rsvg_state_finalize),
+            (rsvg_parse_style_arg), (rsvg_pop_opacity_group),
+            (rsvg_text_handler_characters), (rsvg_handle_free):
+            Port from direct FreeType use to Pango.
 
  ChangeLog         |   21 +
  Makefile.am       |   27 +-
@@ -20860,8 +21191,8 @@ Date:   Thu Dec 6 19:20:44 2001 +0000
 
     Add a dummy member since empty structs are illegal.
     
-    	* rsvg-paint-server.h: Add a dummy member since empty structs
-    	are illegal.
+            * rsvg-paint-server.h: Add a dummy member since empty structs
+            are illegal.
 
  ChangeLog           | 5 +++++
  rsvg-paint-server.h | 1 +
@@ -20873,17 +21204,17 @@ Date:   Tue Dec 4 05:48:15 2001 +0000
 
     Prevent empty gradients from crashing librsvg.
     
-    	* rsvg-paint-server.c: (rsvg_paint_server_lin_grad_render),
-    	(rsvg_paint_server_rad_grad_render): Prevent empty gradients
-    	from crashing librsvg.
+            * rsvg-paint-server.c: (rsvg_paint_server_lin_grad_render),
+            (rsvg_paint_server_rad_grad_render): Prevent empty gradients
+            from crashing librsvg.
     
-    	* rsvg.c: (rsvg_start_svg): Prevent huge image sizes from causing
-    	a core dump by doing overflow checking and using g_try_malloc
-    	instead of g_new.
+            * rsvg.c: (rsvg_start_svg): Prevent huge image sizes from causing
+            a core dump by doing overflow checking and using g_try_malloc
+            instead of g_new.
     
-    	* test-64684-1.svg:
-    	* test-64684-2.svg:
-    	Add some more test cases.
+            * test-64684-1.svg:
+            * test-64684-2.svg:
+            Add some more test cases.
 
  ChangeLog           |  14 +++++++
  rsvg-paint-server.c |  10 +++++
@@ -20914,8 +21245,8 @@ Date:   Thu Nov 8 20:30:59 2001 +0000
     
     2001-11-08  jacob berkman  <jacob@ximian.com>
     
-    	* configure.in (AC_INIT): call ourselves librsvg rather than
-    	librsvg2
+            * configure.in (AC_INIT): call ourselves librsvg rather than
+            librsvg2
 
  ChangeLog    | 5 +++++
  configure.in | 2 +-
@@ -20927,10 +21258,10 @@ Date:   Mon Nov 5 23:53:21 2001 +0000
 
     If no output file name is given, don't try to write the image (would
     
-    	* test-62614.svg:
-    	* test-62620.svg:
-    	* test-rsvg.c: (main): If no output file name is given,
-    	don't try to write the image (would segfault before).
+            * test-62614.svg:
+            * test-62620.svg:
+            * test-rsvg.c: (main): If no output file name is given,
+            don't try to write the image (would segfault before).
 
  ChangeLog      |  7 +++++
  test-62614.svg | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -20944,9 +21275,9 @@ Date:   Mon Oct 22 21:27:43 2001 +0000
 
     Don't ignore tarballs. Switch from gtk_signal_connect to g_signal_connect.
     
-    	* .cvsignore: Don't ignore tarballs.
-    	* test-ft-gtk.c: (check_button), (new_test_window):
-    	Switch from gtk_signal_connect to g_signal_connect.
+            * .cvsignore: Don't ignore tarballs.
+            * test-ft-gtk.c: (check_button), (new_test_window):
+            Switch from gtk_signal_connect to g_signal_connect.
 
  .cvsignore    |  1 -
  ChangeLog     |  6 ++++++
@@ -20961,8 +21292,8 @@ Date:   Fri Oct 19 22:09:32 2001 +0000
     
     2001-10-19  Anders Carlsson  <andersca@gnu.org>
     
-    	* acinclude.m4: Change comment so that we won't fool
-    	automake into thinking it's a macro.
+            * acinclude.m4: Change comment so that we won't fool
+            automake into thinking it's a macro.
 
  ChangeLog    | 5 +++++
  acinclude.m4 | 2 +-
@@ -20974,13 +21305,13 @@ Date:   Sat Sep 29 20:13:04 2001 +0000
 
     Fix font metrics to take affine matrix into account.
     
-    	* rsvg-ft.c: (rsvg_ft_measure_or_render_string): Fix font metrics
-    	to take affine matrix into account.
+            * rsvg-ft.c: (rsvg_ft_measure_or_render_string): Fix font metrics
+            to take affine matrix into account.
     
-    	* rsvg.c: (rsvg_text_handler_characters): Point to correct
-    	directory for eel 2.
+            * rsvg.c: (rsvg_text_handler_characters): Point to correct
+            directory for eel 2.
     
-    	* test-61223.svg: Test file for another bug.
+            * test-61223.svg: Test file for another bug.
 
  ChangeLog      | 10 ++++++++++
  rsvg-ft.c      | 15 ++++++++-------
@@ -20994,7 +21325,7 @@ Date:   Wed Sep 26 05:53:46 2001 +0000
 
     Another test file, from another bug.
     
-    	* test-60544.svg: Another test file, from another bug.
+            * test-60544.svg: Another test file, from another bug.
 
  ChangeLog      |  4 ++++
  test-60544.svg | 19 +++++++++++++++++++
@@ -21006,8 +21337,8 @@ Date:   Wed Sep 26 05:34:26 2001 +0000
 
     Check in test file for bug. I should really do this more often.
     
-    	* test-61082.svg: Check in test file for bug. I should really
-    	do this more often.
+            * test-61082.svg: Check in test file for bug. I should really
+            do this more often.
 
  ChangeLog      | 5 +++++
  test-61082.svg | 7 +++++++
@@ -21019,12 +21350,12 @@ Date:   Tue Sep 25 06:28:18 2001 +0000
 
     Take const char *, not char *.
     
-    	* rsvg.h:
-    	* rsvg.c: (rsvg_pixbuf_from_file), (rsvg_pixbuf_from_file_at_zoom),
-    	(rsvg_pixbuf_from_file_at_size): Take const char *, not char *.
+            * rsvg.h:
+            * rsvg.c: (rsvg_pixbuf_from_file), (rsvg_pixbuf_from_file_at_zoom),
+            (rsvg_pixbuf_from_file_at_size): Take const char *, not char *.
     
-    	* test-rsvg.c: (main): Remove unneeded casts. Restore the error
-    	message for the case when the parser doesn't parse anything.
+            * test-rsvg.c: (main): Remove unneeded casts. Restore the error
+            message for the case when the parser doesn't parse anything.
 
  ChangeLog   |  9 +++++++++
  rsvg.c      | 20 ++++++++++----------
@@ -21038,13 +21369,13 @@ Date:   Tue Sep 25 06:21:38 2001 +0000
 
     Change so it can handle a NULL for the content passed in. Happens at least
     
-    	* rsvg.c: (rsvg_entity_decl): Change so it can handle a NULL
-    	for the content passed in. Happens at least if the .svg file
-    	is empty and presumably in other cases.
-    	(rsvg_handle_free): Handle case where pixbuf is NULL.
-    	* test-rsvg.c: (main): Don't write anything out if a NULL
-    	pixbuf is returned. This can happen if the .svg file is
-    	empty.
+            * rsvg.c: (rsvg_entity_decl): Change so it can handle a NULL
+            for the content passed in. Happens at least if the .svg file
+            is empty and presumably in other cases.
+            (rsvg_handle_free): Handle case where pixbuf is NULL.
+            * test-rsvg.c: (main): Don't write anything out if a NULL
+            pixbuf is returned. This can happen if the .svg file is
+            empty.
 
  ChangeLog   | 10 ++++++++++
  rsvg.c      | 13 ++++++++-----
@@ -21057,7 +21388,7 @@ Date:   Tue Sep 25 05:47:43 2001 +0000
 
     Update to point to libart 2.
     
-    	* librsvg-2.0.pc.in: Update to point to libart 2.
+            * librsvg-2.0.pc.in: Update to point to libart 2.
 
  ChangeLog         | 4 ++++
  librsvg-2.0.pc.in | 6 +++---
@@ -21069,11 +21400,11 @@ Date:   Mon Sep 17 15:35:58 2001 +0000
 
     Roll back fonts_dir to be global like before. We can get rid of fonts_dir
     
-    	* rsvg.h:
-    	* rsvg.c: (rsvg_text_handler_characters), (rsvg_set_fonts_dir):
-    	Roll back fonts_dir to be global like before. We can get rid
-    	of fonts_dir altogether when we port librsvg to use pango
-    	instead of using freetype directly.
+            * rsvg.h:
+            * rsvg.c: (rsvg_text_handler_characters), (rsvg_set_fonts_dir):
+            Roll back fonts_dir to be global like before. We can get rid
+            of fonts_dir altogether when we port librsvg to use pango
+            instead of using freetype directly.
 
  ChangeLog |  8 ++++++++
  rsvg.c    | 30 +++++++-----------------------
@@ -21086,13 +21417,13 @@ Date:   Sat Sep 15 19:43:32 2001 +0000
 
     Fix some NULL dereferences.
     
-    	* rsvg-paint-server.c: (rsvg_paint_server_lin_grad_free),
-    	(rsvg_paint_server_rad_grad_free): Fix some NULL dereferences.
+            * rsvg-paint-server.c: (rsvg_paint_server_lin_grad_free),
+            (rsvg_paint_server_rad_grad_free): Fix some NULL dereferences.
     
-    	* rsvg.c: (rsvg_handle_write), (rsvg_handle_close): Add FIXME
-    	to places that have half-hearted attempt at handling GError.
-    	(rsvg_pixbuf_from_file_at_zoom), (rsvg_pixbuf_from_file_at_size):
-    	Handle case where fopen fails (but not the GError part).
+            * rsvg.c: (rsvg_handle_write), (rsvg_handle_close): Add FIXME
+            to places that have half-hearted attempt at handling GError.
+            (rsvg_pixbuf_from_file_at_zoom), (rsvg_pixbuf_from_file_at_size):
+            Handle case where fopen fails (but not the GError part).
 
  ChangeLog           | 10 ++++++++++
  rsvg-paint-server.c |  6 ++++--
@@ -21107,29 +21438,29 @@ Date:   Mon Sep 10 08:22:16 2001 +0000
     
     
     
-    	* librsvg-features.c:
-    	* rsvg.c: (rsvg_start_svg), (rsvg_parse_style_arg),
-    	(rsvg_parse_style), (rsvg_parse_transform_attr),
-    	(rsvg_parse_style_attrs), (rsvg_push_opacity_group),
-    	(rsvg_pop_opacity_group), (rsvg_start_g), (rsvg_end_g),
-    	(rsvg_render_svp), (rsvg_render_bpath), (rsvg_start_path),
-    	(rsvg_text_handler_characters), (rsvg_start_text),
-    	(rsvg_start_defs), (rsvg_gradient_stop_handler_new),
-    	(rsvg_start_linear_gradient), (rsvg_start_radial_gradient),
-    	(rsvg_start_element), (rsvg_end_element), (rsvg_characters),
-    	(rsvg_get_entity), (rsvg_entity_decl), (rsvg_error_quark),
-    	(rsvg_handle_new), (rsvg_handle_set_fonts_dir),
-    	(rsvg_handle_set_size_callback), (rsvg_handle_write),
-    	(rsvg_handle_close), (rsvg_handle_get_pixbuf), (rsvg_handle_free),
-    	(rsvg_size_callback), (rsvg_pixbuf_from_file),
-    	(rsvg_pixbuf_from_file_at_zoom), (rsvg_pixbuf_from_file_at_size):
-    	* rsvg.h:
-    	* TODO:
-    	* test-rsvg.c: (main): Clean up API substantially.  Support
-    	GError in API.  Remove FILE based API, and support pushing of data
-    	similar to GdkPixbufLoader.  Support loading to a file size, and
-    	to independent x/y zoom factors.  Robustify a little.  Add a
-    	TODO.  Probably break eel a little.
+            * librsvg-features.c:
+            * rsvg.c: (rsvg_start_svg), (rsvg_parse_style_arg),
+            (rsvg_parse_style), (rsvg_parse_transform_attr),
+            (rsvg_parse_style_attrs), (rsvg_push_opacity_group),
+            (rsvg_pop_opacity_group), (rsvg_start_g), (rsvg_end_g),
+            (rsvg_render_svp), (rsvg_render_bpath), (rsvg_start_path),
+            (rsvg_text_handler_characters), (rsvg_start_text),
+            (rsvg_start_defs), (rsvg_gradient_stop_handler_new),
+            (rsvg_start_linear_gradient), (rsvg_start_radial_gradient),
+            (rsvg_start_element), (rsvg_end_element), (rsvg_characters),
+            (rsvg_get_entity), (rsvg_entity_decl), (rsvg_error_quark),
+            (rsvg_handle_new), (rsvg_handle_set_fonts_dir),
+            (rsvg_handle_set_size_callback), (rsvg_handle_write),
+            (rsvg_handle_close), (rsvg_handle_get_pixbuf), (rsvg_handle_free),
+            (rsvg_size_callback), (rsvg_pixbuf_from_file),
+            (rsvg_pixbuf_from_file_at_zoom), (rsvg_pixbuf_from_file_at_size):
+            * rsvg.h:
+            * TODO:
+            * test-rsvg.c: (main): Clean up API substantially.  Support
+            GError in API.  Remove FILE based API, and support pushing of data
+            similar to GdkPixbufLoader.  Support loading to a file size, and
+            to independent x/y zoom factors.  Robustify a little.  Add a
+            TODO.  Probably break eel a little.
 
  ChangeLog          |  26 +++
  TODO               |  12 ++
@@ -21145,10 +21476,10 @@ Date:   Sat Sep 1 05:48:50 2001 +0000
 
     Get rid of all includes of <ctype.h> and use non-locale-specific g_ascii_*
     
-    	* rsvg-paint-server.c: (rsvg_paint_server_parse):
-    	* rsvg.c: (rsvg_parse_transform), (rsvg_text_handler_characters):
-    	Get rid of all includes of <ctype.h> and use non-locale-specific
-    	g_ascii_* calls from glib instead.
+            * rsvg-paint-server.c: (rsvg_paint_server_parse):
+            * rsvg.c: (rsvg_parse_transform), (rsvg_text_handler_characters):
+            Get rid of all includes of <ctype.h> and use non-locale-specific
+            g_ascii_* calls from glib instead.
 
  ChangeLog           |  7 +++++++
  rsvg-paint-server.c |  3 +--
@@ -21161,7 +21492,7 @@ Date:   Fri Aug 24 23:45:41 2001 +0000
 
     Need to export rsvg-ft.h for eel for now.
     
-    	* Makefile.am: Need to export rsvg-ft.h for eel for now.
+            * Makefile.am: Need to export rsvg-ft.h for eel for now.
 
  ChangeLog   | 4 ++++
  Makefile.am | 2 +-
@@ -21173,7 +21504,7 @@ Date:   Fri Aug 24 23:33:14 2001 +0000
 
     gdk_draw_pixmap -> gdk_draw_drawable.
     
-    	* test-ft-gtk.c: (scroll_to): gdk_draw_pixmap -> gdk_draw_drawable.
+            * test-ft-gtk.c: (scroll_to): gdk_draw_pixmap -> gdk_draw_drawable.
 
  ChangeLog     |  4 ++++
  test-ft-gtk.c | 24 ++++++++++++------------
@@ -21185,9 +21516,9 @@ Date:   Wed Aug 22 19:49:24 2001 +0000
 
     Require newer libart. Get rid of bug workaround for old libart.
     
-    	* configure.in: Require newer libart.
-    	* rsvg.c: (rsvg_render_bpath): Get rid of bug workaround for
-    	old libart.
+            * configure.in: Require newer libart.
+            * rsvg.c: (rsvg_render_bpath): Get rid of bug workaround for
+            old libart.
 
  ChangeLog    | 6 ++++++
  configure.in | 2 +-
@@ -21218,31 +21549,31 @@ Date:   Wed Aug 22 19:38:35 2001 +0000
 
     Remove things that are duplicates of stuff already moved into libart. Only
     
-    	* Makefile.am: Remove things that are duplicates of stuff
-    	already moved into libart. Only install public headers.
+            * Makefile.am: Remove things that are duplicates of stuff
+            already moved into libart. Only install public headers.
     
-    	* art_render.c: Removed.
-    	* art_render.h: Removed.
-    	* art_render_gradient.c: Removed.
-    	* art_render_gradient.h: Removed.
-    	* art_render_svp.c: Removed.
-    	* art_render_svp.h: Removed.
-    	* art_rgba.c: Removed.
-    	* art_rgba.h: Removed.
+            * art_render.c: Removed.
+            * art_render.h: Removed.
+            * art_render_gradient.c: Removed.
+            * art_render_gradient.h: Removed.
+            * art_render_svp.c: Removed.
+            * art_render_svp.h: Removed.
+            * art_rgba.c: Removed.
+            * art_rgba.h: Removed.
     
-    	* configure.in: Update for autoconf 2.52. Sadly, the version is
-    	now repeated twice, but I don't see how to avoid this.
+            * configure.in: Update for autoconf 2.52. Sadly, the version is
+            now repeated twice, but I don't see how to avoid this.
     
-    	* librsvg-features.h.in: Use @PACKAGE_VERSION@ instead of
-    	@LIBRSVG_VERSION@.
+            * librsvg-features.h.in: Use @PACKAGE_VERSION@ instead of
+            @LIBRSVG_VERSION@.
     
-    	* art_render_mask.c:
-    	* rsvg-ft.c:
-    	* rsvg-paint-server.c:
-    	* rsvg.c:
-    	* test-ft-gtk.c:
-    	* test-ft.c:
-    	Fix includes.
+            * art_render_mask.c:
+            * rsvg-ft.c:
+            * rsvg-paint-server.c:
+            * rsvg.c:
+            * test-ft-gtk.c:
+            * test-ft.c:
+            Fix includes.
 
  ChangeLog             |   27 ++
  Makefile.am           |   24 +-
@@ -21270,9 +21601,9 @@ Date:   Mon Aug 13 21:57:16 2001 +0000
 
     Use the new gtk_widget_set_size_request instead of the deprecated
     
-    	* test-ft-gtk.c: (new_test_window): Use the new
-    	gtk_widget_set_size_request instead of the deprecated
-    	gtk_widget_set_usize.
+            * test-ft-gtk.c: (new_test_window): Use the new
+            gtk_widget_set_size_request instead of the deprecated
+            gtk_widget_set_usize.
 
  ChangeLog     | 6 ++++++
  test-ft-gtk.c | 2 +-
@@ -21284,9 +21615,9 @@ Date:   Wed Aug 8 18:48:54 2001 +0000
 
     Move code for finding freetype here instead of getting it from the
     
-    	* acinclude.m4: Move code for finding freetype here instead
-    	of getting it from the hack-macros directory.
-    	* autogen.sh: Don't use the hack-macros directory any more.
+            * acinclude.m4: Move code for finding freetype here instead
+            of getting it from the hack-macros directory.
+            * autogen.sh: Don't use the hack-macros directory any more.
 
  ChangeLog    |   6 +++
  acinclude.m4 | 165 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -21299,9 +21630,9 @@ Date:   Mon Aug 6 19:15:27 2001 +0000
 
     Replace uses of GNOME_PKGCONFIG_CHECK_MODULES with a single call to
     
-    	* configure.in: Replace uses of GNOME_PKGCONFIG_CHECK_MODULES
-    	with a single call to PKG_CHECK_MODULES.
-    	* Makefile.am: Use a single set of CFLAGS and LIBS for all.
+            * configure.in: Replace uses of GNOME_PKGCONFIG_CHECK_MODULES
+            with a single call to PKG_CHECK_MODULES.
+            * Makefile.am: Use a single set of CFLAGS and LIBS for all.
 
  ChangeLog    |  6 ++++++
  Makefile.am  | 13 ++-----------
@@ -21314,8 +21645,8 @@ Date:   Thu Jul 26 00:58:45 2001 +0000
 
     Add missing pkg-config file.
     
-    	* librsvg.spec.in:
-    	Add missing pkg-config file.
+            * librsvg.spec.in:
+            Add missing pkg-config file.
 
  ChangeLog       | 5 +++++
  librsvg.spec.in | 1 +
@@ -21327,10 +21658,10 @@ Date:   Thu Jul 26 00:54:39 2001 +0000
 
     Retire this thing which is no longer relevant in the GNOME2 universe.
     
-    	* Makefile.am:
-    	* librsvg.m4:
-    	Retire this thing which is no longer relevant in the GNOME2
-    	universe.
+            * Makefile.am:
+            * librsvg.m4:
+            Retire this thing which is no longer relevant in the GNOME2
+            universe.
 
  ChangeLog   |   7 +++
  Makefile.am |   4 --
@@ -21343,9 +21674,9 @@ Date:   Thu Jul 26 00:45:16 2001 +0000
 
     Im a dumbass. Revert the last stupid change i made to ignore files that
     
-    	* .cvsignore:
-    	Im a dumbass.  Revert the last stupid change i made to ignore
-    	files that arent made no more.
+            * .cvsignore:
+            Im a dumbass.  Revert the last stupid change i made to ignore
+            files that arent made no more.
 
  .cvsignore | 10 ----------
  ChangeLog  |  6 ++++++
@@ -21357,22 +21688,22 @@ Date:   Thu Jul 26 00:40:19 2001 +0000
 
     Add generated files, even though im not 100% sure where they are coming
     
-    	* .cvsignore:
-    	Add generated files, even though im not 100% sure where they are
-    	coming from.
+            * .cvsignore:
+            Add generated files, even though im not 100% sure where they are
+            coming from.
     
-    	* Makefile.am:
-    	Rename library to librsvg-2 so that it can cohabitate with librsvg
-    	from the GNOME1 platform.
-    	Change includedir to librsvg-2/librsvg for the same purpose.
+            * Makefile.am:
+            Rename library to librsvg-2 so that it can cohabitate with librsvg
+            from the GNOME1 platform.
+            Change includedir to librsvg-2/librsvg for the same purpose.
     
-    	* librsvg-2.0.pc.in:
-    	Change includedir to librsvg-2/librsvg.
-    	Change link flags to '-lrsvg-2' instead of '-lrsvg'
+            * librsvg-2.0.pc.in:
+            Change includedir to librsvg-2/librsvg.
+            Change link flags to '-lrsvg-2' instead of '-lrsvg'
     
-    	* librsvg.spec.in:
-    	Update for library and includedir name changes, plus some extra
-    	cleanup.
+            * librsvg.spec.in:
+            Update for library and includedir name changes, plus some extra
+            cleanup.
 
  .cvsignore        | 10 ++++++++++
  ChangeLog         | 19 +++++++++++++++++++
@@ -21387,18 +21718,18 @@ Date:   Wed Jul 25 18:40:55 2001 +0000
 
     Use more warnings when compiling from CVS. Flag to tell configure.in that
     
-    	* configure.in: Use more warnings when compiling from CVS.
-    	* CVSVERSION: Flag to tell configure.in that these are
-    	CVS sources, not a tarball.
+            * configure.in: Use more warnings when compiling from CVS.
+            * CVSVERSION: Flag to tell configure.in that these are
+            CVS sources, not a tarball.
     
-    	* Makefile.am: Set log domain to "librsvg", disable
-    	deprecated stuff from glib, gdk, and gtk.
+            * Makefile.am: Set log domain to "librsvg", disable
+            deprecated stuff from glib, gdk, and gtk.
     
-    	* rsvg-css.c: (rsvg_css_parse_color): Use new
-    	g_string_ascii_down instead of deprecated g_string_down.
-    	* test-ft-gtk.c: (new_test_window): Use gtk_widget_set_usize
-    	instead of deprecated gtk_drawing_area_set_size.
-    	(main): Remove unnecessary call to deprecated gdk_rgb_init.
+            * rsvg-css.c: (rsvg_css_parse_color): Use new
+            g_string_ascii_down instead of deprecated g_string_down.
+            * test-ft-gtk.c: (new_test_window): Use gtk_widget_set_usize
+            instead of deprecated gtk_drawing_area_set_size.
+            (main): Remove unnecessary call to deprecated gdk_rgb_init.
 
  CVSVERSION    |  0
  ChangeLog     | 15 +++++++++++++++
@@ -21414,9 +21745,9 @@ Date:   Tue Jul 24 17:17:46 2001 +0000
 
     Don't ignore files that aren't made any more. Add myself. Removed
     
-    	* .cvsignore: Don't ignore files that aren't made any more.
-    	* MAINTAINERS: Add myself.
-    	* README.CVS: Removed unnecessary file.
+            * .cvsignore: Don't ignore files that aren't made any more.
+            * MAINTAINERS: Add myself.
+            * README.CVS: Removed unnecessary file.
 
  .cvsignore  | 11 -----------
  ChangeLog   |  6 ++++++
@@ -21430,8 +21761,8 @@ Date:   Fri Jul 13 16:08:42 2001 +0000
 
     Remove xml-i18n-tools invocation so we don't end up with a po directory.
     
-    	* configure.in: Remove xml-i18n-tools invocation so we don't
-    	end up with a po directory.
+            * configure.in: Remove xml-i18n-tools invocation so we don't
+            end up with a po directory.
 
  ChangeLog    | 5 +++++
  configure.in | 2 --
@@ -21443,38 +21774,37 @@ Date:   Mon Jul 9 19:12:43 2001 +0000
 
     Port to GNOME2.
     
-    	* .cvsignore:
-    	* Makefile.am:
-    	* README:
-    	* autogen.sh:
-    	* configure.in:
-    	* librsvg-1.0.pc.in:
-    	* librsvg-2.0.pc.in:
-    	* librsvg-config.in:
-    	* librsvg.spec.in:
-    	* librsvgConf.sh.in:
-    	* rsvg.c: (rsvg_entity_decl):
-    	* test-ft-gtk.c: (main):
-    	* test-ft.c: (main):
-    	* test-rsvg.c: (main):
-    	Port to GNOME2.
+            * .cvsignore:
+            * Makefile.am:
+            * README:
+            * autogen.sh:
+            * configure.in:
+            * librsvg-1.0.pc.in:
+            * librsvg-2.0.pc.in:
+            * librsvg-config.in:
+            * librsvg.spec.in:
+            * librsvgConf.sh.in:
+            * rsvg.c: (rsvg_entity_decl):
+            * test-ft-gtk.c: (main):
+            * test-ft.c: (main):
+            * test-rsvg.c: (main):
+            Port to GNOME2.
 
- .cvsignore        |   8 +--
- ChangeLog         |  18 +++++
- Makefile.am       |  25 +------
- README            |  15 ++++-
- autogen.sh        | 111 ++++--------------------------
- configure.in      | 198 ++++++++++++++----------------------------------------
- librsvg-1.0.pc.in |  10 ---
- librsvg-2.0.pc.in |  10 +++
- librsvg-config.in |  58 ----------------
- librsvg.spec.in   |   1 -
- librsvgConf.sh.in |   6 --
- rsvg.c            |   6 +-
- test-ft-gtk.c     |   3 -
- test-ft.c         |   3 +
- test-rsvg.c       |   2 +
- 15 files changed, 119 insertions(+), 355 deletions(-)
+ .cvsignore                             |   8 +-
+ ChangeLog                              |  18 +++
+ Makefile.am                            |  25 +----
+ README                                 |  15 ++-
+ autogen.sh                             | 111 +++---------------
+ configure.in                           | 198 ++++++++-------------------------
+ librsvg-1.0.pc.in => librsvg-2.0.pc.in |   0
+ librsvg-config.in                      |  58 ----------
+ librsvg.spec.in                        |   1 -
+ librsvgConf.sh.in                      |   6 -
+ rsvg.c                                 |   6 +-
+ test-ft-gtk.c                          |   3 -
+ test-ft.c                              |   3 +
+ test-rsvg.c                            |   2 +
+ 14 files changed, 109 insertions(+), 345 deletions(-)
 
 commit c22a76f2792f8c3c1ec9541bddd2e07173a27911
 Author: Darin Adler <darin@src.gnome.org>
@@ -21482,8 +21812,8 @@ Date:   Thu Jul 5 22:03:01 2001 +0000
 
     Bump version to 1.0.1 Tell about new features for 1.0.1
     
-    	* configure.in: Bump version to 1.0.1
-    	* NEWS: Tell about new features for 1.0.1
+            * configure.in: Bump version to 1.0.1
+            * NEWS: Tell about new features for 1.0.1
 
  ChangeLog    | 7 +++++++
  NEWS         | 7 ++++---
@@ -21496,15 +21826,15 @@ Date:   Fri Jun 1 17:08:41 2001 +0000
 
     Add a call to set the fonts dir so it can work without eel, and a future
     
-    	* Makefile.am:
-    	* rsvg.h:
-    	* rsvg.c: (rsvg_text_handler_characters), (rsvg_set_fonts_dir):
-    	Add a call to set the fonts dir so it can work without eel, and
-    	a future version of eel will work even if it's in a different
-    	prefix from librsvg.
+            * Makefile.am:
+            * rsvg.h:
+            * rsvg.c: (rsvg_text_handler_characters), (rsvg_set_fonts_dir):
+            Add a call to set the fonts dir so it can work without eel, and
+            a future version of eel will work even if it's in a different
+            prefix from librsvg.
     
-    	* configure.in: Bump version to 1.0.0.1
-    	* NEWS: Mention the possibility of a 1.0.1 release.
+            * configure.in: Bump version to 1.0.0.1
+            * NEWS: Mention the possibility of a 1.0.1 release.
 
  ChangeLog    | 14 ++++++++++++++
  Makefile.am  |  2 +-
@@ -21520,11 +21850,11 @@ Date:   Mon May 14 20:50:23 2001 +0000
 
     Change awful nasty Nautilus dependency into a slightly-less-awful nasty
     
-    	* Makefile.am:
-    	* rsvg.c: (rsvg_text_handler_characters):
-    	Change awful nasty Nautilus dependency into a slightly-less-awful
-    	nasty Eel dependency. Also fix problem where not finding a font
-    	would lead to a core dump instead of missing text.
+            * Makefile.am:
+            * rsvg.c: (rsvg_text_handler_characters):
+            Change awful nasty Nautilus dependency into a slightly-less-awful
+            nasty Eel dependency. Also fix problem where not finding a font
+            would lead to a core dump instead of missing text.
 
  ChangeLog   |  8 ++++++++
  Makefile.am |  3 +--
@@ -21537,7 +21867,7 @@ Date:   Fri May 4 16:35:39 2001 +0000
 
     upped version to 1.0.0
     
-    	* configure.in: upped version to 1.0.0
+            * configure.in: upped version to 1.0.0
 
  ChangeLog    | 4 ++++
  configure.in | 4 ++--
@@ -21549,8 +21879,8 @@ Date:   Wed May 2 11:37:57 2001 +0000
 
     Add freetype dependency to LIBRSVG_LIBS and LIBRSVG_INCLUDEDIR.
     
-    	* configure.in:
-    	Add freetype dependency to LIBRSVG_LIBS and LIBRSVG_INCLUDEDIR.
+            * configure.in:
+            Add freetype dependency to LIBRSVG_LIBS and LIBRSVG_INCLUDEDIR.
 
  ChangeLog    | 5 +++++
  configure.in | 4 ++--
@@ -21562,8 +21892,8 @@ Date:   Wed May 2 02:21:11 2001 +0000
 
     Ignore generated xml-i18n-tools droppings.
     
-    	* .cvsignore:
-    	Ignore generated xml-i18n-tools droppings.
+            * .cvsignore:
+            Ignore generated xml-i18n-tools droppings.
 
  .cvsignore | 9 +++++++++
  ChangeLog  | 5 +++++
@@ -21575,11 +21905,11 @@ Date:   Wed May 2 02:19:44 2001 +0000
 
     Simplify the freetype2 detection insanity by using autoconf macro
     
-    	* autogen.sh:
-    	* configure.in:
-    	Simplify the freetype2 detection insanity by using autoconf macro
-    	technology.  The new test should work with both FreeType2 RPMS as
-    	well as freetype built from source in any prefix.
+            * autogen.sh:
+            * configure.in:
+            Simplify the freetype2 detection insanity by using autoconf macro
+            technology.  The new test should work with both FreeType2 RPMS as
+            well as freetype built from source in any prefix.
 
  ChangeLog    |   8 ++++
  autogen.sh   |  82 +++++++++++++++++++++++++++---------
@@ -21592,8 +21922,8 @@ Date:   Tue May 1 15:57:24 2001 +0000
 
     Fixed places that referred to Nautilus instead of librsvg.
     
-    	* configure.in:
-    	Fixed places that referred to Nautilus instead of librsvg.
+            * configure.in:
+            Fixed places that referred to Nautilus instead of librsvg.
 
  ChangeLog    | 5 +++++
  configure.in | 8 ++++----
@@ -21605,8 +21935,8 @@ Date:   Tue May 1 03:13:19 2001 +0000
 
     Fix a typo in the module name.
     
-    	* autogen.sh:
-    	Fix a typo in the module name.
+            * autogen.sh:
+            Fix a typo in the module name.
 
  ChangeLog  | 5 +++++
  autogen.sh | 2 +-
@@ -21618,10 +21948,10 @@ Date:   Thu Apr 12 01:14:47 2001 +0000
 
     Work around bug in art_affine_expansion, which doesn't handle negative
     
-    	* rsvg.c: (rsvg_affine_expansion), (rsvg_render_bpath): Work
-    	around bug in art_affine_expansion, which doesn't handle negative
-    	numbers very well. This fixes a bug where librsvg would hang on
-    	certain svg files.
+            * rsvg.c: (rsvg_affine_expansion), (rsvg_render_bpath): Work
+            around bug in art_affine_expansion, which doesn't handle negative
+            numbers very well. This fixes a bug where librsvg would hang on
+            certain svg files.
 
  .cvsignore | 40 ++++++++++++++++++++--------------------
  ChangeLog  |  9 ++++++++-
@@ -21644,10 +21974,10 @@ Date:   Wed Apr 4 10:11:45 2001 +0000
 
     Include dependency modules to make this header more self contained. In
     
-    	* rsvg.c:
-    	* rsvg.h:
-    	Include dependency modules to make this header more self
-    	contained.  In this case gdk-pixbuf and stdio.
+            * rsvg.c:
+            * rsvg.h:
+            Include dependency modules to make this header more self
+            contained.  In this case gdk-pixbuf and stdio.
 
  ChangeLog | 7 +++++++
  rsvg.c    | 8 ++++----
@@ -21660,9 +21990,9 @@ Date:   Wed Apr 4 00:33:05 2001 +0000
 
     Change order of libraries in LDADD as a workaround to problem where it
     
-    	* Makefile.am: Change order of libraries in LDADD
-    	as a workaround to problem where it finds the wrong
-    	version of libxml.
+            * Makefile.am: Change order of libraries in LDADD
+            as a workaround to problem where it finds the wrong
+            version of libxml.
 
  ChangeLog   | 6 ++++++
  Makefile.am | 2 +-
@@ -21674,8 +22004,8 @@ Date:   Tue Apr 3 08:00:32 2001 +0000
 
     Ignore generated files.
     
-    	* .cvsignore:
-    	Ignore generated files.
+            * .cvsignore:
+            Ignore generated files.
 
  .cvsignore | 1 +
  ChangeLog  | 5 +++++
@@ -21687,15 +22017,15 @@ Date:   Tue Apr 3 07:32:43 2001 +0000
 
     Add to make rpm happy.
     
-    	* COPYING.LIB:
-    	* Makefile.am:
-    	Add to make rpm happy.
+            * COPYING.LIB:
+            * Makefile.am:
+            Add to make rpm happy.
     
-    	* configure.in:
-    	Bump gtk down to 1.2.9.
+            * configure.in:
+            Bump gtk down to 1.2.9.
     
-    	* librsvg.spec.in:
-    	Fix undefiend requires.
+            * librsvg.spec.in:
+            Fix undefiend requires.
 
  COPYING.LIB     | 482 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  ChangeLog       |  12 ++
@@ -21710,11 +22040,11 @@ Date:   Tue Apr 3 02:20:31 2001 +0000
 
     Add -lrsvg to LIBS.
     
-    	* configure.in:
-    	Add -lrsvg to LIBS.
+            * configure.in:
+            Add -lrsvg to LIBS.
     
-    	* librsvg.spec.in:
-    	Fix the library name, "librsvg" not "rsvg."
+            * librsvg.spec.in:
+            Fix the library name, "librsvg" not "rsvg."
 
  ChangeLog       | 8 ++++++++
  configure.in    | 2 +-
@@ -21727,11 +22057,11 @@ Date:   Tue Apr 3 01:29:48 2001 +0000
 
     First try at a spec file.
     
-    	* .cvsignore:
-    	* Makefile.am:
-    	* configure.in:
-    	* librsvg.spec.in:
-    	First try at a spec file.
+            * .cvsignore:
+            * Makefile.am:
+            * configure.in:
+            * librsvg.spec.in:
+            First try at a spec file.
 
  .cvsignore      |   3 +-
  ChangeLog       |   8 +++++

@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>RSVG Libary Reference Manual: Version check and feature tests</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<title>Version check and feature tests: RSVG Libary Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.0">
 <link rel="home" href="index.html" title="RSVG Libary Reference Manual">
 <link rel="up" href="rsvg.html" title="Part I. API Reference">
 <link rel="prev" href="rsvg-Using-RSVG-with-GdkPixbuf.html" title="Using RSVG with GdkPixbuf">
 <link rel="next" href="object-tree.html" title="Object Hierarchy">
-<meta name="generator" content="GTK-Doc V1.21 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -33,10 +33,33 @@
 </tr></table></div>
 <div class="refsect1">
 <a name="rsvg-Version-check-and-feature-tests.functions"></a><h2>Functions</h2>
-<div class="informaltable"><table width="100%" border="0">
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
 <colgroup>
 <col width="150px" class="functions_return">
 <col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name">
+<a class="link" href="rsvg-Version-check-and-feature-tests.html#LIBRSVG-CHECK-VERSION:CAPS" title="LIBRSVG_CHECK_VERSION()">LIBRSVG_CHECK_VERSION</a><span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name">
+<a class="link" href="rsvg-Version-check-and-feature-tests.html#LIBRSVG-CHECK-FEATURE:CAPS" title="LIBRSVG_CHECK_FEATURE()">LIBRSVG_CHECK_FEATURE</a><span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="rsvg-Version-check-and-feature-tests.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
 </colgroup>
 <tbody>
 <tr>
@@ -53,9 +76,7 @@
 </tr>
 <tr>
 <td class="define_keyword">#define</td>
-<td class="function_name">
-<a class="link" href="rsvg-Version-check-and-feature-tests.html#LIBRSVG-CHECK-VERSION:CAPS" title="LIBRSVG_CHECK_VERSION()">LIBRSVG_CHECK_VERSION</a><span class="c_punctuation">()</span>
-</td>
+<td class="function_name"><a class="link" href="rsvg-Version-check-and-feature-tests.html#LIBRSVG-VERSION:CAPS" title="LIBRSVG_VERSION">LIBRSVG_VERSION</a></td>
 </tr>
 <tr>
 <td class="define_keyword">#define</td>
@@ -65,26 +86,7 @@
 <td class="define_keyword">#define</td>
 <td class="function_name"><a class="link" href="rsvg-Version-check-and-feature-tests.html#LIBRSVG-HAVE-CSS:CAPS" title="LIBRSVG_HAVE_CSS">LIBRSVG_HAVE_CSS</a></td>
 </tr>
-<tr>
-<td class="define_keyword">#define</td>
-<td class="function_name">
-<a class="link" href="rsvg-Version-check-and-feature-tests.html#LIBRSVG-CHECK-FEATURE:CAPS" title="LIBRSVG_CHECK_FEATURE()">LIBRSVG_CHECK_FEATURE</a><span class="c_punctuation">()</span>
-</td>
-</tr>
 </tbody>
-</table></div>
-</div>
-<div class="refsect1">
-<a name="rsvg-Version-check-and-feature-tests.other"></a><h2>Types and Values</h2>
-<div class="informaltable"><table width="100%" border="0">
-<colgroup>
-<col width="150px" class="name">
-<col class="description">
-</colgroup>
-<tbody><tr>
-<td class="define_keyword">#define</td>
-<td class="function_name"><a class="link" href="rsvg-Version-check-and-feature-tests.html#LIBRSVG-VERSION:CAPS" title="LIBRSVG_VERSION">LIBRSVG_VERSION</a></td>
-</tr></tbody>
 </table></div>
 </div>
 <div class="refsect1">
@@ -92,6 +94,18 @@
 </div>
 <div class="refsect1">
 <a name="rsvg-Version-check-and-feature-tests.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="LIBRSVG-CHECK-VERSION:CAPS"></a><h3>LIBRSVG_CHECK_VERSION()</h3>
+<pre class="programlisting">#define             LIBRSVG_CHECK_VERSION(major,minor,micro)</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="LIBRSVG-CHECK-FEATURE:CAPS"></a><h3>LIBRSVG_CHECK_FEATURE()</h3>
+<pre class="programlisting">#define             LIBRSVG_CHECK_FEATURE(FEATURE)</pre>
+</div>
+</div>
+<div class="refsect1">
+<a name="rsvg-Version-check-and-feature-tests.other_details"></a><h2>Types and Values</h2>
 <div class="refsect2">
 <a name="LIBRSVG-MAJOR-VERSION:CAPS"></a><h3>LIBRSVG_MAJOR_VERSION</h3>
 <pre class="programlisting">#define             LIBRSVG_MAJOR_VERSION</pre>
@@ -108,8 +122,8 @@
 </div>
 <hr>
 <div class="refsect2">
-<a name="LIBRSVG-CHECK-VERSION:CAPS"></a><h3>LIBRSVG_CHECK_VERSION()</h3>
-<pre class="programlisting">#define             LIBRSVG_CHECK_VERSION(major,minor,micro)</pre>
+<a name="LIBRSVG-VERSION:CAPS"></a><h3>LIBRSVG_VERSION</h3>
+<pre class="programlisting">#define             LIBRSVG_VERSION</pre>
 </div>
 <hr>
 <div class="refsect2">
@@ -121,22 +135,9 @@
 <a name="LIBRSVG-HAVE-CSS:CAPS"></a><h3>LIBRSVG_HAVE_CSS</h3>
 <pre class="programlisting">#define             LIBRSVG_HAVE_CSS</pre>
 </div>
-<hr>
-<div class="refsect2">
-<a name="LIBRSVG-CHECK-FEATURE:CAPS"></a><h3>LIBRSVG_CHECK_FEATURE()</h3>
-<pre class="programlisting">#define             LIBRSVG_CHECK_FEATURE(FEATURE)</pre>
-</div>
-</div>
-<div class="refsect1">
-<a name="rsvg-Version-check-and-feature-tests.other_details"></a><h2>Types and Values</h2>
-<div class="refsect2">
-<a name="LIBRSVG-VERSION:CAPS"></a><h3>LIBRSVG_VERSION</h3>
-<pre class="programlisting">#define             LIBRSVG_VERSION</pre>
-</div>
 </div>
 </div>
 <div class="footer">
-<hr>
-          Generated by GTK-Doc V1.21</div>
+<hr>Generated by GTK-Doc V1.25</div>
 </body>
 </html>
