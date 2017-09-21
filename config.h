@@ -92,3 +92,9 @@
 #  undef WORDS_BIGENDIAN
 # endif
 #endif
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1310)
+#  define isnan(a) _isnan(a)
+#else
+#  define isnan(a) (a != a)
+#endif
