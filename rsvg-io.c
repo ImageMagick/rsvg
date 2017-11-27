@@ -130,7 +130,7 @@ _rsvg_io_get_file_path (const gchar * filename,
 {
     gchar *absolute_filename;
 
-    if (g_file_test (filename, G_FILE_TEST_EXISTS) || g_path_is_absolute (filename)) {
+    if (g_path_is_absolute (filename)) {
         absolute_filename = g_strdup (filename);
     } else {
         gchar *tmpcdir;
