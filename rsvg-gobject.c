@@ -68,6 +68,7 @@ rsvg_handle_init (RsvgHandle * self)
     self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, RSVG_TYPE_HANDLE, RsvgHandlePrivate);
 
     self->priv->flags = RSVG_HANDLE_FLAGS_NONE;
+    self->priv->state = RSVG_HANDLE_STATE_START;
     self->priv->load_policy = RSVG_LOAD_POLICY_DEFAULT;
     self->priv->defs = rsvg_defs_new (self);
     self->priv->handler_nest = 0;
@@ -87,13 +88,13 @@ rsvg_handle_init (RsvgHandle * self)
     self->priv->currentnode = NULL;
     self->priv->treebase = NULL;
 
-    self->priv->finished = 0;
-    self->priv->data_input_stream = NULL;
-    self->priv->first_write = TRUE;
+    self->priv->compressed_input_stream = NULL;
     self->priv->cancellable = NULL;
 
     self->priv->is_disposed = FALSE;
     self->priv->in_loop = FALSE;
+
+    self->priv->is_testing = FALSE;
 }
 
 static void
@@ -105,6 +106,8 @@ rsvg_handle_dispose (GObject *instance)
       goto chain;
 
     self->priv->is_disposed = TRUE;
+
+    self->priv->ctxt = rsvg_free_xml_parser_and_doc (self->priv->ctxt);
 
     g_hash_table_destroy (self->priv->entities);
     rsvg_defs_free (self->priv->defs);
@@ -126,9 +129,9 @@ rsvg_handle_dispose (GObject *instance)
         g_object_unref (self->priv->base_gfile);
         self->priv->base_gfile = NULL;
     }
-    if (self->priv->data_input_stream) {
-        g_object_unref (self->priv->data_input_stream);
-        self->priv->data_input_stream = NULL;
+    if (self->priv->compressed_input_stream) {
+        g_object_unref (self->priv->compressed_input_stream);
+        self->priv->compressed_input_stream = NULL;
     }
 
     g_clear_object (&self->priv->cancellable);

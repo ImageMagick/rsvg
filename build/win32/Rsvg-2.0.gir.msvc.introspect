@@ -13,6 +13,7 @@ Rsvg-2.0.gir: Rsvg_2_0_gir_list
 	--cflags-begin	\
 	-I../.. -DRSVG_COMPILATION	\
 	--cflags-end	\
+	-Lvs$(VSVER)\$(CFG)\$(PLAT)\bin	\
 	--c-include=librsvg/rsvg.h	\
 	--filelist=Rsvg_2_0_gir_list	\
 	-o $@

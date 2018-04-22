@@ -25,6 +25,8 @@
    Caleb Moore <c.moore@student.unsw.edu.au>
 */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <glib.h>
@@ -46,6 +48,18 @@ rsvg_cairo_render_free (RsvgRender * self)
 
     /* TODO */
 
+#ifdef HAVE_PANGOFT2
+    if (me->font_config_for_testing) {
+        FcConfigDestroy (me->font_config_for_testing);
+        me->font_config_for_testing = NULL;
+    }
+
+    if (me->font_map_for_testing) {
+        g_object_unref (me->font_map_for_testing);
+        me->font_map_for_testing = NULL;
+    }
+#endif
+
     g_free (me);
 }
 
@@ -53,6 +67,7 @@ RsvgCairoRender *
 rsvg_cairo_render_new (cairo_t * cr, double width, double height)
 {
     RsvgCairoRender *cairo_render = g_new0 (RsvgCairoRender, 1);
+    cairo_matrix_t matrix;
 
     cairo_render->super.type = RSVG_RENDER_TYPE_CAIRO;
     cairo_render->super.free = rsvg_cairo_render_free;
@@ -73,6 +88,14 @@ rsvg_cairo_render_new (cairo_t * cr, double width, double height)
     cairo_render->cr_stack = NULL;
     cairo_render->bb_stack = NULL;
     cairo_render->surfaces_stack = NULL;
+
+#ifdef HAVE_PANGOFT2
+    cairo_render->font_config_for_testing = NULL;
+    cairo_render->font_map_for_testing = NULL;
+#endif
+
+    cairo_matrix_init_identity (&matrix);
+    rsvg_bbox_init (&cairo_render->bbox, &matrix);
 
     return cairo_render;
 }
@@ -154,6 +177,7 @@ rsvg_cairo_new_drawing_ctx (cairo_t * cr, RsvgHandle * handle)
     draw->pango_context = NULL;
     draw->drawsub_stack = NULL;
     draw->acquired_nodes = NULL;
+    draw->is_testing = handle->priv->is_testing;
 
     rsvg_state_push (draw);
     state = rsvg_current_state (draw);
@@ -198,7 +222,7 @@ rsvg_handle_render_cairo_sub (RsvgHandle * handle, cairo_t * cr, const char *id)
 
     g_return_val_if_fail (handle != NULL, FALSE);
 
-    if (!handle->priv->finished)
+    if (handle->priv->state != RSVG_HANDLE_STATE_CLOSED_OK)
         return FALSE;
 
     if (id && *id)

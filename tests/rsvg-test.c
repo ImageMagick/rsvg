@@ -173,17 +173,29 @@ save_image (cairo_surface_t *surface,
 static gboolean
 is_svg_or_subdir (GFile *file)
 {
-  char *uri;
-  gboolean result;
+    char *basename;
+    gboolean ignore;
+    gboolean result;
 
-  if (g_file_query_file_type (file, 0, NULL) == G_FILE_TYPE_DIRECTORY)
-    return TRUE;
+    result = FALSE;
 
-  uri = g_file_get_uri (file);
-  result = g_str_has_suffix (uri, ".svg");
-  g_free (uri);
+    basename = g_file_get_basename (file);
+    ignore = g_str_has_prefix (basename, "ignore") || strcmp (basename, "resources") == 0;
 
-  return result;
+    if (ignore)
+	goto out;
+
+    if (g_file_query_file_type (file, 0, NULL) == G_FILE_TYPE_DIRECTORY) {
+	result = TRUE;
+	goto out;
+    }
+
+    result = g_str_has_suffix (basename, ".svg");
+
+out:
+    g_free (basename);
+
+    return result;
 }
 
 static cairo_status_t
@@ -213,6 +225,8 @@ read_png (const char *test_name)
 
   reference_uri = g_strconcat (test_name, "-ref.png", NULL);
   file = g_file_new_for_uri (reference_uri);
+  g_free (reference_uri);
+
   stream = g_file_read (file, NULL, &error);
   g_assert_no_error (error);
   g_assert (stream);
@@ -246,6 +260,8 @@ rsvg_cairo_check (gconstpointer data)
     rsvg = rsvg_handle_new_from_gfile_sync (test_file, 0, NULL, &error);
     g_assert_no_error (error);
     g_assert (rsvg != NULL);
+
+    rsvg_handle_internal_set_testing (rsvg, TRUE);
 
     rsvg_handle_get_dimensions (rsvg, &dimensions);
     g_assert (dimensions.width > 0);
@@ -290,6 +306,7 @@ rsvg_cairo_check (gconstpointer data)
     cairo_destroy (cr);
 
     g_object_unref (rsvg);
+    g_free (test_file_base);
 }
 
 int

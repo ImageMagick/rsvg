@@ -27,6 +27,8 @@
             Carl Worth <cworth@cworth.org>
 */
 
+#include "config.h"
+
 #include "rsvg-cairo-draw.h"
 #include "rsvg-cairo-render.h"
 #include "rsvg-cairo-clip.h"
@@ -40,8 +42,6 @@
 #include <string.h>
 
 #include <pango/pangocairo.h>
-
-static const cairo_user_data_key_t surface_pixel_data_key;
 
 static void
 _pattern_add_rsvg_color_stops (cairo_pattern_t * pattern,
@@ -189,6 +189,7 @@ _set_source_rsvg_pattern (RsvgDrawingCtx * ctx,
     cairo_matrix_t affine, caffine, taffine;
     double bbwscale, bbhscale, scwscale, schscale;
     double patternw, patternh, patternx, patterny;
+    double scaled_width, scaled_height;
     int pw, ph;
 
     rsvg_pattern = &local_pattern;
@@ -206,9 +207,7 @@ _set_source_rsvg_pattern (RsvgDrawingCtx * ctx,
     if (rsvg_pattern->obj_bbox)
         _rsvg_pop_view_box (ctx);
 
-
     /* Work out the size of the rectangle so it takes into account the object bounding box */
-
 
     if (rsvg_pattern->obj_bbox) {
         bbwscale = bbox.rect.width;
@@ -226,8 +225,14 @@ _set_source_rsvg_pattern (RsvgDrawingCtx * ctx,
     pw = patternw * bbwscale * scwscale;
     ph = patternh * bbhscale * schscale;
 
-    scwscale = (double) pw / (double) (patternw * bbwscale);
-    schscale = (double) ph / (double) (patternh * bbhscale);
+    scaled_width = patternw * bbwscale;
+    scaled_height = patternh * bbhscale;
+
+    if (fabs (scaled_width) < DBL_EPSILON || fabs (scaled_height) < DBL_EPSILON)
+        return;
+
+    scwscale = pw / scaled_width;
+    schscale = ph / scaled_height;
 
     surface = cairo_surface_create_similar (cairo_get_target (cr_render),
                                             CAIRO_CONTENT_COLOR_ALPHA, pw, ph);
@@ -366,6 +371,60 @@ _set_rsvg_affine (RsvgCairoRender * render, cairo_matrix_t *affine)
     cairo_set_matrix (cr, &matrix);
 }
 
+#ifdef HAVE_PANGOFT2
+static cairo_font_options_t *
+get_font_options_for_testing (void)
+{
+    cairo_font_options_t *options;
+
+    options = cairo_font_options_create ();
+    cairo_font_options_set_antialias (options, CAIRO_ANTIALIAS_GRAY);
+    cairo_font_options_set_hint_style (options, CAIRO_HINT_STYLE_FULL);
+    cairo_font_options_set_hint_metrics (options, CAIRO_HINT_METRICS_ON);
+
+    return options;
+}
+
+static void
+set_font_options_for_testing (PangoContext *context)
+{
+    cairo_font_options_t *font_options;
+
+    font_options = get_font_options_for_testing ();
+    pango_cairo_context_set_font_options (context, font_options);
+    cairo_font_options_destroy (font_options);
+}
+
+static void
+create_font_config_for_testing (RsvgCairoRender *render)
+{
+    const char *font_path = SRCDIR "/tests/resources/LiberationSans-Regular.ttf";
+
+    if (render->font_config_for_testing != NULL)
+        return;
+
+    render->font_config_for_testing = FcConfigCreate ();
+
+    if (!FcConfigAppFontAddFile (render->font_config_for_testing, (const FcChar8 *) font_path)) {
+        g_error ("Could not load font file \"%s\" for tests; aborting", font_path);
+    }
+}
+
+static PangoFontMap *
+get_font_map_for_testing (RsvgCairoRender *render)
+{
+    create_font_config_for_testing (render);
+
+    if (!render->font_map_for_testing) {
+        render->font_map_for_testing = pango_cairo_font_map_new_for_font_type (CAIRO_FONT_TYPE_FT);
+        pango_fc_font_map_set_config (PANGO_FC_FONT_MAP (render->font_map_for_testing),
+                                      render->font_config_for_testing);
+    }
+
+    return render->font_map_for_testing;
+}
+#endif
+
 PangoContext *
 rsvg_cairo_create_pango_context (RsvgDrawingCtx * ctx)
 {
@@ -373,10 +432,27 @@ rsvg_cairo_create_pango_context (RsvgDrawingCtx * ctx)
     PangoContext *context;
     RsvgCairoRender *render = RSVG_CAIRO_RENDER (ctx->render);
 
-    fontmap = pango_cairo_font_map_get_default ();
+#ifdef HAVE_PANGOFT2
+    if (ctx->is_testing) {
+        fontmap = get_font_map_for_testing (render);
+    } else {
+#endif
+        fontmap = pango_cairo_font_map_get_default ();
+#ifdef HAVE_PANGOFT2
+    }
+#endif
+
     context = pango_font_map_create_context (fontmap);
     pango_cairo_update_context (render->cr, context);
+
     pango_cairo_context_set_resolution (context, ctx->dpi_y);
+
+#ifdef HAVE_PANGOFT2
+    if (ctx->is_testing) {
+        set_font_options_for_testing (context);
+    }
+#endif
+
     return context;
 }
 
@@ -390,11 +466,15 @@ rsvg_cairo_render_pango_layout (RsvgDrawingCtx * ctx, PangoLayout * layout, doub
     PangoGravity gravity = pango_context_get_gravity (pango_layout_get_context (layout));
     double rotation;
 
+    pango_layout_get_extents(layout, &ink, NULL);
+
+    if (ink.width == 0 || ink.height == 0) {
+        return;
+    }
+
     cairo_set_antialias (render->cr, state->text_rendering_type);
 
     _set_rsvg_affine (render, &state->affine);
-
-    pango_layout_get_extents (layout, &ink, NULL);
 
     rsvg_bbox_init (&bbox, &state->affine);
     if (PANGO_GRAVITY_IS_VERTICAL (gravity)) {
@@ -422,6 +502,8 @@ rsvg_cairo_render_pango_layout (RsvgDrawingCtx * ctx, PangoLayout * layout, doub
                                        bbox, rsvg_current_state (ctx)->current_color);
         if (rotation != 0.)
             cairo_rotate (render->cr, -rotation);
+
+        pango_cairo_update_layout (render->cr, layout);
         pango_cairo_show_layout (render->cr, layout);
         cairo_restore (render->cr);
     }
@@ -439,6 +521,8 @@ rsvg_cairo_render_pango_layout (RsvgDrawingCtx * ctx, PangoLayout * layout, doub
 
         if (rotation != 0.)
             cairo_rotate (render->cr, -rotation);
+
+        pango_cairo_update_layout (render->cr, layout);
         pango_cairo_layout_path (render->cr, layout);
 
         cairo_set_line_width (render->cr, _rsvg_css_normalize_length (&state->stroke_width, ctx, 'h'));
@@ -485,6 +569,19 @@ rsvg_cairo_render_path (RsvgDrawingCtx * ctx, const cairo_path_t *path)
     /* dropping the precision of cairo's bezier subdivision, yielding 2x
        _rendering_ time speedups, are these rather expensive operations
        really needed here? */
+
+    /* FIXME: See https://www.w3.org/TR/SVG/coords.html#ObjectBoundingBox for
+     * discussion on how to compute bounding boxes to be used for viewports and
+     * clipping.  It looks like we should be using cairo_path_extents() for
+     * that, not cairo_fill_extents().
+     *
+     * We may need to maintain *two* sets of bounding boxes - one for
+     * viewports/clipping, and one for user applications like a
+     * rsvg_compute_ink_rect() function in the future.
+     *
+     * See https://bugzilla.gnome.org/show_bug.cgi?id=760112 for discussion of a
+     * public API to get the ink rectangle.
+     */
 
     /* Bounding box for fill
      *
@@ -693,9 +790,28 @@ rsvg_cairo_generate_mask (cairo_t * cr, RsvgMask * self, RsvgDrawingCtx * ctx, R
         guint8 *row_data = (pixels + (row * rowstride));
         for (i = 0; i < width; i++) {
             guint32 *pixel = (guint32 *) row_data + i;
-            *pixel = ((((*pixel & 0x00ff0000) >> 16) * 13817 +
-                       ((*pixel & 0x0000ff00) >> 8) * 46518 +
-                       ((*pixel & 0x000000ff)) * 4688) * state->opacity);
+            /*
+             *  Assuming, the pixel is linear RGB (not sRGB)
+             *  y = luminance
+             *  Y = 0.2126 R + 0.7152 G + 0.0722 B
+             *  1.0 opacity = 255
+             *
+             *  When Y = 1.0, pixel for mask should be 0xFFFFFFFF
+             *  	(you get 1.0 luminance from 255 from R, G and B)
+             *
+             *	r_mult = 0xFFFFFFFF / (255.0 * 255.0) * .2126 = 14042.45  ~= 14042
+             *	g_mult = 0xFFFFFFFF / (255.0 * 255.0) * .7152 = 47239.69  ~= 47240
+             *	b_mult = 0xFFFFFFFF / (255.0 * 255.0) * .0722 =  4768.88  ~= 4769
+             *
+             * 	This allows for the following expected behaviour:
+             *  (we only care about the most sig byte)
+             *	if pixel = 0x00FFFFFF, pixel' = 0xFF......
+             *	if pixel = 0x00020202, pixel' = 0x02......
+             *	if pixel = 0x00000000, pixel' = 0x00......
+             */
+            *pixel = ((((*pixel & 0x00ff0000) >> 16) * 14042 +
+                       ((*pixel & 0x0000ff00) >>  8) * 47240 +
+                       ((*pixel & 0x000000ff)      ) * 4769    ) * state->opacity);
         }
     }
 

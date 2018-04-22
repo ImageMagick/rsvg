@@ -27,6 +27,8 @@
             Carl Worth <cworth@cworth.org>
 */
 
+#include "config.h"
+
 #include "rsvg-cairo-draw.h"
 #include "rsvg-cairo-clip.h"
 #include "rsvg-cairo-render.h"
@@ -35,6 +37,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <pango/pangocairo.h>
 
 typedef struct RsvgCairoClipRender RsvgCairoClipRender;
 
@@ -58,6 +61,31 @@ rsvg_cairo_clip_apply_affine (RsvgCairoClipRender *render, cairo_matrix_t *affin
                        affine->x0 + (nest ? 0 : render->parent->offset_x),
                        affine->y0 + (nest ? 0 : render->parent->offset_y));
     cairo_set_matrix (cairo_render->cr, &matrix);
+}
+
+static void
+rsvg_cairo_clip_render_pango_layout (RsvgDrawingCtx * ctx, PangoLayout * layout, double x, double y)
+{
+    RsvgCairoClipRender *render = RSVG_CAIRO_CLIP_RENDER (ctx->render);
+    RsvgCairoRender *cairo_render = &render->super;
+    cairo_matrix_t affine;
+    PangoGravity gravity = pango_context_get_gravity (pango_layout_get_context (layout));
+    double rotation;
+
+    affine = ctx->state->affine;
+    rsvg_cairo_clip_apply_affine (render, &affine);
+
+    rotation = pango_gravity_to_rotation (gravity);
+
+    cairo_save (cairo_render->cr);
+    cairo_move_to (cairo_render->cr, x, y);
+    if (rotation != 0.)
+        cairo_rotate (cairo_render->cr, -rotation);
+
+    pango_cairo_update_layout (cairo_render->cr, layout);
+    pango_cairo_layout_path (cairo_render->cr, layout);
+
+    cairo_restore (cairo_render->cr);
 }
 
 static void
@@ -112,7 +140,7 @@ rsvg_cairo_clip_add_clipping_rect (RsvgDrawingCtx * ctx, double x, double y, dou
 }
 
 static RsvgRender *
-rsvg_cairo_clip_render_new (cairo_t * cr, RsvgCairoRender *parent)
+rsvg_cairo_clip_render_new (cairo_t *cr, RsvgCairoRender *parent)
 {
     RsvgCairoClipRender *clip_render = g_new0 (RsvgCairoClipRender, 1);
     RsvgCairoRender *cairo_render = &clip_render->super;
@@ -123,15 +151,24 @@ rsvg_cairo_clip_render_new (cairo_t * cr, RsvgCairoRender *parent)
     render->type = RSVG_RENDER_TYPE_CAIRO_CLIP;
     render->free = rsvg_cairo_clip_render_free;
     render->create_pango_context = rsvg_cairo_create_pango_context;
-    render->render_pango_layout = rsvg_cairo_render_pango_layout;
-    render->render_surface = rsvg_cairo_clip_render_surface;
+    render->render_pango_layout = rsvg_cairo_clip_render_pango_layout;
     render->render_path = rsvg_cairo_clip_render_path;
+    render->render_surface = rsvg_cairo_clip_render_surface;
     render->pop_discrete_layer = rsvg_cairo_clip_pop_discrete_layer;
     render->push_discrete_layer = rsvg_cairo_clip_push_discrete_layer;
     render->add_clipping_rect = rsvg_cairo_clip_add_clipping_rect;
     render->get_surface_of_node = NULL;
+
     cairo_render->initial_cr = parent->cr;
-    cairo_render->cr = cr;
+    cairo_render->cr         = cr;
+    cairo_render->width      = parent->width;
+    cairo_render->height     = parent->height;
+    cairo_render->offset_x   = parent->offset_x;
+    cairo_render->offset_y   = parent->offset_y;
+    cairo_render->cr_stack   = NULL;
+    cairo_render->bbox       = parent->bbox;
+    cairo_render->bb_stack   = NULL;
+
     clip_render->parent = parent;
 
     return render;
@@ -140,10 +177,14 @@ rsvg_cairo_clip_render_new (cairo_t * cr, RsvgCairoRender *parent)
 void
 rsvg_cairo_clip (RsvgDrawingCtx * ctx, RsvgClipPath * clip, RsvgBbox * bbox)
 {
+    RsvgCairoClipRender *clip_render;
     RsvgCairoRender *save = RSVG_CAIRO_RENDER (ctx->render);
+    cairo_t *cr;
     cairo_matrix_t affinesave;
 
-    ctx->render = rsvg_cairo_clip_render_new (save->cr, save);
+    cr = save->cr;
+    clip_render = RSVG_CAIRO_CLIP_RENDER (rsvg_cairo_clip_render_new (cr, save));
+    ctx->render = &clip_render->super.super;
 
     /* Horribly dirty hack to have the bbox premultiplied to everything */
     if (clip->units == objectBoundingBox) {
@@ -166,7 +207,11 @@ rsvg_cairo_clip (RsvgDrawingCtx * ctx, RsvgClipPath * clip, RsvgBbox * bbox)
     if (clip->units == objectBoundingBox)
         clip->super.state->affine = affinesave;
 
+    g_assert (clip_render->super.cr_stack == NULL);
+    g_assert (clip_render->super.bb_stack == NULL);
+    g_assert (clip_render->super.surfaces_stack == NULL);
+
     g_free (ctx->render);
-    cairo_clip (save->cr);
+    cairo_clip (cr);
     ctx->render = &save->super;
 }

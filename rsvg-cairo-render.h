@@ -31,6 +31,10 @@
 #include "rsvg-private.h"
 #include <cairo.h>
 
+#ifdef HAVE_PANGOFT2
+#include <pango/pangofc-fontmap.h>
+#endif
+
 G_BEGIN_DECLS typedef struct _RsvgCairoRender RsvgCairoRender;
 
 struct _RsvgCairoRender {
@@ -48,14 +52,18 @@ struct _RsvgCairoRender {
     RsvgBbox bbox;
     GList *bb_stack;
     GList *surfaces_stack;
+
+#ifdef HAVE_PANGOFT2
+    FcConfig *font_config_for_testing;
+    PangoFontMap *font_map_for_testing;
+#endif
 };
 
 #define RSVG_CAIRO_RENDER(render) (_RSVG_RENDER_CIC ((render), RSVG_RENDER_TYPE_CAIRO, RsvgCairoRender))
 
 G_GNUC_INTERNAL
 RsvgCairoRender *rsvg_cairo_render_new		(cairo_t * cr, double width, double height);
-G_GNUC_INTERNAL
-void		rsvg_cairo_render_rsvg_handle	(cairo_t * cr, RsvgHandle * handle);
+
 G_GNUC_INTERNAL
 RsvgDrawingCtx *rsvg_cairo_new_drawing_ctx	(cairo_t * cr, RsvgHandle * handle);
 

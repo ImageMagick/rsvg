@@ -1,3 +1,1283 @@
+commit 2cbb0f7bf56666187993bd7ba688bf82d0c9a5c7
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Dec 15 16:59:32 2017 -0600
+
+    Update NEWS for 2.40.20
+
+ NEWS | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+commit c606a40f4020b442ccc2764f7a26b7e3f835697a
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Dec 15 16:44:21 2017 -0600
+
+    Remove TODO; it's obsolete
+
+ Makefile.am |  1 -
+ TODO        | 40 ----------------------------------------
+ 2 files changed, 41 deletions(-)
+
+commit e4391cb5a06adfe9967109379f635815a49e6d9f
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Dec 15 16:42:19 2017 -0600
+
+    Update READMEs and misc. files for 2.40.20
+
+ AUTHORS         | 105 +++++++++++++++++++++++++++++++++++
+ README          |   2 +-
+ librsvg.doap    |   3 +-
+ tests/README.md | 167 +++++++++++++++++++++++++++++++++++---------------------
+ 4 files changed, 213 insertions(+), 64 deletions(-)
+
+commit 366b0d8185464c86e069e100c55fd8bd7718f7e1
+Author: Emmanuele Bassi <ebassi@gnome.org>
+Date:   Fri Dec 15 11:45:38 2017 +0000
+
+    Fix generating Vala bindings in non-srcdir builds
+    
+    The location of the files vapigen uses must be relative to the source
+    and build directories, otherwise they will not be found.
+    
+    This fixes the librsvg build in Continuous, which is failing with the
+    error:
+    
+    /usr/bin/vapigen-0.40  --library librsvg-2.0 --metadatadir .. --pkg gio-2.0 --pkg cairo Rsvg-2.0.gir Rsvg-2.0-custom.vala
+    error: Rsvg-2.0-custom.vala not found
+    Generation failed: 1 error(s), 0 warning(s)
+    
+    Signed-off-by: Emmanuele Bassi <ebassi@gnome.org>
+
+ Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 131fce24bcac9b7a289b78373d37ba7f8d31f51e
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Dec 12 12:03:47 2017 -0600
+
+    Update the README in preparation for deprecating the 2.40 series
+
+ README | 68 +++++++++++++++++++++++++++++++++---------------------------------
+ 1 file changed, 34 insertions(+), 34 deletions(-)
+
+commit 87e387e684859f42d86c0b4a08d26652f599c7e5
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Sat Dec 9 12:13:12 2017 +0800
+
+    Visual Studio builds: Integrate introspection in projects
+    
+    This integrates the introspection build process into the project files,
+    so that one is able to build the introspection files directly via the
+    Visual Studio projects.
+    
+    Note that this is not built by default (and so not cleaned by default),
+    so one must explicitly select and build the rsvg-introspection project,
+    which will build the rest of the projects before building the
+    introspection files.
+    
+    For this to work, a complete install of GObject-Introspection is
+    required, with the introspection files for GDK-Pixbuf must be found in
+    apprpriate locations under $(GlibEtcInstallRoot).
+
+ build/win32/vs10/Makefile.am                  |   1 +
+ build/win32/vs10/librsvg.sln                  |   6 ++
+ build/win32/vs10/rsvg-build-defines.props     |  10 +++
+ build/win32/vs10/rsvg-introspect.vcxproj      | 103 ++++++++++++++++++++++++++
+ build/win32/vs10/rsvg-version-paths.props.in  |   8 ++
+ build/win32/vs11/Makefile.am                  |   1 +
+ build/win32/vs12/Makefile.am                  |   1 +
+ build/win32/vs14/Makefile.am                  |   1 +
+ build/win32/vs15/Makefile.am                  |   1 +
+ build/win32/vs9/Makefile.am                   |   1 +
+ build/win32/vs9/librsvg.sln                   |   9 +++
+ build/win32/vs9/rsvg-build-defines.vsprops    |   8 ++
+ build/win32/vs9/rsvg-introspect.vcproj        |  76 +++++++++++++++++++
+ build/win32/vs9/rsvg-version-paths.vsprops.in |   8 ++
+ 14 files changed, 234 insertions(+)
+
+commit c633afa060f4afcd140991d6d3fccff9147632b8
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Sat Dec 9 11:24:18 2017 +0800
+
+    Visual Studio projects: Rename PythonPath to PythonDir
+    
+    This is to avoid confusion with PythonPath, which is commonly used as a
+    envvar to specify where Python modules are found.
+    
+    Also split out PythonDir for 32-bit and 64-bit builds, as we are going
+    to use these for introspection builds directly from the projects, and
+    set the default Python installations for each Visual Studio version
+    according to what is now set in GObject-Introspection's Visual Studio
+    projects.
+
+ build/win32/vs10/rsvg-install.propsin         |  6 +++++-
+ build/win32/vs10/rsvg-install.vcxproj         | 10 ++++------
+ build/win32/vs10/rsvg-version-paths.props.in  | 14 +++++++++++---
+ build/win32/vs9/rsvg-install.vcproj           |  4 ++--
+ build/win32/vs9/rsvg-install.vspropsin        |  6 +++++-
+ build/win32/vs9/rsvg-version-paths.vsprops.in |  6 +++++-
+ 6 files changed, 32 insertions(+), 14 deletions(-)
+
+commit fcd4d6d9b1617b0bfdadf28988e9a0ffe3db324b
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Sat Dec 9 10:55:59 2017 +0800
+
+    MSVC introspection builds: Ensure we use the freshly-built library
+    
+    Use the -L argument of g-ir-scanner so that we ensure that we indeed
+    link the dumper program to the .lib/.dll that we just built, and so
+    ensure that when the dumper program is being run, it finds the
+    freshly-built DLL first.
+
+ build/Makefile.msvc-introspection | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit b52cf8a5156e365153addfe0ea55ab791e3ec560
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Dec 5 07:01:53 2017 -0600
+
+    Add reftests/bugs/761175-recursive-masks.svg for the previous commit
+
+ .../reftests/bugs/761175-recursive-masks-ref.png   | Bin 0 -> 513 bytes
+ .../reftests/bugs/761175-recursive-masks.svg       |  50 +++++++++++++++++++++
+ 2 files changed, 50 insertions(+)
+
+commit fe5711c8785a4ef3582752e2109e54440102c702
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Sat Nov 11 04:52:09 2017 -0600
+
+    bgo#761175 - Allow masks to (re)use a node being referenced
+    
+    If a <use> element acquires a node for drawing, then it needs to
+    release the node before calling pop_discrete_layer().  Mask generation
+    occurs in that function, and the mask may in turn reuse the referenced
+    node.  If the node is still acquired at that time, the mask will not
+    be able to use it.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=761175
+
+ rsvg-structure.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+commit 90cda486949d92e8ef3185e8e7a581e20f8a5f27
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 4 18:29:46 2017 -0600
+
+    Clean up rsvg-defs a bit
+
+ rsvg-defs.c | 54 ++++++++++++++++++++++++++----------------------------
+ rsvg-io.c   |  2 +-
+ rsvg-io.h   |  4 ----
+ 3 files changed, 27 insertions(+), 33 deletions(-)
+
+commit e9fef9c950e456b0535418f947a2d833a574414f
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 4 18:28:43 2017 -0600
+
+    rsvg-io - Don't resolve relative filenames here; do it in the caller
+
+ rsvg-io.c | 47 ++++++++++++-----------------------------------
+ 1 file changed, 12 insertions(+), 35 deletions(-)
+
+commit b0fb1d78631a1726a3427bb2680f1431ac16d868
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 4 18:27:59 2017 -0600
+
+    rsvg_get_base_uri_from_filename(): Make private
+
+ rsvg-base.c    | 3 +--
+ rsvg-private.h | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+commit 475764fcbb89fa24464c1e3a7097bf162a44198b
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 4 18:26:39 2017 -0600
+
+    rsvg_handle_new_from_file(): Use the GFile machinery to convert a filename to a URI
+
+ rsvg-base-file-util.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+commit 9efada91cd4afb7824d3785314ec21b65f93798d
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 4 18:25:20 2017 -0600
+
+    rsvg_handle_resolve_uri(): Make public
+
+ rsvg-base.c    | 10 +++++-----
+ rsvg-private.h |  4 ++++
+ 2 files changed, 9 insertions(+), 5 deletions(-)
+
+commit c88c7927da34a5f79e628ec1a87b8edbf0ca8d3c
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 4 13:23:17 2017 -0600
+
+    rsvg_decode_data_uri(): Renamed from rsvg_acquire_data_data()
+
+ rsvg-io.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+commit 8ed0b6b3d9cabbe3ce00a46fa64e2ad248fec530
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 4 13:22:54 2017 -0600
+
+    Add emacs indentation magic
+
+ rsvg-io.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 88b534ba19d3101fc6241d062b0ae8a22ad9a8a2
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 4 13:21:27 2017 -0600
+
+    rsvg_acquire_data_data(): Remove unused argument
+
+ rsvg-io.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+commit f3ec294c943b4fe54134b6b636506eba0a9434e7
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 4 13:11:37 2017 -0600
+
+    rsvg_allow_load(): Rename from _rsvg_handle_allow_load(); make it public
+
+ rsvg-base.c    | 14 +++++++-------
+ rsvg-private.h |  5 +++++
+ 2 files changed, 12 insertions(+), 7 deletions(-)
+
+commit 34ee247c3cf689702f50d1859a969d3d09d8e305
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 4 13:06:39 2017 -0600
+
+    Make _rsvg_handle_allow_load() take a GFile for the base uri, not a handle
+
+ rsvg-base.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
+
+commit e9823ed7e73c3fb4d365f3eb2fc984bd38744668
+Merge: 10676f9 2419996
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Nov 28 10:06:09 2017 -0600
+
+    Merge remote-tracking branch 'origin/librsvg-2.40' into librsvg-2.40
+
+commit 2419996b926d5bb76093e8b7aa5282bef46d845f
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Fri Oct 20 18:07:10 2017 +0800
+
+    Visual Studio builds: Enhance security of x64 binaries
+    
+    Use the HIGHENTROPYVA linker option on x64 builds with MSVC 2012 and
+    later to enhance the security of the built binaries.
+    
+    Pointed out by Ignacio Casal Quinteiro.
+
+ build/win32/vs10/rsvg-build-defines.props | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+commit 10676f9870c37868f99848acfbf6156e27bff801
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 11:20:52 2017 -0500
+
+    Post-release version bump to 2.40.20
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 1f3101b0509d76583a940f4662d964cb199ea0c8
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Wed Oct 4 23:51:25 2017 +0800
+
+    build: Fix Visual Studio 2017 introspection builds
+    
+    We need to be able to detect Visual Studio 2017 properly in the NMake
+    Makefiles.
+
+ build/win32/detectenv-msvc.mak | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+commit 0359a8825e0db9c91d0335b0394f3ef70771d48f
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 10:30:42 2017 -0500
+
+    Update NEWS
+
+ NEWS | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 511f76c7e421430eec869359aa925f462cea7379
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Apr 18 11:22:18 2017 -0500
+
+    Backport: bgo#634324 - Gaussian blur with negative-scaling transformation matrix is not rendered
+    
+    From commit f7ccfbff857b5ec8d7ace494e20f28d97f1c91f1
+    
+    When we figure out the standard deviations for Gaussian blurs, we were
+    simply multiplying the given values by the scaling factors in the current
+    transformation.  But if this is a negative-scaling matrix, we'd get
+    negative values, and we would not do a blur at all.
+    
+    Take the absolute value of the scaled factors instead.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=634324
+
+ rsvg-filter.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 05fd03117bffbae36b28b5ea7934520b46751476
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Jan 11 15:33:31 2017 -0600
+
+    bgo#777155 - Ignore patterns that have close-to-zero dimensions
+    
+    A fuzzed file yielded a pattern that had (0, 0) for a pattern's width
+    and height.  We try to invert a scaling matrix based on those
+    dimensions; this would fail for such a pattern.  Now we ignore patterns
+    that have unspecified dimensions, or that are very close to zero.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=777155
+
+ rsvg-cairo-draw.c                                  | 13 ++++--
+ .../render-crash/777155-zero-sized-pattern.svg     | 50 ++++++++++++++++++++++
+ 2 files changed, 59 insertions(+), 4 deletions(-)
+
+commit 721fbee0821551696cf5bf9ab9b609c6f8a2ce5a
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Jan 11 15:50:26 2017 -0600
+
+    Backport: tests/render-crash: New test for things that crash the
+    rendering code
+    
+    From commit 3a3becd2045ed6b5e264bdfbd7c53c799e5abe7c
+    
+    Sometimes we don't have rendering bugs in the generated image, but SVG
+    files that just crash the rendering code.  Add a test for this.  If you
+    put a SVG under tests/fixtures/render-crash, that file is expected to
+    render and *not* crash.  The actual rendered image is ignored.
+
+ tests/Makefile.am    |  6 +++++
+ tests/render-crash.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 74 insertions(+)
+
+commit cd174196792bd6c3b849b6beb9e3ff61b727a607
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 10:23:47 2017 -0500
+
+    Distribute test resources as well
+
+ tests/Makefile.am | 53 +++++++++++++++++++++++++++--------------------------
+ 1 file changed, 27 insertions(+), 26 deletions(-)
+
+commit 8bc6db1c7bc862db30b3dc2e4e0321aa3022c2d9
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 09:36:11 2017 -0500
+
+    Update NEWS
+
+ NEWS | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+commit f30913447a9594d8811cfceee21b0d1ea2af84f4
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 10:10:45 2017 -0500
+
+    Enable test again
+
+ ...text-transform-ref.png => 587721-text-transform-ref.png} | Bin
+ ...-587721-text-transform.svg => 587721-text-transform.svg} |   0
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+
+commit 14602403106d13431d874c6342c63d3487a005e1
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Dec 7 13:57:08 2016 -0600
+
+    Backport: rsvg_cairo_render_new(): Initialize ->bbox to the identity affine
+    
+    From commit d37e275bc6f6d3ff1d81680433903574f6a508d1
+    
+    Otherwise, when filters cause rsvg_get_surface_of_node() to be called,
+    that function will create a RsvgCairoRender with an all-zeros bbox and
+    bbox.affine.
+    
+    This all-zeros affine causes cairo_matrix_invert() inside
+    RsvbBbox::clip()/insert() to fail.  In the C version it failed silently,
+    since it ignored failures from cairo_matrix_invert().  The Rust version
+    panic()s when a matrix can't be inverted.
+
+ rsvg-cairo-render.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+commit 5649d08533846ff540f4f654af128f26aea0c642
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 09:39:11 2017 -0500
+
+    Backport: cross-compiling bits for gdk-pixbuf-loader
+    
+    From commit 30a91d1e1f2df9ad4d6b28ed635e69619b1ed8b3
+
+ configure.ac                  |  2 ++
+ gdk-pixbuf-loader/Makefile.am | 23 ++++++++++++++++++++++-
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+
+commit 892a29c2b5010bfd4a952d842fc690425a258690
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 09:33:01 2017 -0500
+
+    Backport: build: Check for PangoFT2/FontConfig availability
+    
+    From commit 46c8688aa1795958fb1308c2bf5ea29295fe6c23
+    
+    On Windows the GTK+ stack does not hard depend on PangoFT2 (thus
+    Fontconfig--GTK+ uses PangoWin32 to do the Font discovery and
+    configuration stuff by default, unless one uses an envvar to force
+    PangoFT2 usage), unlike *NIX platforms, so we need to check for
+    it by doing:
+    
+    -On Windows, enable the test code that uses PangoFT2/FontConfig if
+     PangoFT2 and FontConfig is found during configure.  On Visual Studio
+     builds, this is set to be disabled in config.h.win32(.in), and can be
+     manually enabled by uncommenting #define HAVE_PANGOFT2 1 in
+     config.h.win32 prior to the build (or rebuild).  This continues to have
+     FontConfig and PangoFT2 to act as an optional dependency.
+    
+    -On non-Windows platforms, make PangoFT2 and FontConfig a hard dependency,
+     which is what the current code assumes.
+    
+    We might probably need to make the custom TTF load via PangoWin32 and/or
+    the native Windows API to run the tests when PangoFT2 and FontConfig are
+    not found on Windows.
+    
+    Also bump the Pango dependency to 1.38 as the test code uses API that is
+    introduced in 1.38.x.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=779405
+
+ config.h.win32.in   |  3 +++
+ configure.ac        | 22 ++++++++++++++++++++--
+ rsvg-cairo-clip.c   |  2 ++
+ rsvg-cairo-draw.c   | 23 +++++++++++++++++------
+ rsvg-cairo-render.c | 13 +++++++++++++
+ rsvg-cairo-render.h |  6 ++++++
+ 6 files changed, 61 insertions(+), 8 deletions(-)
+
+commit 823e30ed5ebce64ffd7c5f6e307ef7a822ee896f
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Thu Mar 2 18:50:39 2017 -0600
+
+    Backport: bgo#777834: Don't try to render text whose PangoLayout has zero extents
+    
+    From commit 8bf4354fdc3703c0ea6ecec86ce2f3583933c03a
+    
+    Text elements sometimes have children with empty strings for their
+    contents, so PangoLayout returns an ink_rect with (width, height) = (0, 0).
+    
+    In this case, we would set a bbox's size to (0, 0), then use that in an
+    affine matrix, and try to invert it, and kaboom.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=777834
+
+ rsvg-cairo-draw.c                                        |   8 ++++++--
+ .../reftests/bugs/777834-empty-text-children-ref.png     | Bin 0 -> 9386 bytes
+ .../reftests/bugs/777834-empty-text-children.svg}        |   0
+ 3 files changed, 6 insertions(+), 2 deletions(-)
+
+commit 84f7a64179615a23936022cde148e109ecd56b50
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 12 15:19:42 2016 -0600
+
+    bgo#603550 - Compute the luminance correctly when generating a mask
+    
+    Thanks to Mike Lewis for the patch.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=603550
+
+ rsvg-cairo-draw.c                                  |  25 +++-
+ .../reftests/bugs/603550-mask-luminance-ref.png    | Bin 0 -> 4502 bytes
+ .../reftests/bugs/603550-mask-luminance.svg        | 130 +++++++++++++++++++++
+ 3 files changed, 152 insertions(+), 3 deletions(-)
+
+commit 1555bbf3ff6de01b6ee8cb13d039892551537dbd
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Nov 9 17:42:27 2016 -0600
+
+    Disable the "/dimensions/sub/rect with transform" test for now
+
+ tests/dimensions.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 1b14b5ab375db864d71cf866eb17e107efb0e74d
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Nov 9 17:39:26 2016 -0600
+
+    tests/dimensions.c: Assert that we got the sub-object; print the dimensions
+
+ tests/dimensions.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+commit 3de027bd6a7198a386442f23552b519a60a84f89
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Nov 9 17:29:03 2016 -0600
+
+    Backport: Enable dimensions tests
+    
+    From commit 16d652c4430209a1736052ec333ba1af203e97ec
+    
+    Why were they disabled?  Because they fail...?
+
+ tests/Makefile.am                       |  2 --
+ tests/dimensions.c                      | 10 ++++++----
+ tests/fixtures/dimensions/bug614018.svg | 11 ++++++++---
+ 3 files changed, 14 insertions(+), 9 deletions(-)
+
+commit baa9aa6c8282d57554d0dd3888a96a2a068cd783
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 07:58:10 2017 -0500
+
+    Normalize test files
+
+ tests/fixtures/reftests/bugs/340047-ref.png        | Bin 4891 -> 4779 bytes
+ tests/fixtures/reftests/bugs/548494-ref.png        | Bin 751 -> 695 bytes
+ tests/fixtures/reftests/bugs/563933-ref.png        | Bin 2526 -> 2470 bytes
+ tests/fixtures/reftests/bugs/738367-ref.png        | Bin 8748 -> 8692 bytes
+ tests/fixtures/reftests/bugs/760180-ref.png        | Bin 8884 -> 0 bytes
+ tests/fixtures/reftests/bugs/760180.svg            | 159 ---------------------
+ .../reftests/svg1.1/filters-composite-02-b-ref.png | Bin 16647 -> 16613 bytes
+ .../reftests/svg1.1/paths-data-04-t-ref.png        | Bin 18160 -> 18138 bytes
+ .../reftests/svg1.1/paths-data-05-t-ref.png        | Bin 16048 -> 16037 bytes
+ .../reftests/svg1.1/paths-data-06-t-ref.png        | Bin 7255 -> 7242 bytes
+ .../reftests/svg1.1/paths-data-07-t-ref.png        | Bin 6646 -> 6628 bytes
+ .../reftests/svg1.1/paths-data-08-t-ref.png        | Bin 19314 -> 19317 bytes
+ .../reftests/svg1.1/pservers-grad-08-b-ref.png     | Bin 38874 -> 38874 bytes
+ 13 files changed, 159 deletions(-)
+
+commit 54c4e1a8e1356286eb6f4e23d0f902eb985b059b
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Sep 4 16:53:41 2017 -0500
+
+    test-utils.c: Fix a leak
+
+ tests/test-utils.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 493b27497d1a4801e91ac760df8f5d5e853757e5
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 07:40:41 2017 -0500
+
+    Ignore the "resources" directories in rsvg-test.c
+    
+    From commit 4ec908b71f9f19d0d37c98879188a72308c00433
+
+ tests/rsvg-test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit c92772d25005f15f8e95418138959109baa0f5b3
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Jan 4 15:00:00 2017 -0600
+
+    Use a hard-coded font file to render test images, for predictable font rendering
+    
+    If we depend on whatever Fontconfig finds on the system (or the user's
+    configuration, or any number of variables not under our control), "make
+    distcheck" will certainly fail.
+    
+    Now we ship a specific font file (LiberationSans-Regular.ttf) that is
+    used only for the reftests.  We use that in addition to explicitly
+    setting font rendering options for tests.
+    
+    Also, re-normalize all the reference images to this new font.
+    
+    Thanks to Vlad Vukicevic for the idea to use a hard-coded font file, and
+    to Christian Hergert for the Fontconfig / Pango incantations.
+
+ Makefile.am                                        |   1 +
+ rsvg-cairo-draw.c                                  |  37 ++++++++++++++--
+ rsvg-cairo-render.c                                |   6 +++
+ rsvg-cairo-render.h                                |   3 ++
+ tests/Makefile.am                                  |  47 +++++++++++----------
+ tests/fixtures/reftests/bugs/749415-ref.png        | Bin 21402 -> 21862 bytes
+ .../reftests/svg1.1/filters-color-02-b-ref.png     | Bin 0 -> 6231 bytes
+ .../reftests/svg1.1/filters-composite-02-b-ref.png | Bin 0 -> 16647 bytes
+ .../reftests/svg1.1/painting-marker-01-f-ref.png   | Bin 0 -> 8454 bytes
+ .../reftests/svg1.1/painting-marker-02-f-ref.png   | Bin 0 -> 9172 bytes
+ .../reftests/svg1.1/painting-marker-03-f-ref.png   | Bin 0 -> 29006 bytes
+ .../reftests/svg1.1/painting-marker-04-f-ref.png   | Bin 0 -> 27598 bytes
+ .../reftests/svg1.1/painting-marker-06-f-ref.png   | Bin 0 -> 8640 bytes
+ .../reftests/svg1.1/painting-marker-07-f-ref.png   | Bin 0 -> 5158 bytes
+ .../svg1.1/painting-marker-properties-01-f-ref.png | Bin 0 -> 6175 bytes
+ .../reftests/svg1.1/paths-data-01-t-ref.png        | Bin 0 -> 25436 bytes
+ .../reftests/svg1.1/paths-data-02-t-ref.png        | Bin 0 -> 32917 bytes
+ .../reftests/svg1.1/paths-data-03-f-ref.png        | Bin 0 -> 30956 bytes
+ .../reftests/svg1.1/paths-data-04-t-ref.png        | Bin 0 -> 18160 bytes
+ .../reftests/svg1.1/paths-data-05-t-ref.png        | Bin 0 -> 16048 bytes
+ .../reftests/svg1.1/paths-data-06-t-ref.png        | Bin 0 -> 7255 bytes
+ .../reftests/svg1.1/paths-data-07-t-ref.png        | Bin 0 -> 6646 bytes
+ .../reftests/svg1.1/paths-data-08-t-ref.png        | Bin 0 -> 19314 bytes
+ .../reftests/svg1.1/paths-data-09-t-ref.png        | Bin 0 -> 17595 bytes
+ .../reftests/svg1.1/paths-data-10-t-ref.png        | Bin 0 -> 20995 bytes
+ .../reftests/svg1.1/paths-data-12-t-ref.png        | Bin 0 -> 9704 bytes
+ .../reftests/svg1.1/paths-data-13-t-ref.png        | Bin 0 -> 4526 bytes
+ .../reftests/svg1.1/paths-data-14-t-ref.png        | Bin 0 -> 12525 bytes
+ .../reftests/svg1.1/paths-data-15-t-ref.png        | Bin 0 -> 6001 bytes
+ .../reftests/svg1.1/paths-data-16-t-ref.png        | Bin 0 -> 7879 bytes
+ .../reftests/svg1.1/paths-data-17-f-ref.png        | Bin 0 -> 4464 bytes
+ .../reftests/svg1.1/paths-data-18-f-ref.png        | Bin 0 -> 4781 bytes
+ .../reftests/svg1.1/paths-data-19-f-ref.png        | Bin 0 -> 23515 bytes
+ .../reftests/svg1.1/paths-data-20-f-ref.png        | Bin 0 -> 9144 bytes
+ .../reftests/svg1.1/pservers-grad-01-b-ref.png     | Bin 0 -> 9758 bytes
+ .../reftests/svg1.1/pservers-grad-02-b-ref.png     | Bin 0 -> 22622 bytes
+ .../reftests/svg1.1/pservers-grad-03-b-ref.png     | Bin 0 -> 9805 bytes
+ .../reftests/svg1.1/pservers-grad-04-b-ref.png     | Bin 0 -> 24018 bytes
+ .../reftests/svg1.1/pservers-grad-05-b-ref.png     | Bin 0 -> 65037 bytes
+ .../reftests/svg1.1/pservers-grad-06-b-ref.png     | Bin 0 -> 21260 bytes
+ .../reftests/svg1.1/pservers-grad-07-b-ref.png     | Bin 0 -> 11051 bytes
+ .../reftests/svg1.1/pservers-grad-08-b-ref.png     | Bin 0 -> 38874 bytes
+ .../reftests/svg1.1/pservers-grad-09-b-ref.png     | Bin 0 -> 6207 bytes
+ .../reftests/svg1.1/pservers-grad-10-b-ref.png     | Bin 0 -> 9229 bytes
+ .../reftests/svg1.1/pservers-grad-11-b-ref.png     | Bin 0 -> 56357 bytes
+ .../reftests/svg1.1/pservers-grad-12-b-ref.png     | Bin 0 -> 23747 bytes
+ .../reftests/svg1.1/pservers-grad-13-b-ref.png     | Bin 0 -> 93434 bytes
+ .../reftests/svg1.1/pservers-grad-14-b-ref.png     | Bin 0 -> 24537 bytes
+ .../reftests/svg1.1/pservers-grad-15-b-ref.png     | Bin 0 -> 10180 bytes
+ .../reftests/svg1.1/pservers-grad-16-b-ref.png     | Bin 0 -> 4738 bytes
+ .../reftests/svg1.1/pservers-grad-18-b-ref.png     | Bin 0 -> 4733 bytes
+ .../reftests/svg1.1/pservers-grad-21-b-ref.png     | Bin 0 -> 11549 bytes
+ .../reftests/svg1.1/pservers-grad-22-b-ref.png     | Bin 0 -> 7605 bytes
+ .../reftests/svg1.1/pservers-grad-23-f-ref.png     | Bin 0 -> 6129 bytes
+ .../reftests/svg1.1/pservers-grad-24-f-ref.png     | Bin 0 -> 7313 bytes
+ .../svg1.1/pservers-grad-stops-01-f-ref.png        | Bin 0 -> 6356 bytes
+ tests/resources/LiberationSans-Regular.ttf         | Bin 0 -> 139764 bytes
+ 57 files changed, 69 insertions(+), 25 deletions(-)
+
+commit 4504e3a5fcd5c8f13f536ecbf01ce0962d0a670d
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Jan 4 14:08:26 2017 -0600
+
+    Use a separate function to set PangoContext font options for testing
+
+ rsvg-cairo-draw.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+commit aaee907f2e7b1c102ce06716c178795c309c241c
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Feb 17 10:29:47 2017 -0600
+
+    test-utils.c: Fix a string leak
+
+ tests/test-utils.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit a84d3b425998b972c4edd0be587dc3b6899e756e
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Feb 17 10:24:18 2017 -0600
+
+    rsvg-test.c: Fix a couple of leaked strings
+
+ tests/rsvg-test.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit e659c14a5e1c5360cb7a81129b704935cf79cd1a
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Dec 19 11:49:17 2016 -0600
+
+    Backport: Add a testing mode so reftests can use predictable text rendering
+    
+    From commit 25457b72770018045aa88d47688fbf1a45bff9af
+    
+    This adds an rsvg_handle_internal_set_testing() API, which should only
+    be called by the test suite.  Internally, it sets cairo_font_options_t
+    that should yield reproducible text rendering.
+    
+    For example, I get different rendering results from text objects when I
+    run "make check" as a user, than when I run it as root.
+
+ rsvg-base.c         | 16 ++++++++++++++++
+ rsvg-cairo-draw.c   | 22 ++++++++++++++++++++++
+ rsvg-cairo-render.c |  1 +
+ rsvg-gobject.c      |  2 ++
+ rsvg-private.h      |  3 +++
+ rsvg.h              |  2 ++
+ tests/rsvg-test.c   |  2 ++
+ 7 files changed, 48 insertions(+)
+
+commit 69911f6bf46f61b012052ba585512a83776a5375
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Dec 14 10:20:08 2016 -0600
+
+    rsvg-test: allow skipping directories that start with "ignore" as well as files
+    
+    It turns out that it's more convenient to move the whole set of
+    problematic SVGs into an ignore/ subdirectory for now.
+
+ tests/README.md                                    | 229 +++++++++++++++++++++
+ .../reftests/svg1.1/ignore-pservers-grad-17-b.svg  |  92 ---------
+ tests/rsvg-test.c                                  |  28 ++-
+ 3 files changed, 249 insertions(+), 100 deletions(-)
+
+commit 8a008995777f81f82dd80228638674c3e5b8af8b
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Nov 22 09:00:56 2016 -0600
+
+    rsvg-test: Ignore SVG fixtures that start with "ignore-"
+    
+    Right now pservers-grad-17-b.svg doesn't pass the tests, but I think it
+    may be a Cairo bug.
+    
+    Add the ability to ignore test files if they have a "ignore-" filename
+    prefix.  Hopefully I'll remember to fix this later...
+
+ .../reftests/svg1.1/ignore-pservers-grad-17-b.svg  | 92 ++++++++++++++++++++++
+ tests/rsvg-test.c                                  |  8 +-
+ 2 files changed, 96 insertions(+), 4 deletions(-)
+
+commit ff2284034369a28727359e6b6c54cba2f00fff65
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 07:17:23 2017 -0500
+
+    Ignore a test file that doesn't work in this branch...
+
+ ...ansform-ref.png => ignore-587721-text-transform-ref.png} | Bin
+ ...-text-transform.svg => ignore-587721-text-transform.svg} |   0
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+
+commit 32e294ad461d0af3ed7703fdf0e264b08ca1844a
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Oct 4 07:10:49 2017 -0500
+
+    Update NEWS
+
+ NEWS | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+commit 9b86813172afa26016e199943f5514a1e5375a35
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 20:00:17 2017 -0500
+
+    Add missing test
+
+ tests/Makefile.am | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+commit 7dfc59efbb51832edef496654b0c7530d4cdd9da
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 19:50:28 2017 -0500
+
+    Factor out create_xml_stream_parser()
+
+ rsvg-base.c | 40 ++++++++++++++++++++++++++++------------
+ 1 file changed, 28 insertions(+), 12 deletions(-)
+
+commit 2bde0d3c103f6e4e4867dad9357fa677b519909d
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 19:49:59 2017 -0500
+
+    Rename create_xml_push_parser()
+
+ rsvg-base.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 89598279c808c8abdcc940ff171612c86c31e26c
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 19:43:08 2017 -0500
+
+    bgo#787895 - Use xmlCreateIOParserCtxt() for I/O callbacks instead of a push parser
+    
+    We were using libxml2 incorrectly since 2010 (!).  We have to use
+    xmlCreatePushParserCtxt() with xmlParseChunk(), *OR*
+    xmlCreateIOParserCtxt(io_callbacks) with xmlParseDocument().
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=787895
+
+ rsvg-base.c | 42 +++++++++++++++++++-----------------------
+ rsvg-xml.c  | 45 +++++++++++++++++++++++++++------------------
+ rsvg-xml.h  | 11 ++++++++---
+ 3 files changed, 54 insertions(+), 44 deletions(-)
+
+commit 593b6f103992989561a776d7f57d55cb161c9047
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 19:12:53 2017 -0500
+
+    Un-inline a function (we'll change the callers), and tighten assertions
+
+ rsvg-base.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+commit ef5e26c19f28b26cc71549688d7fc6b11234e541
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 19:02:54 2017 -0500
+
+    Centralize a function to create an libxml2 parser
+
+ rsvg-base.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+commit 8dc0136326e8d9514473ee382c969c915edc94b3
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 18:54:38 2017 -0500
+
+    Remove unnecessary argument
+
+ rsvg-base.c | 4 ++--
+ rsvg-xml.c  | 3 +--
+ rsvg-xml.h  | 1 -
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+commit 4ab0f57e08ce1ab6db89a97d2fb7198f8437c518
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 18:43:29 2017 -0500
+
+    Set replaceEntities where we set the rest of the XML parser's options
+    
+    It's a bit iffy that we do it by directly poking inside the
+    xmlParserCtxPtr...
+
+ rsvg-base.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+commit e7e45d6128451e67b62c116e1cc200117ab0f49e
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 18:33:29 2017 -0500
+
+    Use xmlCtxtUseOptions() instead of setting ctxt->options directly (!)
+    
+    We now require libxml2 version 2.9.0 or later.  That release is from
+    2012, so we should be okay.
+
+ configure.ac |  2 +-
+ rsvg-base.c  | 21 ++++++++++-----------
+ 2 files changed, 11 insertions(+), 12 deletions(-)
+
+commit 0e10fd4463f7aca70f8731bd91e7eb6373cfbb26
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 17:52:58 2017 -0500
+
+    Comment about having to slurp the whole compressed file if using write()/close()
+
+ rsvg-base.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+commit a8b10c704327c01f9e9ed50d7ee9672021ae9e70
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 15:10:27 2017 -0500
+
+    Use a different reading state when reading compressed data
+    
+    This is to avoid having special cases everywhere if
+    priv->compressed_input_stream is present.
+
+ rsvg-base.c    | 19 +++++++++----------
+ rsvg-private.h |  1 +
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+commit 22f73906fcdf2932862e64c1402ddaa4952cc8ff
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 15:06:08 2017 -0500
+
+    Create the compressed_input_stream in a separate function
+
+ rsvg-base.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
+
+commit 88f5f60563868098b2d6980a00386803496ba6d4
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 15:01:52 2017 -0500
+
+    Rename data_input_stream to compressed_input_stream for clarity
+
+ rsvg-base.c    | 17 +++++++++--------
+ rsvg-gobject.c |  8 ++++----
+ rsvg-private.h |  2 +-
+ 3 files changed, 14 insertions(+), 13 deletions(-)
+
+commit 9a314cdcd5a37423546c632cbbfd55f6c54d8f61
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 15:01:18 2017 -0500
+
+    Rename the loading tests to have a "/loading/" prefix
+
+ tests/loading.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 68cd2f2e7f25d2daf551a4bbbc876cb25346ab42
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 14:55:08 2017 -0500
+
+    Test reading compressed SVGs one and two bytes at a time
+    
+    To test reading the 2-byte GZ header one byte at a time, and also in a
+    single shot.
+
+ tests/loading.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
+
+commit 0a4b56f7b681d7766cd8c5dd5fd6dadbd65d4f16
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 14:54:48 2017 -0500
+
+    Run the loading tests first... they are kind of the basic smokee tests
+
+ tests/Makefile.am | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 20bab7fb4a181419617b5bbbf539b1e00f94a344
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 14:45:37 2017 -0500
+
+    Allow loading one byte at a time with rsvg_handle_write()
+    
+    This hadn't worked for a long time for compressed files, since we
+    weren't holding the state of reading the gzip header.  Now we have a
+    test for it.
+
+ rsvg-base.c     | 57 ++++++++++++++++++++++++++++++++++++++++++++-------------
+ rsvg-private.h  |  1 +
+ tests/loading.c |  9 +++++++--
+ 3 files changed, 52 insertions(+), 15 deletions(-)
+
+commit 06f5e91d6b124a12d8ca7913fad46a9dc52ad3b3
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 14:22:58 2017 -0500
+
+    rsvg-base.c: Use constants for the gzip header magic
+
+ rsvg-base.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+commit c09ee4e2dd4c7d0302549ccf70a71344fe796e41
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 14:16:06 2017 -0500
+
+    tests/loading.c: New tests for the loading machinery
+    
+    We start with a test to load an SVG one byte at a time, using
+    rsvg_handle_write().
+
+ tests/Makefile.am | 24 ++++++++++++++-------
+ tests/loading.c   | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 79 insertions(+), 7 deletions(-)
+
+commit 1e316d657b9b2b7d50ba7c0546826ad55847af32
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 14:07:40 2017 -0500
+
+    Add new test files to tests/Makefile.am
+
+ tests/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 7c07bae176062a4d16da18f3f48b83f2bcfd067c
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 13:47:48 2017 -0500
+
+    Add compressed version of the last test file
+
+ tests/fixtures/loading/gnome-cool.svgz | Bin 0 -> 5183 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 8bd36eb0cc3ff4a26816c543000727e10d59202b
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Oct 3 13:45:04 2017 -0500
+
+    Update an out-of-date Sodipodi (!) file to plain SVG to use for testing
+
+ tests/fixtures/loading/gnome-cool.svg | 66 +++++++++++++++++++++++++++++++
+ tests/samples/gnome-sodi2.svg         | 73 -----------------------------------
+ 2 files changed, 66 insertions(+), 73 deletions(-)
+
+commit 63ddae44a21405b6cb2dae9e465574d3c48c47d9
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Sep 1 09:39:30 2017 -0500
+
+    RsvgCairoClipRender: Implement the ::render_pango_layout() method, so we can clip text
+    
+    With this, the test masking-path-04-b.svg passes.
+
+ rsvg-cairo-clip.c                                  |  28 +++++++-
+ .../reftests/svg1.1/masking-path-04-b-ref.png      | Bin 88260 -> 92911 bytes
+ .../fixtures/reftests/svg1.1/masking-path-04-b.svg |  79 +++++++++++++++++++++
+ .../reftests/svg1.1/resources/bluesquidj.png       | Bin 0 -> 37497 bytes
+ 4 files changed, 106 insertions(+), 1 deletion(-)
+
+commit 66c0f991db5ffe3e20f8d30c629d1c71148c746f
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Sep 1 08:45:31 2017 -0500
+
+    bgo#621088: rsvg_cairo_clip_render_new(): Don't leave uninitialized fields in the parent RsvgCairoRender
+    
+    A text object used as a clip path caused librsvg to crash.  The reason
+    is that when we create an RsvgCairoClipRender, we were leaving an
+    all-zeros clip_render->super.bbox field.
+    
+    This caused two things:
+    
+    1. An all-zeros RsvgBbox is invalid; it should be "virgin" or actually
+    have a valid affine.
+    
+    2. We were not preserving the bbox from the parent rendering context,
+    so the clipped objects would not know their viewport size.  Now we
+    copy the original cairo_render->bbox to our derived
+    clip_render->super.bbox, and start afresh with an empty bb_stack
+    inside the clip_render.
+
+ rsvg-cairo-clip.c | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
+
+commit 391b6795d5af04af5c1235ce103a9f3b2abebf93
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Sep 1 08:09:35 2017 -0500
+
+    Remove unused prototype
+
+ rsvg-cairo-render.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+commit ad3daec79eddbe00641e94346c78c7e06f1611fe
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Sep 1 07:54:33 2017 -0500
+
+    Add a bunch of masking/clipping tests from the SVG test suite
+
+ .../reftests/svg1.1/masking-intro-01-f-ref.png     | Bin 0 -> 14528 bytes
+ .../reftests/svg1.1/masking-intro-01-f.svg         |  81 +++++++++++++
+ .../reftests/svg1.1/masking-mask-01-b-ref.png      | Bin 0 -> 17887 bytes
+ .../fixtures/reftests/svg1.1/masking-mask-01-b.svg | 131 ++++++++++++++++++++
+ .../reftests/svg1.1/masking-mask-02-f-ref.png      | Bin 0 -> 4512 bytes
+ .../fixtures/reftests/svg1.1/masking-mask-02-f.svg |  50 ++++++++
+ .../reftests/svg1.1/masking-opacity-01-b-ref.png   | Bin 0 -> 30924 bytes
+ .../reftests/svg1.1/masking-opacity-01-b.svg       | 125 +++++++++++++++++++
+ .../reftests/svg1.1/masking-path-01-b-ref.png      | Bin 0 -> 12226 bytes
+ .../fixtures/reftests/svg1.1/masking-path-01-b.svg |  95 +++++++++++++++
+ .../reftests/svg1.1/masking-path-02-b-ref.png      | Bin 0 -> 13294 bytes
+ .../fixtures/reftests/svg1.1/masking-path-02-b.svg |  84 +++++++++++++
+ .../reftests/svg1.1/masking-path-03-b-ref.png      | Bin 0 -> 23263 bytes
+ .../fixtures/reftests/svg1.1/masking-path-03-b.svg | 134 +++++++++++++++++++++
+ .../reftests/svg1.1/masking-path-04-b-ref.png      | Bin 0 -> 88260 bytes
+ 15 files changed, 700 insertions(+)
+
+commit d8c442fe03e9bec67abd0fd59836ccf051230e16
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Fri Sep 1 07:12:13 2017 -0500
+
+    rsvg-cairo-draw: Comment on how we should be computing bounding boxes for viewports/clipping
+
+ rsvg-cairo-draw.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+commit bf717d5c6a521e53cd455f9a19b6761164715d28
+Author: Massimo <sixtysix@inwind.it>
+Date:   Wed Aug 30 09:55:48 2017 -0500
+
+    bgo#587721: Update the PangoLayout for the new matrix before rendering
+    
+    If the cairo_t's transformation changes between the time the
+    PangoLayout is created and the time it is shown, one needs to
+    pango_cairo_update_layout() first.
+
+ rsvg-cairo-draw.c                                        |   4 ++++
+ .../fixtures/reftests/bugs/587721-text-transform-ref.png | Bin 0 -> 3910 bytes
+ tests/fixtures/reftests/bugs/587721-text-transform.svg   |  13 +++++++++++++
+ 3 files changed, 17 insertions(+)
+
+commit f87ea57e124d5ae0d271117707b3617831b4d084
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Aug 29 15:15:01 2017 -0500
+
+    Oops, sort the list of supported SVG features so <switch> works
+    
+    We use the list of supported features with bsearch(), and the list
+    was not sorted.
+    
+    Added struct-cond-03-t.svg from the SVG test suite to this effect.
+    The reference PNG is different from the official test suite's original
+    one, because we do NOT support the SVG DOM feature.  Still, the test
+    file lets us test for <switch> working based on supported feature names.
+
+ rsvg-cond.c                                        |   7 +-
+ .../reftests/svg1.1/struct-cond-03-t-ref.png       | Bin 0 -> 4433 bytes
+ .../fixtures/reftests/svg1.1/struct-cond-03-t.svg  |  83 +++++++++++++++++++++
+ 3 files changed, 87 insertions(+), 3 deletions(-)
+
+commit 3730200ec5625c7e3e5e28c60a607cebef835ee3
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Aug 29 08:48:08 2017 -0500
+
+    bgo#634514: Don't render unknown elements and their sub-elements
+    
+    We were representing unknown elements as a NodeGroup, so their
+    children would be rendered.
+    
+    Now we represent them as NodeDefs.  This is like a NodeGroup, but it
+    doesn't do any rendering of itself or its children.  The SVG spec says
+    that we should stop rendering the file if we encounter an unknown
+    element, but it seems that real-world renderers are more lenient - so
+    we'll just not render unknown elements and their children.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=634514
+
+ rsvg-base.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+commit 69ed84e783b2aef9095c8495cdceb1a03b81b4e3
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Aug 29 09:19:41 2017 -0500
+
+    bgo#785276: Don't crash on empty or single-byte files
+    
+    Sigh...
+    
+    We also modify tests/crash.c to test for this condition, and add a
+    couple of new tests.
+
+ rsvg-base.c                                | 11 ++++++++++-
+ tests/crash.c                              | 12 ++++++++----
+ tests/fixtures/crash/785276-empty.svg      |  0
+ tests/fixtures/crash/785276-short-file.svg |  1 +
+ 4 files changed, 19 insertions(+), 5 deletions(-)
+
+commit b2cc9ce181be7dbe90cbea3a57db1e841b0fe826
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Thu Aug 17 15:23:16 2017 -0500
+
+    bgo#786372 - In the style element, the type attribute should default to "text/css"
+    
+    Per https://www.w3.org/TR/SVG/styling.html#StyleElementTypeAttribute ,
+    if a <style> element doesn't specify a "type" attribute, then it
+    should be as if type="text/css".  We should really pick up that value
+    from the svg element's contentStyleType, but we don't read that yet.
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=786372
+
+ rsvg-base.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+commit 525cba08c580b9fc436cfa7ebfdf0a7c095b644b
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Aug 8 14:04:46 2017 -0500
+
+    Update NEWS
+
+ NEWS | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+commit b617c1a9407e29a26a4965554a51ef3fd81193e5
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Aug 8 13:19:06 2017 -0500
+
+    rsvg_handle_dispose(): Free the libxml2 parser context
+    
+    If the RsvgHandle was written to but not closed, then we'll still have
+    an XML parser context at dispose time - don't leak it.
+    
+    Fixes the leak in https://bugzilla.gnome.org/show_bug.cgi?id=777833#c2
+
+ rsvg-base.c    | 4 ++--
+ rsvg-gobject.c | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+commit 623308dbe268af00aee5d9adc294cac941cd48c6
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Aug 8 13:08:41 2017 -0500
+
+    RsvgHandle: use a state field instead of finished/is_closed/first_write flags
+    
+    This makes it easier to see, well, which reading state we are in.
+
+ rsvg-base.c         | 39 ++++++++++++++++++++++++++++-----------
+ rsvg-cairo-render.c |  2 +-
+ rsvg-gobject.c      |  3 +--
+ rsvg-private.h      | 14 ++++++++++----
+ rsvg.c              |  2 +-
+ 5 files changed, 41 insertions(+), 19 deletions(-)
+
+commit 15614533ffc947d7c1383babb6f347ca05efd527
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Aug 8 10:32:39 2017 -0500
+
+    rsvg-base.c: Use rsvg_free_xml_parser_and_doc() throughout
+
+ rsvg-base.c | 25 ++++++-------------------
+ 1 file changed, 6 insertions(+), 19 deletions(-)
+
+commit a4e69643dc9c28ff1cec91231658500fbc897841
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Aug 8 10:23:04 2017 -0500
+
+    rsvg_free_xml_parser_and_doc(): New function; we'll use it instead of freeing things by hand
+    
+    libxml2's xmlFreeParserCtxt(c) does not free the underlying c->myDoc;
+    that needs to be freed separately.  We are forgetting to do that in a
+    couple of places, so rsvg_free_xml_parser_and_doc() will take care of
+    that in a single place.
+    
+    http://xmlsoft.org/html/libxml-parser.html#xmlFreeParserCtxt
+
+ rsvg-base.c    | 20 ++++++++++++++++++++
+ rsvg-private.h |  3 +++
+ 2 files changed, 23 insertions(+)
+
+commit 92366d85ae89d0f0e5a61a5383d8ea6cee75391f
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Tue Aug 8 09:49:54 2017 -0500
+
+    rsvg-gobject.c: Use FALSE, not 0
+
+ rsvg-gobject.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 43bc181c43dfe157654e69fb515b89baa7c371c5
+Author: Philip Withnall <withnall@endlessm.com>
+Date:   Fri Jan 27 14:06:18 2017 +0000
+
+    tools: Fix a minor memory leak of command line arguments
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=777833
+
+ tools/rsvg-tools-main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 42422dcb4643e19487be0f7982460bea53e7865f
+Author: Philip Withnall <withnall@endlessm.com>
+Date:   Fri Jan 27 14:02:11 2017 +0000
+
+    tools: Fix an incorrect g_new() call
+    
+    It was allocating an array of guint8 pointers, rather than an array of
+    guint8s. This resulted in an allocation 4 times too large, which is a
+    bug, but not one which would cause crashes.
+    
+    Coverity ID: 1398303
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=777833
+
+ tools/rsvg-tools-main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit db5e8bace01e0f956a818c10d8c190a76e7e1aeb
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Mon Aug 7 21:46:09 2017 -0500
+
+    Post-release version bump to 2.40.19
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit dbdd68bec86b7d8ab25b01bd8e153241b9e83c72
+Author: Ting-Wei Lan <lantw44@gmail.com>
+Date:   Mon Aug 7 21:43:10 2017 -0500
+
+    bgo#782098 - Don't pass deprecated --nogtkinit to gtkdoc-scangobj
+
+ doc/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit f3219f124113c4973bbf09a4d14e81e5ebc8975c
+Author: Federico Mena Quintero <federico@gnome.org>
+Date:   Wed Jul 19 20:15:54 2017 -0500
+
+    Create a .tar.xz tarball, like it's 2017
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 commit 4cf9665d7a00a6b3c134fe1723f2b00a56923391
 Author: Federico Mena Quintero <federico@gnome.org>
 Date:   Wed Jul 19 20:08:59 2017 -0500

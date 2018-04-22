@@ -37,7 +37,7 @@
 #include "rsvg-mask.h"
 #include "rsvg-marker.h"
 
-#include <libcroco.h>
+#include <libcroco/libcroco.h>
 
 #define RSVG_DEFAULT_FONT "Times New Roman"
 
