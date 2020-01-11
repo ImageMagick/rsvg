@@ -189,6 +189,7 @@ typedef enum /*< flags >*/
     RSVG_HANDLE_FLAG_KEEP_IMAGE_DATA = 1 << 1
 } RsvgHandleFlags;
 
+RSVG_EXPORT
 RsvgHandle *rsvg_handle_new_with_flags (RsvgHandleFlags flags);
 
 void        rsvg_handle_set_base_gfile (RsvgHandle *handle,
