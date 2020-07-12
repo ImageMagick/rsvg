@@ -1,4 +1,4 @@
-SUBDIRS = gdk-pixbuf po docs thumbnailer tests contrib win32
+SUBDIRS = gdk-pixbuf po docs contrib win32
 
 meson_files = \
 	meson.build \

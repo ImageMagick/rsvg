@@ -50,16 +50,20 @@ G_BEGIN_DECLS
 #define RSVG_IS_HANDLE_CLASS(klass)       (G_TYPE_CHECK_CLASS_TYPE ((klass), RSVG_TYPE_HANDLE))
 #define RSVG_HANDLE_GET_CLASS(obj)        (G_TYPE_INSTANCE_GET_CLASS ((obj), RSVG_TYPE_HANDLE, RsvgHandleClass))
 
+#ifndef _MSC_VER
+  #define RSVG_EXPORT extern
+#endif
+
 #ifndef RSVG_EXPORT
-#  if defined(_LIB)
-#    define RSVG_EXPORT extern
-#  else
-#    ifdef RSVG_COMPILATION
-#      define RSVG_EXPORT __declspec(dllexport)
-#    else
-#      define RSVG_EXPORT extern __declspec(dllimport)
-#    endif
-#  endif
+  #if defined(_LIB)
+    #define RSVG_EXPORT extern
+  #else
+    #ifdef RSVG_COMPILATION
+      #define RSVG_EXPORT __declspec(dllexport)
+    #else
+      #define RSVG_EXPORT extern __declspec(dllimport)
+    #endif
+  #endif
 #endif
 
 GType rsvg_handle_get_type (void);

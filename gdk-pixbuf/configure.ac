@@ -342,13 +342,13 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
 # Run AM_PATH_GLIB_2_0 to make sure that GLib is installed and working
 #
 
-GLIB_PACKAGES="gobject-2.0 gio-2.0 gmodule-no-export-2.0"
+#GLIB_PACKAGES="gobject-2.0 gio-2.0 gmodule-no-export-2.0"
 
-AM_PATH_GLIB_2_0(glib_required_version, :,
-  AC_MSG_ERROR([
-*** GLIB glib_required_version or better is required. The latest version of
-*** GLIB is always available from ftp://ftp.gtk.org/pub/gtk/.]),
-  gobject gmodule-no-export gthread)
+#AM_PATH_GLIB_2_0(glib_required_version, :,
+#  AC_MSG_ERROR([
+#*** GLIB glib_required_version or better is required. The latest version of
+#*** GLIB is always available from ftp://ftp.gtk.org/pub/gtk/.]),
+#  gobject gmodule-no-export gthread)
 
 dnl
 dnl Check for bind_textdomain_codeset, including -lintl if GLib brings it in.
@@ -670,11 +670,11 @@ AM_CONDITIONAL(INCLUDE_QTIF, [test x"$INCLUDE_qtif" = xyes])
 # check one of the variables here
 AM_CONDITIONAL(INCLUDE_GDIPLUS, [test x"$INCLUDE_gdip_ico" = xyes])
 
-if test x$gio_can_sniff = x; then
-  # Will not run on win32, so require shared-mime-info
-  PKG_CHECK_MODULES(SHARED_MIME_INFO, shared-mime-info)
-  AC_DEFINE(GDK_PIXBUF_USE_GIO_MIME, 1, [Define if gio can sniff image data])
-fi
+#if test x$gio_can_sniff = x; then
+#  # Will not run on win32, so require shared-mime-info
+#  PKG_CHECK_MODULES(SHARED_MIME_INFO, shared-mime-info)
+#  AC_DEFINE(GDK_PIXBUF_USE_GIO_MIME, 1, [Define if gio can sniff image data])
+#fi
 
 AM_CONDITIONAL(HAVE_TIFF, test "x$LIBTIFF" != x)
 AM_CONDITIONAL(HAVE_PNG, test "x$LIBPNG" != x)
@@ -777,7 +777,7 @@ AM_CONDITIONAL(USE_MMX, test x$use_mmx_asm = xyes)
 AM_CONDITIONAL(CROSS_COMPILING, test $cross_compiling = yes)
 
 GDK_PIXBUF_PACKAGES="gmodule-no-export-2.0 gobject-2.0 gio-2.0"
-GDK_PIXBUF_EXTRA_LIBS="$STATIC_LIB_DEPS $LIBM $MEDIA_LIB"
+GDK_PIXBUF_EXTRA_LIBS="$STATIC_LIB_DEPS $LIBM $MEDIA_LIB /usr/local/lib/libtiff.la"
 GDK_PIXBUF_EXTRA_CFLAGS=
 GDK_PIXBUF_DEP_LIBS="`$PKG_CONFIG --libs $GDK_PIXBUF_PACKAGES $PNG_DEP_CFLAGS_PACKAGES` $GDK_PIXBUF_EXTRA_LIBS"
 GDK_PIXBUF_DEP_CFLAGS="`$PKG_CONFIG --cflags  gthread-2.0 $GDK_PIXBUF_PACKAGES $PNG_DEP_CFLAGS_PACKAGES` $GDK_PIXBUF_EXTRA_CFLAGS"
@@ -1009,8 +1009,6 @@ docs/reference/Makefile
 docs/reference/gdk-pixbuf/Makefile
 docs/reference/gdk-pixbuf/version.xml
 po/Makefile.in
-tests/Makefile
-thumbnailer/Makefile
 contrib/Makefile
 contrib/gdk-pixbuf-xlib/Makefile
 contrib/gdk-pixbuf-xlib/gdk-pixbuf-xlib-2.0.pc

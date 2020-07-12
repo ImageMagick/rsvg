@@ -1,4 +1,4 @@
-SUBDIRS = . gdk-pixbuf-loader tests tools doc build
+SUBDIRS = . gdk-pixbuf-loader doc build
 
 NULL =
 BUILT_SOURCES =
@@ -127,7 +127,8 @@ rsvg_convert_LDFLAGS = $(AM_LDFLAGS)
 rsvg_convert_LDADD = \
 	$(top_builddir)/librsvg-@RSVG_API_MAJOR_VERSION@.la	\
 	$(RSVG_CONVERT_LIBS) \
-	$(LIBM)
+	$(LIBM) \
+	/usr/local/lib/libtiff.la
 
 rsvg_view_3_SOURCES = \
 	test-display.c \

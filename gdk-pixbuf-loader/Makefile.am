@@ -45,7 +45,8 @@ rsvg_loader_CFLAGS = \
 rsvg_loader_LDFLAGS = \
 	$(AM_LDFLAGS)
 rsvg_loader_LDADD = \
-	$(GDK_PIXBUF_LIBS)
+	$(GDK_PIXBUF_LIBS) \
+	/usr/local/lib/libtiff.la
 EXTRA_rsvg_loader_DEPENDENCIES = libpixbufloader-svg.la gdk-pixbuf-loaders
 
 gdk-pixbuf-loaders: Makefile
