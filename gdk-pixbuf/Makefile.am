@@ -1,4 +1,4 @@
-SUBDIRS = gdk-pixbuf po docs contrib win32
+SUBDIRS = gdk-pixbuf docs contrib win32
 
 meson_files = \
 	meson.build \
@@ -7,7 +7,6 @@ meson_files = \
 	gdk-pixbuf/pixops/meson.build \
 	docs/reference/gdk-pixbuf/meson.build \
 	contrib/gdk-pixbuf-xlib/meson.build \
-	po/meson.build \
 	tests/meson.build \
 	thumbnailer/meson.build \
 	build-aux/gen-color-table.pl \

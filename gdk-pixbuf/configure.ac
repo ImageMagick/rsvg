@@ -330,8 +330,8 @@ if test "$gtk_ok" = "yes"; then
 fi
 
 # i18n stuff
-AM_GNU_GETTEXT_VERSION([0.19])
-AM_GNU_GETTEXT([external])
+#AM_GNU_GETTEXT_VERSION([0.19])
+#AM_GNU_GETTEXT([external])
 
 GETTEXT_PACKAGE="$PACKAGE"
 AC_SUBST(GETTEXT_PACKAGE)
@@ -1008,7 +1008,6 @@ docs/Makefile
 docs/reference/Makefile
 docs/reference/gdk-pixbuf/Makefile
 docs/reference/gdk-pixbuf/version.xml
-po/Makefile.in
 contrib/Makefile
 contrib/gdk-pixbuf-xlib/Makefile
 contrib/gdk-pixbuf-xlib/gdk-pixbuf-xlib-2.0.pc
