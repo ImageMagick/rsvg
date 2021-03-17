@@ -17,6 +17,7 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
 #include <math.h>
  
 /* Workaround for round() for non-GCC/non-C99 compilers */
