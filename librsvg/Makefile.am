@@ -5,11 +5,6 @@ BUILT_SOURCES =
 
 lib_LTLIBRARIES = librsvg-@RSVG_API_MAJOR_VERSION@.la
 
-bin_PROGRAMS = rsvg-convert
-if HAVE_GTK_3
-bin_PROGRAMS += rsvg-view-3
-endif
-
 headers = \
 	rsvg.h	\
 	rsvg-cairo.h
