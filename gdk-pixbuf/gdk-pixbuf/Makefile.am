@@ -441,14 +441,6 @@ AM_CPPFLAGS = \
 
 LDADDS = libgdk_pixbuf-$(GDK_PIXBUF_API_VERSION).la $(GDK_PIXBUF_DEP_LIBS)
 
-bin_PROGRAMS = gdk-pixbuf-csource gdk-pixbuf-pixdata
-gdk_pixbuf_csource_SOURCES = gdk-pixbuf-csource.c
-gdk_pixbuf_csource_LDADD = $(LDADDS)
-
-gdk_pixbuf_pixdata_SOURCES = gdk-pixbuf-pixdata.c
-gdk_pixbuf_pixdata_LDADD = $(LDADDS)
-
-
 #
 # The GdkPixBuf library
 #
