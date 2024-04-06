@@ -178,7 +178,6 @@
 #define INCLUDE_gif
 #define INCLUDE_ico
 #define INCLUDE_icns
-#define INCLUDE_jasper
 #define INCLUDE_jpeg
 #define INCLUDE_pcx
 #define INCLUDE_png

@@ -23,7 +23,6 @@ glib->.
 glib->glib
 glib->gmodule
 harfbuzz->src
-jasper->src\libjasper\include
 jpeg-turbo->.
 pango->.
 png->.
@@ -34,15 +33,8 @@ xml->include
 fallback-c89.c
 gdk_pixbuf.rc
 gdk-pixbuf-csource.c
-io-gdip-animation.c
-io-gdip-bmp.c
-io-gdip-emf.c
-io-gdip-gif.c
-io-gdip-ico.c
-io-gdip-jpeg.c
-io-gdip-tiff.c
-io-gdip-utils.c
-io-gdip-wmf.c
+io-gdip-*
+io-jasper.c
 queryloaders.c
 rsvg-convert.c
 rsvg-file-util.c
@@ -55,7 +47,6 @@ timescale.c
 cairo
 croco
 glib
-jasper
 jpeg-turbo
 pango
 png
