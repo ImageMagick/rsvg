@@ -23,7 +23,7 @@ glib->.
 glib->glib
 glib->gmodule
 harfbuzz->src
-jpeg-turbo->.
+jpeg-turbo->src
 pango->.
 png->.
 tiff->libtiff
