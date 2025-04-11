@@ -363,7 +363,7 @@ rsvg_css_parse_color (const char *str, gboolean * inherit)
 
         val |= 0xff000000; /* opaque */
     }
-    else if (g_str_has_prefix (str, "rgb")) {
+    else if (g_ascii_strncasecmp(str, "rgb", 3) == 0) {
         gint r, g, b, a;
         gboolean has_alpha;
         guint nb_toks;
@@ -372,7 +372,7 @@ rsvg_css_parse_color (const char *str, gboolean * inherit)
         r = g = b = 0;
         a = 255;
 
-        if (str[3] == 'a') {
+        if (str[3] == 'a' || str[3] == 'A') {
             /* "rgba" */
             has_alpha = TRUE;
             str += 4;
