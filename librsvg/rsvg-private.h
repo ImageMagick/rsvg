@@ -33,6 +33,7 @@
 
 #include <libxml/SAX.h>
 #include <libxml/xmlmemory.h>
+#include <libxml/tree.h>
 #include <pango/pango.h>
 #include <glib.h>
 #include <glib-object.h>
