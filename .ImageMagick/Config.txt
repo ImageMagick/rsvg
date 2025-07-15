@@ -1,4 +1,4 @@
-[DLL]
+[DYNAMIC_LIBRARY]
 
 [LICENSE]
 librsvg\COPYING.LIB
@@ -7,45 +7,38 @@ librsvg\COPYING.LIB
 GDK_PIXBUF_ENABLE_BACKEND
 RSVG_COMPILATION
 
-[DIRECTORIES]
-gdk-pixbuf
-gdk-pixbuf\gdk-pixbuf
-gdk-pixbuf\gdk-pixbuf\pixops
-librsvg
-librsvg\gdk-pixbuf-loader
-
 [INCLUDES]
 gdk-pixbuf
+gdk-pixbuf\gdk-pixbuf
 librsvg
-cairo->src
-croco->src
-glib->.
-glib->glib
-glib->gmodule
-harfbuzz->src
-jpeg-turbo->src
-pango->.
-png->.
-tiff->libtiff
-xml->include
+
+[INCLUDE_ARTIFACTS]
+librsvg -> librsvg
+gdk-pixbuf\gdk-pixbuf -> gdk-pixbuf
 
 [EXCLUDES]
-fallback-c89.c
-gdk_pixbuf.rc
-gdk-pixbuf-csource.c
-io-gdip-*
-io-jasper.c
-queryloaders.c
-rsvg-convert.c
-rsvg-file-util.c
-test.c
-test-display.c
-test-gdk-pixbuf.c
-timescale.c
+gdk-pixbuf\contrib\
+gdk-pixbuf\docs\
+gdk-pixbuf\gdk-pixbuf\pixops\timescale.c
+gdk-pixbuf\gdk-pixbuf\io-gdip-
+gdk-pixbuf\gdk-pixbuf\io-jasper.c
+gdk-pixbuf\gdk-pixbuf\gdk-pixbuf-csource.c
+gdk-pixbuf\gdk-pixbuf\queryloaders.c
+gdk-pixbuf\gdk-pixbuf\test-gdk-pixbuf.c
+gdk-pixbuf\tests\
+gdk-pixbuf\thumbnailer\
+gdk-pixbuf\win32\
+librsvg\gdk-pixbuf-loader\test.c
+librsvg\rsvg-convert.c
+librsvg\rsvg-file-util.c
+librsvg\test-display.c
+librsvg\tests\
+librsvg\tools\
 
-[DEPENDENCIES]
+[REFERENCES]
 cairo
 croco
+harfbuzz
 glib
 jpeg-turbo
 pango
@@ -53,7 +46,7 @@ png
 tiff
 xml
 
-[CONFIG_DEFINE]
+[MAGICK_BASECONFIG_DEFINE]
 /*
   Define to use the RSVG library
 */
