@@ -85,7 +85,7 @@ make_rg (int width, int height)
 }
 
 gboolean
-format_supported (const gchar *filename)
+find_format (const gchar *filename, gchar **found_format)
 {
   GSList *formats, *l;
   gboolean retval;
@@ -102,18 +102,26 @@ format_supported (const gchar *filename)
         {
           if (g_str_has_suffix (filename, extensions[i]))
             {
+              if (found_format != NULL)
+                *found_format = gdk_pixbuf_format_get_name (format);
               retval = TRUE;
               break;
             }
         }
 
-      g_free (extensions);
+      g_strfreev (extensions);
       if (retval)
         break;
     }
   g_slist_free (formats);
 
   return retval;
+}
+
+gboolean
+format_supported (const gchar *filename)
+{
+  return find_format(filename, NULL);
 }
 
 gboolean
@@ -288,6 +296,8 @@ add_test_for_all_images (const gchar   *prefix,
       test_path = g_strconcat (prefix, "/", relative_path, NULL);
       
       g_test_add_data_func_full (test_path, g_object_ref (file), test_func, g_object_unref);
+      g_free (relative_path);
+      g_free (test_path);
       return;
     }
 

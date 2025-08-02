@@ -32,8 +32,11 @@
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
+#include <glib-object.h>
+#include <glib/gi18n-lib.h>
 
-#include "gdk-pixbuf-private.h"
+#include "gdk-pixbuf-core.h"
+#include "gdk-pixbuf-io.h"
 #include "gdk-pixbuf-buffer-queue-private.h"
 
 #undef DEBUG_TGA
@@ -126,10 +129,10 @@ struct _TGAContext {
 
         TGAProcessFunc process;
 
-	GdkPixbufModuleSizeFunc sfunc;
-	GdkPixbufModulePreparedFunc pfunc;
-	GdkPixbufModuleUpdatedFunc ufunc;
-	gpointer udata;
+	GdkPixbufModuleSizeFunc size_func;
+	GdkPixbufModulePreparedFunc prepared_func;
+	GdkPixbufModuleUpdatedFunc updated_func;
+	gpointer user_data;
 };
 
 static TGAColormap *
@@ -190,13 +193,18 @@ static inline void
 tga_write_pixel (TGAContext     *ctx,
                  const TGAColor *color)
 {
-  guint x = (ctx->hdr->flags & TGA_ORIGIN_RIGHT) ? ctx->pbuf->width - ctx->pbuf_x - 1 : ctx->pbuf_x;
-  guint y = (ctx->hdr->flags & TGA_ORIGIN_UPPER) ? ctx->pbuf_y : ctx->pbuf->height - ctx->pbuf_y - 1;
+  gint width = gdk_pixbuf_get_width (ctx->pbuf);
+  gint height = gdk_pixbuf_get_height (ctx->pbuf);
+  gint rowstride = gdk_pixbuf_get_rowstride (ctx->pbuf);
+  gint n_channels = gdk_pixbuf_get_n_channels (ctx->pbuf);
 
-  memcpy (ctx->pbuf->pixels + y * ctx->pbuf->rowstride + x * ctx->pbuf->n_channels, color, ctx->pbuf->n_channels);
+  guint x = (ctx->hdr->flags & TGA_ORIGIN_RIGHT) ? width - ctx->pbuf_x - 1 : ctx->pbuf_x;
+  guint y = (ctx->hdr->flags & TGA_ORIGIN_UPPER) ? ctx->pbuf_y : height - ctx->pbuf_y - 1;
+
+  memcpy (gdk_pixbuf_get_pixels (ctx->pbuf) + y * rowstride + x * n_channels, color, n_channels);
 
   ctx->pbuf_x++;
-  if (ctx->pbuf_x >= ctx->pbuf->width)
+  if (ctx->pbuf_x >= width)
     {
       ctx->pbuf_x = 0;
       ctx->pbuf_y++;
@@ -206,20 +214,25 @@ tga_write_pixel (TGAContext     *ctx,
 static gsize
 tga_pixels_remaining (TGAContext *ctx)
 {
-  return ctx->pbuf->width * (ctx->pbuf->height - ctx->pbuf_y) - ctx->pbuf_x;
+  gint width = gdk_pixbuf_get_width (ctx->pbuf);
+  gint height = gdk_pixbuf_get_height (ctx->pbuf);
+
+  return width * (height - ctx->pbuf_y) - ctx->pbuf_x;
 }
 
 static gboolean
 tga_all_pixels_written (TGAContext *ctx)
 {
-  return ctx->pbuf_y >= ctx->pbuf->height;
+  gint height = gdk_pixbuf_get_height (ctx->pbuf);
+
+  return ctx->pbuf_y >= height;
 }
 
 static void
 tga_emit_update (TGAContext *ctx)
 {
-  if (!ctx->ufunc)
-    return;
+  gint width = gdk_pixbuf_get_width (ctx->pbuf);
+  gint height = gdk_pixbuf_get_height (ctx->pbuf);
 
   /* We only notify row-by-row for now.
    * I was too lazy to handle line-breaks.
@@ -228,15 +241,15 @@ tga_emit_update (TGAContext *ctx)
     return;
 
   if (ctx->hdr->flags & TGA_ORIGIN_UPPER)
-    (*ctx->ufunc) (ctx->pbuf,
+    (*ctx->updated_func) (ctx->pbuf,
                    0, ctx->pbuf_y_notified,
-                   ctx->pbuf->width, ctx->pbuf_y - ctx->pbuf_y_notified,
-                   ctx->udata);
+                   width, ctx->pbuf_y - ctx->pbuf_y_notified,
+                   ctx->user_data);
   else
-    (*ctx->ufunc) (ctx->pbuf,
-                   0, ctx->pbuf->height - ctx->pbuf_y,
-                   ctx->pbuf->width, ctx->pbuf_y - ctx->pbuf_y_notified,
-                   ctx->udata);
+    (*ctx->updated_func) (ctx->pbuf,
+                   0, height - ctx->pbuf_y,
+                   width, ctx->pbuf_y - ctx->pbuf_y_notified,
+                   ctx->user_data);
 
   ctx->pbuf_y_notified = ctx->pbuf_y;
 }
@@ -341,13 +354,13 @@ static gboolean fill_in_context(TGAContext *ctx, GError **err)
 	w = LE16(ctx->hdr->width);
 	h = LE16(ctx->hdr->height);
 
-	if (ctx->sfunc) {
+	{
 		gint wi = w;
 		gint hi = h;
-		
-		(*ctx->sfunc) (&wi, &hi, ctx->udata);
-		
-		if (wi == 0 || hi == 0) 
+
+		(*ctx->size_func) (&wi, &hi, ctx->user_data);
+
+		if (wi == 0 || hi == 0)
 			return FALSE;
 	}
 
@@ -565,7 +578,7 @@ tga_load_header (TGAContext  *ctx,
                            _("Cannot allocate TGA header memory"));
       return FALSE;
   }
-  g_memmove(ctx->hdr, g_bytes_get_data (bytes, NULL), sizeof(TGAHeader));
+  memmove(ctx->hdr, g_bytes_get_data (bytes, NULL), sizeof(TGAHeader));
   g_bytes_unref (bytes);
 #ifdef DEBUG_TGA
   g_print ("infolen %d "
@@ -613,19 +626,22 @@ tga_load_header (TGAContext  *ctx,
   if (!fill_in_context(ctx, err))
           return FALSE;
 
-  if (ctx->pfunc)
-          (*ctx->pfunc) (ctx->pbuf, NULL, ctx->udata);
+  (*ctx->prepared_func) (ctx->pbuf, NULL, ctx->user_data);
 
   ctx->process = tga_read_info;
   return TRUE;
 }
 
-static gpointer gdk_pixbuf__tga_begin_load(GdkPixbufModuleSizeFunc f0,
-                                           GdkPixbufModulePreparedFunc f1,
-					   GdkPixbufModuleUpdatedFunc f2,
-					   gpointer udata, GError **err)
+static gpointer gdk_pixbuf__tga_begin_load(GdkPixbufModuleSizeFunc size_func,
+                                           GdkPixbufModulePreparedFunc prepared_func,
+					   GdkPixbufModuleUpdatedFunc updated_func,
+					   gpointer user_data, GError **err)
 {
 	TGAContext *ctx;
+
+	g_assert (size_func != NULL);
+	g_assert (prepared_func != NULL);
+	g_assert (updated_func != NULL);
 
 	ctx = g_try_malloc(sizeof(TGAContext));
 	if (!ctx) {
@@ -649,10 +665,11 @@ static gpointer gdk_pixbuf__tga_begin_load(GdkPixbufModuleSizeFunc f0,
 
         ctx->process = tga_load_header;
 
-	ctx->sfunc = f0;
-	ctx->pfunc = f1;
-	ctx->ufunc = f2;
-	ctx->udata = udata;
+	ctx->size_func     = size_func;
+	ctx->prepared_func = prepared_func;
+	ctx->updated_func  = updated_func;
+
+	ctx->user_data = user_data;
 
 	return ctx;
 }

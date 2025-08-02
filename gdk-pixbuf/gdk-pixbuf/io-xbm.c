@@ -35,8 +35,10 @@
 #endif
 #include <stdio.h>
 #include <errno.h>
-#include "gdk-pixbuf-private.h"
 #include <glib/gstdio.h>
+#include <glib/gi18n-lib.h>
+
+#include "gdk-pixbuf-io.h"
 
 
 
@@ -44,8 +46,8 @@
 typedef struct _XBMData XBMData;
 struct _XBMData
 {
-	GdkPixbufModulePreparedFunc prepare_func;
-	GdkPixbufModuleUpdatedFunc update_func;
+	GdkPixbufModulePreparedFunc prepared_func;
+	GdkPixbufModuleUpdatedFunc updated_func;
 	gpointer user_data;
 
 	gchar *tempname;
@@ -131,8 +133,8 @@ next_int (FILE *fstream)
 			/* trim high bits, check type and accumulate */
 			ch &= 0xff;
 			if (g_ascii_isxdigit (ch)) {
-				value = (value << 4) + g_ascii_xdigit_value (ch);
-				gotone++;
+				value = ((value & 0xf) << 4) + g_ascii_xdigit_value (ch);
+				gotone = 1;
 			} else if ((hex_table[ch]) < 0 && gotone) {
 				done++;
 			}
@@ -302,7 +304,7 @@ gdk_pixbuf__xbm_image_load_real (FILE     *f,
 {
 	guint w, h;
 	int x_hot, y_hot;
-	guchar *data, *ptr;
+	guchar *data = NULL, *ptr;
 	guchar *pixels;
 	guint row_stride;
 	int x, y;
@@ -322,6 +324,7 @@ gdk_pixbuf__xbm_image_load_real (FILE     *f,
 	pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, FALSE, 8, w, h);
 
         if (pixbuf == NULL) {
+                g_free (data);
                 g_set_error_literal (error,
                                      GDK_PIXBUF_ERROR,
                                      GDK_PIXBUF_ERROR_INSUFFICIENT_MEMORY,
@@ -340,8 +343,8 @@ gdk_pixbuf__xbm_image_load_real (FILE     *f,
 	pixels = gdk_pixbuf_get_pixels (pixbuf);
 	row_stride = gdk_pixbuf_get_rowstride (pixbuf);
 
-	if (context && context->prepare_func)
-		(* context->prepare_func) (pixbuf, NULL, context->user_data);
+	if (context)
+		(* context->prepared_func) (pixbuf, NULL, context->user_data);
 
 
 	/* Initialize PIXBUF */
@@ -360,17 +363,16 @@ gdk_pixbuf__xbm_image_load_real (FILE     *f,
 			reg >>= 1;
 			bits--;
 
-			pixels[x*3+0] = channel;
-			pixels[x*3+1] = channel;
-			pixels[x*3+2] = channel;
+			pixels[x * 3 + 0] = channel;
+			pixels[x * 3 + 1] = channel;
+			pixels[x * 3 + 2] = channel;
 		}
 		pixels += row_stride;
 	}
 	g_free (data);
 
 	if (context) {
-		if (context->update_func)
-			(* context->update_func) (pixbuf, 0, 0, w, h, context->user_data);
+		(* context->updated_func) (pixbuf, 0, 0, w, h, context->user_data);
 	}
 
 	return pixbuf;
@@ -396,17 +398,21 @@ gdk_pixbuf__xbm_image_load (FILE    *f,
 
 static gpointer
 gdk_pixbuf__xbm_image_begin_load (GdkPixbufModuleSizeFunc       size_func,
-                                  GdkPixbufModulePreparedFunc   prepare_func,
-				  GdkPixbufModuleUpdatedFunc    update_func,
+                                  GdkPixbufModulePreparedFunc   prepared_func,
+				  GdkPixbufModuleUpdatedFunc    updated_func,
 				  gpointer                      user_data,
 				  GError                      **error)
 {
 	XBMData *context;
 	gint fd;
 
+	g_assert (size_func != NULL);
+	g_assert (prepared_func != NULL);
+	g_assert (updated_func != NULL);
+
 	context = g_new (XBMData, 1);
-	context->prepare_func = prepare_func;
-	context->update_func = update_func;
+	context->prepared_func = prepared_func;
+	context->updated_func = updated_func;
 	context->user_data = user_data;
 	context->all_okay = TRUE;
 	fd = g_file_open_tmp ("gdkpixbuf-xbm-tmp.XXXXXX",

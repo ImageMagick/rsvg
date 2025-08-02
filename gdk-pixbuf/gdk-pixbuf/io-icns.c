@@ -26,7 +26,11 @@
 #include <string.h>
 #include <errno.h>
 
-#include "gdk-pixbuf-private.h"
+#include <glib-object.h>
+#include <glib/gi18n-lib.h>
+
+#include "gdk-pixbuf-core.h"
+#include "gdk-pixbuf-io.h"
 #include "gdk-pixbuf-loader.h"
 
 G_MODULE_EXPORT void fill_vtable (GdkPixbufModule * module);
@@ -95,7 +99,8 @@ load_resources (unsigned size, IN gpointer data, gsize datalen,
       blocklen = GUINT32_FROM_BE (header->size);
 
       /* Check that blocklen isn't garbage */
-      if (blocklen > icnslen - (current - bytes))
+      if (blocklen > icnslen - (current - bytes) ||
+	  blocklen < sizeof (IcnsBlockHeader))
         return FALSE;
 
       switch (size)
@@ -394,6 +399,10 @@ gdk_pixbuf__icns_image_begin_load (GdkPixbufModuleSizeFunc      size_func,
 {
   IcnsProgressiveState *context;
 
+  g_assert (size_func != NULL);
+  g_assert (prepared_func != NULL);
+  g_assert (updated_func != NULL);
+
   context = g_new0 (IcnsProgressiveState, 1);
   context->size_func = size_func;
   context->prepared_func = prepared_func;
@@ -456,23 +465,20 @@ gdk_pixbuf__icns_image_load_increment (gpointer       data,
   w = gdk_pixbuf_get_width (context->pixbuf);
   h = gdk_pixbuf_get_height (context->pixbuf);
 
-  if (context->size_func != NULL)
-    (*context->size_func) (&w,
-			   &h,
-			   context->user_data);
+  (*context->size_func) (&w,
+			 &h,
+			 context->user_data);
 
-  if (context->prepared_func != NULL)
-    (*context->prepared_func) (context->pixbuf,
-			       NULL,
-			       context->user_data);
+  (*context->prepared_func) (context->pixbuf,
+			     NULL,
+			     context->user_data);
 
-  if (context->updated_func != NULL)
-    (*context->updated_func) (context->pixbuf,
-			      0,
-			      0,
-			      gdk_pixbuf_get_width (context->pixbuf),
-			      gdk_pixbuf_get_height (context->pixbuf),
-			      context->user_data);
+  (*context->updated_func) (context->pixbuf,
+			    0,
+			    0,
+			    gdk_pixbuf_get_width (context->pixbuf),
+			    gdk_pixbuf_get_height (context->pixbuf),
+			    context->user_data);
 
   return TRUE;
 }

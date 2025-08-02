@@ -1,3 +1,234 @@
+2.43.3 (development)
+===
+
+- Add a native loader for Android builds
+- Use the glycin loader for SVG as well.
+- Change the default build options to be 'auto' for all loader options.
+  On Linux, we build only the glycin loader, unless overwritten.
+- Change the default value for the builtin_loaders option to 'default'.
+  On Linux, we interpret 'default' as 'glycin'. On other platforms, we
+  interpret it as 'png,jpeg' (which was the previous default value).
+- Require Meson 1.5 to build gdk-pixbuf
+- Use glycin for saving. The following formats are supported:
+  png, jpeg, tiff, webp, ico, bmp. For png, jpeg and tiff, the most
+  common options are supported when saving.
+- Fix introspection annotations for loading and saving GdkPixbuf
+  from and to streams asynchronously
+
+2.43.2 (development)
+===
+
+- Make the thumbnailer optional
+- Add a glycin loader. Glycin is a sandboxed image loading framework that
+  is written in rust, and supports more image formats than gdk-pixbuf ever
+  did. On Linux, we recommend that you build gdk-pixbuf with *only* the
+  glycin loaders, and rely on glycin for thumbnailers too. Like this:
+
+  meson configure -Dpng=disabled                \
+                  -Dtiff=disabled               \
+                  -Djpeg=disabled               \
+                  -Dgif=disabled                \
+                  -Dothers=disabled             \
+                  -Dglycin=enabled              \
+                  -Dbuiltin_loaders='glycin'    \
+                  -Dthumbnailer=disabled
+
+  Note that this change has some potential for fallout: use of gdk-pixbuf
+  (e.g. for pixdata conversions) will fail if bubblewrap sandboxing is not
+  available (as is the case in many build systems). The recommendation is
+  to simply stop using pixdata as a format for resources, and just use png.
+- Deprecate "gtk_doc" configuration option; to conform with the rest of the
+  GNOME core libraries, use "documentation" instead
+- Remove the long-since deprecated "docs" configuration option
+- Require Meson 1.0 to build gdk-pixbuf
+- Deprecate the XPM-related API; the XPM loader is disabled by default,
+  and we have better API for loading those kinds of assets, though nobody
+  should be shipping XPM files in 2025
+
+2.42.12 (stable)
+===
+
+- Fix a build failure (Christian Heusel)
+- Fix occasional build failures (Benjamin Gilbert)
+- ani: Reject files with multiple INA or IART chunks (Benjamin Gilbert)
+- ani: Reject files with multiple anih chunks (Benjamin Gilbert, CVE-2022-48622)
+- ani: validate chunk size (Benjamin Gilbert)
+- Translation updates
+
+2.42.11 (stable)
+===
+
+- Disable fringe loaders by default
+- Introspection fixes [#146]
+- Translation updates
+
+2.42.10 (stable)
+===
+
+- Search for rst2man.py [!145, Matt Turner]
+- Update the memory size limit for JPEG images [#216, #218]
+- Translation updates
+
+2.42.9 (stable)
+===
+
+- Fix the check for maximum value of LZW initial code size [#136, Robert Ancell]
+- Use CMake for dependencies on Windows/MSVC [!131, Chun-Wei Fan]
+- Add option for building tests [!132]
+- Move man pages to reStructuredText [!134]
+- Disable relocation when built as a static libary on Windows [!136, Hesham Essam]
+- Update wrap file for libjpeg-turbo [!138, Georges Basile Stavracas Neto]
+- Limit the memory size when loading image data [#205, Sam Ezeh]
+
+2.42.8 (stable)
+===
+
+- Clear the pixbuf's memory buffer to avoid returning uninitialized memory [#199]
+- Turn GdkPixbufModule functions into typed callbacks [!123]
+- tiff: Use non-deprecated C99 integer types [!124]
+- gif: Check for overflow when compositing or clearing frames [#190]
+- Change png/jpeg/tiff build options from boolean to feature [!118]
+- jpeg: Do not rely on UB around setjmp/longjmp [#143]
+- Build fixes [!114, #185, #182]
+- Documentation fixes [!120, !125]
+- Translation updates
+
+2.42.6 (stable)
+===
+
+ - Disable shared-mime-info dependency on Android [BogDan Vatra, !104]
+ - Yield gtk_doc option value in subprojects
+ - Always initialise locale on thumbnailer startup [Bastien Nocera, !110]
+ - Add fallback subproject for libjpeg [Benjamin Otte, !109]
+ - Install API reference directly under $datadir/doc/gdk-pixbuf
+ - Use type:array for the builtin_loaders option
+ - Default to using builtin png and jpeg loaders
+ - Replace platform-specific post-install script files with a Python script
+
+2.42.4 (stable)
+===
+
+ - Make enum type registration thread safe
+ - Do not install skipped test files [Jan Tojnar]
+ - Fix GIF initialization [Simon McVittie]
+ - Always run GIF loader tests [Simon McVittie]
+ - Fix leaks discovered via ASan [Simon McVittie]
+ - Expose GdkPixbufLoader API via introspection [Paolo Borelli]
+ - Fix revert-to-previous first frame behaviour for GIF files [Robert Ancell, #166]
+ - Link to libintl if needed [Fabrice Fontaine]
+ - Improve support for using gdk-pixbuf as a subproject [Xavier Claessens]
+ - Fix build with GModule disabled [Fabrice Fontaine]
+ - Use gi-docgen to generate the API reference from introspection data
+
+2.42.2 (stable)
+===
+
+ - Requre Meson 0.55.3
+ - Improve the PNG save operation
+ - Fix leak in the error path of the XPM loader
+ - Fix loading GIF without a GCE rendering color 0 [Robert Ancell, #162]
+ - Fix invalid LZW codes in the GIF loader [Robert Ancell, #164, CVE-2020-29385]
+
+2.42.0 (stable)
+===
+
+ - Remove the libjasper JPEG2000 loader
+ - Split the gdk-pixbuf-xlib library to a separate repository
+ - Fix build on Solaris [Alan Coopersmith]
+ - Fix cppcheck 'shifting signed 32-bit value warning' [Emmanuel Fleury, #96]
+ - Fix memory leaks in pixops error paths [Alex Henrie]
+ - Improve internal consistency of loaders [Federico Mena Quintero]
+ - Fix build with MSVC [Chun-wei Fan]
+ - Skip bytes during JPEG incremental load [Nathan Lee]
+ - Check for overflows [#132]
+ - Add missing test for issue #70 [Bastien Nocera]
+ - Let the test suite cope with missing loaders [#123]
+ - Fix build on SunOS [#128]
+ - Check for mmap failure [Tobias Müller]
+ - Fix UB in the XPM loader [Tobias Stoeckmann]
+ - Speed up alpha scaling pixop [Jan Ziak]
+ - Add the `gtk_doc` configuration option, and deprecate `docs`
+ - Add the `introspection` configuration option, and remove `gir` [Xavier Claessens, !85]
+ - Handle truncated PNMs more gracefully [Felix Riemann, #111]
+ - Clean up GIF loader code [Robert Ancell]
+ - Fix colormap handling in GIF [Robert Ancell, #156]
+
+2.40.0 (stable)
+===
+
+ - Allow creating a GdkPixbuf instance without any property [Federico Mena
+   Quintero, #91]
+
+2.39.2 (development)
+===
+
+ - Add gdk_pixbuf_init_modules() for applications with GdkPixbuf loader
+   modules in a separate directory [Bastien Nocera, bgo#786035]
+ - Add subproject fallback for dependencies [Nirbheek Chauhan]
+ - Handle large XPM without crashing [Bastien Nocera, #95]
+ - Use the appropriate gdk-pixbuf-query-loaders on install [Emmanuele
+   Bassi, #126]
+ - Disable deprecation warnings introduced by GLib 2.62
+ - Escape GIF version in error messages [Robert Ancell]
+ - Use the appropriate fallback for libpng on Windows [Chun-wei Fan]
+ - Render GIF frames on demand [Robert Ancell, #101]
+
+2.38.0 (stable)
+===
+ - Documentation fixes
+
+2.37.92 (release candidate)
+===
+ - Ensure that GdkPixbuf's storage is safely handled [Federico Mena Quintero]
+ - Add test case for buffer overflow in pixdata loader [Bastien Nocera, #57]
+
+2.37.0 (development)
+===
+ - Rework relocation support for loaders cache on Windows [Christoph Reiter, #776081]
+ - Properly install test data [Emmanuele Bassi, Jeremy Bicha, #795527, #795210]
+ - Plug a memory leak when using GBytes [Vitaly Kirsanov, #787626]
+ - Fix introspection annotations [Iñaki García Etxebarria, #789935]
+ - Fix documentation building with X11 disabled [Quentin Glidic, #794872]
+ - Drop Autotools build and move to Meson [Emmanuele Bassi]
+ - Fix OOB error when dithering [Bert Pauline, #748211]
+ - Drop the MMX assembly optimizations for pixops [Emmanuele Bassi]
+ - Improve compatibility for the post-install script [Brendan L, #795705]
+ - Expose the dimensions of the original image from GdkPixbufLoader [Debarshi Ray, #778517]
+ - Improve thumbnailer implementation [Debarshi Ray, #778517]
+ - Make X11 a dependency if the `x11` build option is enabled [Emmanuele Bassi, #77]
+ - Generate separate introspection data for GdkPixdata API [Emmanuele Bassi, #72]
+ - Deprecate GDK_INTERP_HYPER [Emmanuele Bassi, #3]
+ - Avoid a deprecation warning with recent libjasper [Emmanuele Bassi, #73]
+ - Fix build on macOS [Emmanuele Bassi, !5]
+ - Fix build with Visual Studio [Chun-wei Fan, !8]
+ - Fix cross-compilation of Windows build on Linux [Benjamin Gilbert, !10]
+
+2.36.12
+=======
+* build: meson fixes for win32
+* build: Make --without-libtiff work
+* build: Make x11 support optional
+* gif, ico, jpeg, tiff, icns: various fixes (#778584, #779012, #753605, #779020, #779016)
+* Implement async loading without threads
+* Translation updates
+
+2.36.11
+=======
+* build: Fix tiff loader build (#786342)
+* build: Fix the build on OS X (#786167)
+* build: Prefer newer libpng (#786035)
+* Use a free reference images for tests (#787050)
+* gif: fail quickly if image dimensions are too big (#785973)
+* xlib: Avoid an out-of-bounds error on bigendian (#775896)
+* Translation updates
+
+2.36.10
+=======
+* build: meson build improvements
+* build: win32 build fixes
+* tests: show error before failing (#786259)
+* Translation updates
+
 2.36.9
 ======
 * build: meson build improvements

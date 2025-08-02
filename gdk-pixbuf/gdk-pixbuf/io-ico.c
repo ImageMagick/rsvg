@@ -44,7 +44,8 @@ Known bugs:
 #endif
 #include <string.h>
 #include <errno.h>
-#include "gdk-pixbuf-private.h"
+#include <glib/gi18n-lib.h>
+#include "gdk-pixbuf-io.h"
 
 
 
@@ -333,16 +334,17 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 	for (l = State->entries; l != NULL; l = g_list_next (l)) {
 		entry = l->data;
 
-		/* We know how many bytes are in the "header" part. */
-		State->HeaderSize = entry->DIBoffset + INFOHEADER_SIZE;
-
-		if (State->HeaderSize < 0) {
+		/* Avoid invoking undefined behavior in the State->HeaderSize calculation below */
+		if (entry->DIBoffset > G_MAXINT - INFOHEADER_SIZE) {
 			g_set_error (error,
 			             GDK_PIXBUF_ERROR,
 			             GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
 			             _("Invalid header in icon (%s)"), "header size");
 			return;
 		}
+
+		/* We know how many bytes are in the "header" part. */
+		State->HeaderSize = entry->DIBoffset + INFOHEADER_SIZE;
 
 		if (State->HeaderSize>State->BytesInHeaderBuf) {
 			guchar *tmp=g_try_realloc(State->HeaderBuf,State->HeaderSize);
@@ -508,7 +510,7 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 
 
 	if (State->pixbuf == NULL) {
-		if (State->size_func) {
+		{
 			gint width = State->Header.width;
 			gint height = State->Header.height;
 
@@ -538,12 +540,10 @@ static void DecodeHeader(guchar *Data, gint Bytes,
 			gdk_pixbuf_set_option (State->pixbuf, "y_hot", hot);
 		}
 
-		if (State->prepared_func != NULL)
-			/* Notify the client that we are ready to go */
-			(*State->prepared_func) (State->pixbuf,
-                                                 NULL,
-						 State->user_data);
-
+		/* Notify the client that we are ready to go */
+		(*State->prepared_func) (State->pixbuf,
+					 NULL,
+					 State->user_data);
 	}
 
 }
@@ -562,6 +562,10 @@ gdk_pixbuf__ico_image_begin_load(GdkPixbufModuleSizeFunc size_func,
                                  GError **error)
 {
 	struct ico_progressive_state *context;
+
+	g_assert (size_func != NULL);
+	g_assert (prepared_func != NULL);
+	g_assert (updated_func != NULL);
 
 	context = g_new0(struct ico_progressive_state, 1);
 	context->size_func = size_func;
@@ -635,16 +639,15 @@ OneLine32 (struct ico_progressive_state *context)
 {
         gint X;
         guchar *Pixels;
+	gsize rowstride = gdk_pixbuf_get_rowstride (context->pixbuf);
 
         X = 0;
         if (context->Header.Negative == 0)
-                Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-                          (context->Header.height - context->Lines - 1));
+                Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * (context->Header.height - context->Lines - 1));
         else
-                Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-                          context->Lines);
+                Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * context->Lines);
         while (X < context->Header.width) {
                 /* BGRA */
                 Pixels[X * 4 + 0] = context->LineBuf[X * 4 + 2];
@@ -659,16 +662,15 @@ static void OneLine24(struct ico_progressive_state *context)
 {
 	gint X;
 	guchar *Pixels;
+	gsize rowstride = gdk_pixbuf_get_rowstride (context->pixbuf);
 
 	X = 0;
 	if (context->Header.Negative == 0)
-		Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-			  (context->Header.height - context->Lines - 1));
+		Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * (context->Header.height - context->Lines - 1));
 	else
-		Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-			  context->Lines);
+		Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * context->Lines);
 	while (X < context->Header.width) {
 		Pixels[X * 4 + 0] = context->LineBuf[X * 3 + 2];
 		Pixels[X * 4 + 1] = context->LineBuf[X * 3 + 1];
@@ -685,15 +687,14 @@ OneLine16 (struct ico_progressive_state *context)
         int i;
         guchar *pixels;
         guchar *src;
+	gsize rowstride = gdk_pixbuf_get_rowstride (context->pixbuf);
 
         if (context->Header.Negative == 0)
-                pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-                          (context->Header.height - context->Lines - 1));
+                pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * (context->Header.height - context->Lines - 1));
         else
-                pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-                          context->Lines);
+                pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * context->Lines);
 
         src = context->LineBuf;
 
@@ -723,16 +724,15 @@ static void OneLine8(struct ico_progressive_state *context)
 {
 	gint X;
 	guchar *Pixels;
+	gsize rowstride = gdk_pixbuf_get_rowstride (context->pixbuf);
 
 	X = 0;
 	if (context->Header.Negative == 0)
-		Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-			  (context->Header.height - context->Lines - 1));
+		Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * (context->Header.height - context->Lines - 1));
 	else
-		Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-			  context->Lines);
+		Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * context->Lines);
 	while (X < context->Header.width) {
 		/* The joys of having a BGR byteorder */
 		Pixels[X * 4 + 0] =
@@ -749,16 +749,15 @@ static void OneLine4(struct ico_progressive_state *context)
 {
 	gint X;
 	guchar *Pixels;
+	gsize rowstride = gdk_pixbuf_get_rowstride (context->pixbuf);
 
 	X = 0;
 	if (context->Header.Negative == 0)
-		Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-			  (context->Header.height - context->Lines - 1));
+		Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * (context->Header.height - context->Lines - 1));
 	else
-		Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-			  context->Lines);
+		Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * context->Lines);
 	
 	while (X < context->Header.width) {
 		guchar Pix;
@@ -792,16 +791,15 @@ static void OneLine1(struct ico_progressive_state *context)
 {
 	gint X;
 	guchar *Pixels;
+	gsize rowstride = gdk_pixbuf_get_rowstride (context->pixbuf);
 
 	X = 0;
 	if (context->Header.Negative == 0)
-		Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-			  (context->Header.height - context->Lines - 1));
+		Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * (context->Header.height - context->Lines - 1));
 	else
-		Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-			  context->Lines);
+		Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * context->Lines);
 	while (X < context->Header.width) {
 		int Bit;
 
@@ -820,6 +818,7 @@ static void OneLineTransp(struct ico_progressive_state *context)
 {
 	gint X;
 	guchar *Pixels;
+	gsize rowstride = gdk_pixbuf_get_rowstride (context->pixbuf);
 
 	/* Ignore the XOR mask for XP style 32-bpp icons with alpha */ 
 	if (context->Header.depth == 32)
@@ -827,13 +826,11 @@ static void OneLineTransp(struct ico_progressive_state *context)
 
 	X = 0;
 	if (context->Header.Negative == 0)
-		Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-			  (2*context->Header.height - context->Lines - 1));
+		Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * (2*context->Header.height - context->Lines - 1));
 	else
-		Pixels = (context->pixbuf->pixels +
-			  (gsize) context->pixbuf->rowstride *
-			  (context->Lines-context->Header.height));
+		Pixels = (gdk_pixbuf_get_pixels (context->pixbuf) +
+			  rowstride * (context->Lines-context->Header.height));
 	while (X < context->Header.width) {
 		int Bit;
 
@@ -892,7 +889,7 @@ static void OneLine(struct ico_progressive_state *context)
 			context->LineWidth = (context->LineWidth / 4) * 4 + 4;
 	}
 
-	if (context->updated_func != NULL) {
+	{
 		int y;
 
 		y = context->Lines % context->Header.height;

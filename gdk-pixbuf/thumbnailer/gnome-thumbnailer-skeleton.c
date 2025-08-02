@@ -24,6 +24,7 @@
 #include <gio/gio.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
+#include <locale.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -238,6 +239,8 @@ int main (int argc, char **argv)
 	gsize length;
 #endif
 
+	setlocale (LC_ALL, "");
+
 #if !GLIB_CHECK_VERSION(2, 36, 0)
 	g_type_init ();
 #endif
@@ -249,8 +252,11 @@ int main (int argc, char **argv)
 	if (g_option_context_parse (context, &argc, &argv, &error) == FALSE) {
 		g_warning ("Couldn't parse command-line options: %s", error->message);
 		g_error_free (error);
+		g_option_context_free (context);
 		return 1;
 	}
+
+	g_option_context_free (context);
 
 	/* Set fatal warnings if required */
 	if (g_fatal_warnings) {
@@ -301,7 +307,7 @@ int main (int argc, char **argv)
 			scaled = gdk_pixbuf_scale_simple (pixbuf,
 							  floor (width * scale + 0.5),
 							  floor (height * scale + 0.5),
-							  GDK_INTERP_HYPER);
+							  GDK_INTERP_BILINEAR);
 #endif
 			gdk_pixbuf_copy_options (pixbuf, scaled);
 			g_object_unref (pixbuf);

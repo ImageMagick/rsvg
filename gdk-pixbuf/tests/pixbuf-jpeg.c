@@ -115,6 +115,100 @@ test_comment(void)
   g_object_unref (ref);
 }
 
+static void
+test_at_size (void)
+{
+  GError *error = NULL;
+  GdkPixbuf *ref;
+
+  if (!format_supported ("jpeg") || !format_supported ("png"))
+    {
+      g_test_skip ("format not supported");
+      return;
+    }
+
+  ref = gdk_pixbuf_new_from_file (g_test_get_filename (G_TEST_DIST, "bug753605-atsize.jpg", NULL), &error);
+  g_assert_no_error (error);
+  g_object_unref (ref);
+
+  ref = gdk_pixbuf_new_from_file_at_size (g_test_get_filename (G_TEST_DIST, "bug753605-atsize.jpg", NULL),
+					  50, 50, &error);
+  g_assert_no_error (error);
+  g_object_unref (ref);
+}
+
+static void
+test_jpeg_markers (void)
+{
+  GdkPixbufLoader *loader;
+  GdkPixbuf *pixbuf;
+  GError *error = NULL;
+  gchar *contents;
+  gsize size;
+
+  if (!format_supported ("jpeg"))
+    {
+      g_test_skip ("format not supported");
+      return;
+    }
+
+  g_file_get_contents (g_test_get_filename (G_TEST_DIST, "issue70.jpg", NULL), &contents, &size, &error);
+  g_assert_no_error (error);
+
+  loader = gdk_pixbuf_loader_new ();
+
+  gdk_pixbuf_loader_write (loader, (const guchar*)contents, size, &error);
+  g_assert_no_error (error);
+
+  gdk_pixbuf_loader_close (loader, &error);
+  g_assert_no_error (error);
+
+  pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+  g_assert_nonnull (pixbuf);
+
+  g_object_unref (loader);
+  g_free (contents);
+}
+
+static void
+test_jpeg_fbfbfbfb (void)
+{
+  GdkPixbufLoader *loader;
+  GError *error = NULL;
+  gchar *contents;
+  gsize size;
+
+  if (!format_supported ("jpeg"))
+    {
+      g_test_skip ("format not supported");
+      return;
+    }
+
+  g_test_message ("Load JPEG with size 0xfbfbfbfb (issue: 205)");
+
+  if (!g_file_get_contents (g_test_get_filename (G_TEST_DIST, "issue205.jpg", NULL), &contents, &size, &error))
+    {
+      if (g_error_matches (error, GDK_PIXBUF_ERROR, GDK_PIXBUF_ERROR_INSUFFICIENT_MEMORY))
+        {
+          g_test_skip ("not enough memory for this test");
+          return;
+        }
+    }
+
+  g_assert_no_error (error);
+
+  loader = gdk_pixbuf_loader_new ();
+
+  gdk_pixbuf_loader_write (loader, (const guchar*)contents, size, &error);
+  g_assert_no_error (error);
+
+  gdk_pixbuf_loader_close (loader, &error);
+  g_assert_true (error != NULL && error->domain == GDK_PIXBUF_ERROR);
+
+  g_object_unref (loader);
+  g_free (contents);
+}
+
 int
 main (int argc, char **argv)
 {
@@ -124,6 +218,9 @@ main (int argc, char **argv)
   g_test_add_func ("/pixbuf/jpeg/type9_rotation_exif_tag", test_type9_rotation_exif_tag);
   g_test_add_func ("/pixbuf/jpeg/bug775218", test_bug_775218);
   g_test_add_func ("/pixbuf/jpeg/comment", test_comment);
+  g_test_add_func ("/pixbuf/jpeg/at_size", test_at_size);
+  g_test_add_func ("/pixbuf/jpeg/issue70", test_jpeg_markers);
+  g_test_add_func ("/pixbuf/jpeg/issue205", test_jpeg_fbfbfbfb);
 
   return g_test_run ();
 }

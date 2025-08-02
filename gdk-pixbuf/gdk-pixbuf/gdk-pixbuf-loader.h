@@ -43,18 +43,12 @@ G_BEGIN_DECLS
 #define GDK_IS_PIXBUF_LOADER_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GDK_TYPE_PIXBUF_LOADER))
 #define GDK_PIXBUF_LOADER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GDK_TYPE_PIXBUF_LOADER, GdkPixbufLoaderClass))
 
-/**
- * GdkPixbufLoader:
- * 
- * The GdkPixbufLoader struct contains only private
- * fields. 
- */
 typedef struct _GdkPixbufLoader GdkPixbufLoader;
 struct _GdkPixbufLoader
 {
+  /*< private >*/
   GObject parent_instance;
   
-  /*< private >*/
   gpointer priv;
 };
 
@@ -112,8 +106,8 @@ gboolean             gdk_pixbuf_loader_close         (GdkPixbufLoader *loader,
 GDK_PIXBUF_AVAILABLE_IN_2_2
 GdkPixbufFormat     *gdk_pixbuf_loader_get_format    (GdkPixbufLoader *loader);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkPixbufLoader, g_object_unref)
+
 G_END_DECLS
 
 #endif
-
-

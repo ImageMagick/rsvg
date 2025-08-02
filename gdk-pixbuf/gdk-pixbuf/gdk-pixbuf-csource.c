@@ -65,6 +65,7 @@ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   g_fprintf (f_out, "%s\n", gstring->str);
 
   g_free (free_me);
+  g_string_free (gstring, TRUE);
 G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
@@ -75,6 +76,8 @@ main (int   argc,
   GdkPixbuf *pixbuf;
   GError *error = NULL;
   gchar *infilename;
+
+  g_set_prgname ("gdk-pixbuf-csource");
 
   /* parse args and do fast exits */
   parse_args (&argc, &argv);

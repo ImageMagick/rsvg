@@ -29,29 +29,38 @@
 
 #include "config.h"
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 #include <tiffio.h>
 #include <errno.h>
-#include "gdk-pixbuf-private.h"
+#include <glib-object.h>
+#include <glib/gi18n-lib.h>
+
+#include "gdk-pixbuf-core.h"
+#include "gdk-pixbuf-io.h"
 #include "fallback-c89.c"
 
 #ifdef G_OS_WIN32
 #include <fcntl.h>
 #include <io.h>
+#include <windows.h>
 #define lseek(a,b,c) _lseek(a,b,c)
 #define O_RDWR _O_RDWR
 #endif
 
 
+/* Helper macros to convert between density units */
+#define DPCM_TO_DPI(value) ((int) round ((value) * 2.54))
+
 typedef struct _TiffContext TiffContext;
 struct _TiffContext
 {
 	GdkPixbufModuleSizeFunc size_func;
-	GdkPixbufModulePreparedFunc prepare_func;
-	GdkPixbufModuleUpdatedFunc update_func;
+	GdkPixbufModulePreparedFunc prepared_func;
+	GdkPixbufModuleUpdatedFunc updated_func;
 	gpointer user_data;
         
         guchar *buffer;
@@ -89,13 +98,13 @@ tiff_image_parse (TIFF *tiff, TiffContext *context, GError **error)
 	gint width, height, rowstride, bytes;
 	GdkPixbuf *pixbuf;
 	guint16 bits_per_sample = 0;
-	uint16 orientation = 0;
-	uint16 transform = 0;
-        uint16 codec;
+	uint16_t orientation = 0;
+	uint16_t transform = 0;
+        uint16_t codec;
         gchar *icc_profile_base64;
         const gchar *icc_profile;
         guint icc_profile_size;
-        uint16 resolution_unit;
+        uint16_t resolution_unit;
         gchar *density_str;
         gint retval;
 
@@ -145,7 +154,7 @@ tiff_image_parse (TIFF *tiff, TiffContext *context, GError **error)
 
         bytes = height * rowstride;
 
-	if (context && context->size_func) {
+	if (context) {
                 gint w = width;
                 gint h = height;
 		(* context->size_func) (&w, &h, context->user_data);
@@ -268,10 +277,10 @@ tiff_image_parse (TIFF *tiff, TiffContext *context, GError **error)
                 }
         }
 
-	if (context && context->prepare_func)
-		(* context->prepare_func) (pixbuf, NULL, context->user_data);
+	if (context)
+		(* context->prepared_func) (pixbuf, NULL, context->user_data);
 
-	if (!TIFFReadRGBAImageOriented (tiff, width, height, (uint32 *)pixels, ORIENTATION_TOPLEFT, 1)) {
+	if (!TIFFReadRGBAImageOriented (tiff, width, height, (uint32_t *)pixels, ORIENTATION_TOPLEFT, 1)) {
 		g_set_error_literal (error,
                                      GDK_PIXBUF_ERROR,
                                      GDK_PIXBUF_ERROR_FAILED,
@@ -286,24 +295,30 @@ tiff_image_parse (TIFF *tiff, TiffContext *context, GError **error)
                 gdk_pixbuf_set_option (pixbuf, "multipage", "yes");
 
 #if G_BYTE_ORDER == G_BIG_ENDIAN
-	/* Turns out that the packing used by TIFFRGBAImage depends on 
-         * the host byte order... 
-         */ 
-	while (pixels < pixbuf->pixels + bytes) {
-		uint32 pixel = *(uint32 *)pixels;
-		int r = TIFFGetR(pixel);
-		int g = TIFFGetG(pixel);
-		int b = TIFFGetB(pixel);
-		int a = TIFFGetA(pixel);
-		*pixels++ = r;
-		*pixels++ = g;
-		*pixels++ = b;
-		*pixels++ = a;
-	}
+        {
+                guchar *pixbuf_pixels = gdk_pixbuf_get_pixels (pixbuf);
+
+                pixels = pixbuf_pixels;
+
+                /* Turns out that the packing used by TIFFRGBAImage depends on 
+                 * the host byte order... 
+                 */ 
+                while (pixels < pixbuf_pixels + bytes) {
+                        uint32 pixel = *(uint32 *)pixels;
+                        int r = TIFFGetR(pixel);
+                        int g = TIFFGetG(pixel);
+                        int b = TIFFGetB(pixel);
+                        int a = TIFFGetA(pixel);
+                        *pixels++ = r;
+                        *pixels++ = g;
+                        *pixels++ = b;
+                        *pixels++ = a;
+                }
+        }
 #endif
 
-	if (context && context->update_func)
-		(* context->update_func) (pixbuf, 0, 0, width, height, context->user_data);
+	if (context)
+		(* context->updated_func) (pixbuf, 0, 0, width, height, context->user_data);
 
         return pixbuf;
 }
@@ -315,7 +330,7 @@ tiff_image_parse (TIFF *tiff, TiffContext *context, GError **error)
 static GdkPixbuf *
 gdk_pixbuf__tiff_image_load (FILE *f, GError **error)
 {
-        TIFF *tiff;
+        TIFF *tiff = NULL;
         int fd;
         GdkPixbuf *pixbuf;
         
@@ -331,7 +346,30 @@ gdk_pixbuf__tiff_image_load (FILE *f, GError **error)
          * before using it. (#60840)
          */
         lseek (fd, 0, SEEK_SET);
+#ifndef G_OS_WIN32
         tiff = TIFFFdOpen (fd, "libpixbuf-tiff", "r");
+#else
+        /* W32 version of this function takes HANDLE.
+         * What's worse, the caller will close the file,
+         * but TIFFClose() will *also* close it, so we
+         * need to make a duplicate.
+         */
+        {
+                HANDLE h;
+
+                if (DuplicateHandle (GetCurrentProcess (),
+                                     (HANDLE) _get_osfhandle (fd),
+                                     GetCurrentProcess (),
+                                     &h,
+                                     0,
+                                     FALSE,
+                                     DUPLICATE_SAME_ACCESS)) {
+                        tiff = TIFFFdOpen ((intptr_t) h, "libpixbuf-tiff", "r");
+                        if (tiff == NULL)
+                                CloseHandle (h);
+                }
+        }
+#endif
 
         if (!tiff) {
                 g_set_error_literal (error,
@@ -354,17 +392,21 @@ gdk_pixbuf__tiff_image_load (FILE *f, GError **error)
 
 static gpointer
 gdk_pixbuf__tiff_image_begin_load (GdkPixbufModuleSizeFunc size_func,
-                                   GdkPixbufModulePreparedFunc prepare_func,
-				   GdkPixbufModuleUpdatedFunc update_func,
+                                   GdkPixbufModulePreparedFunc prepared_func,
+				   GdkPixbufModuleUpdatedFunc updated_func,
 				   gpointer user_data,
                                    GError **error)
 {
 	TiffContext *context;
         
+        g_assert (size_func != NULL);
+        g_assert (prepared_func != NULL);
+        g_assert (updated_func != NULL);
+
 	context = g_new0 (TiffContext, 1);
 	context->size_func = size_func;
-	context->prepare_func = prepare_func;
-	context->update_func = update_func;
+	context->prepared_func = prepared_func;
+	context->updated_func = updated_func;
 	context->user_data = user_data;
         context->buffer = NULL;
         context->allocated = 0;
@@ -505,8 +547,15 @@ make_available_at_least (TiffContext *context, guint needed)
         need_alloc = context->used + needed;
         if (need_alloc > context->allocated) {
                 guint new_size = 1;
-                while (new_size < need_alloc)
-                        new_size *= 2;
+                while (new_size < need_alloc) {
+                        if (!g_uint_checked_mul (&new_size, new_size, 2)) {
+                                new_size = 0;
+                                break;
+                        }
+                }
+
+                if (new_size == 0)
+                        return FALSE;
 
                 new_buffer = g_try_realloc (context->buffer, new_size);
                 if (new_buffer) {
@@ -769,7 +818,7 @@ gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
                 g_set_error_literal (error,
                                      GDK_PIXBUF_ERROR,
                                      GDK_PIXBUF_ERROR_FAILED,
-                                     _("TIFF compression doesn't refer to a valid codec."));
+                                     _("TIFF compression doesn’t refer to a valid codec."));
                 retval = FALSE;
                 goto cleanup;
         }
@@ -814,7 +863,7 @@ gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
                 g_set_error_literal (error,
                                      GDK_PIXBUF_ERROR,
                                      GDK_PIXBUF_ERROR_FAILED,
-                                     _("TIFF bits-per-sample doesn't contain a supported value."));
+                                     _("TIFF bits-per-sample doesn’t contain a supported value."));
                 retval = FALSE;
                 goto cleanup;
          }
@@ -903,7 +952,7 @@ gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
 
         if (x_dpi != NULL && y_dpi != NULL) {
                 char *endptr = NULL;
-                uint16 resolution_unit = RESUNIT_INCH;
+                uint16_t resolution_unit = RESUNIT_INCH;
                 float x_dpi_value, y_dpi_value;
 
                 x_dpi_value = strtol (x_dpi, &endptr, 10);
@@ -913,7 +962,7 @@ gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
                     g_set_error (error,
                                  GDK_PIXBUF_ERROR,
                                  GDK_PIXBUF_ERROR_BAD_OPTION,
-                                 _("TIFF x-dpi must be greater than zero; value '%s' is not allowed."),
+                                 _("TIFF x-dpi must be greater than zero; value “%s” is not allowed."),
                                  x_dpi);
                     retval = FALSE;
                     goto cleanup;
@@ -925,7 +974,7 @@ gdk_pixbuf__tiff_image_save_to_callback (GdkPixbufSaveFunc   save_func,
                     g_set_error (error,
                                  GDK_PIXBUF_ERROR,
                                  GDK_PIXBUF_ERROR_BAD_OPTION,
-                                 _("TIFF y-dpi must be greater than zero; value '%s' is not allowed."),
+                                 _("TIFF y-dpi must be greater than zero; value “%s” is not allowed."),
                                  y_dpi);
                     retval = FALSE;
                     goto cleanup;
@@ -966,7 +1015,7 @@ save_to_file_cb (const gchar *buf,
 		g_set_error_literal (error,
                                      GDK_PIXBUF_ERROR,
                                      GDK_PIXBUF_ERROR_FAILED,
-                                     _("Couldn't write to TIFF file"));
+                                     _("Couldn’t write to TIFF file"));
 		return FALSE;
 	}
 	

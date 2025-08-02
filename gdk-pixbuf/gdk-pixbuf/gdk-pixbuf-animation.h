@@ -36,20 +36,9 @@ G_BEGIN_DECLS
 
 /* Animation support */
 
-/**
- * GdkPixbufAnimation:
- *
- * An opaque struct representing an animation.
- */
 typedef struct _GdkPixbufAnimation GdkPixbufAnimation;
 
 
-/**
- * GdkPixbufAnimationIter:
- *
- * An opaque struct representing an iterator which points to a
- * certain position in an animation.
- */
 typedef struct _GdkPixbufAnimationIter GdkPixbufAnimationIter;
 
 #define GDK_TYPE_PIXBUF_ANIMATION              (gdk_pixbuf_animation_get_type ())
@@ -89,13 +78,10 @@ GDK_PIXBUF_AVAILABLE_IN_2_28
 GdkPixbufAnimation *gdk_pixbuf_animation_new_from_resource(const char        *resource_path,
                                                           GError            **error);
 
-#ifndef GDK_PIXBUF_DISABLE_DEPRECATED
-
 GDK_PIXBUF_DEPRECATED_IN_2_0_FOR(g_object_ref)
 GdkPixbufAnimation *gdk_pixbuf_animation_ref             (GdkPixbufAnimation *animation);
 GDK_PIXBUF_DEPRECATED_IN_2_0_FOR(g_object_unref)
 void                gdk_pixbuf_animation_unref           (GdkPixbufAnimation *animation);
-#endif
 
 GDK_PIXBUF_AVAILABLE_IN_ALL
 int                 gdk_pixbuf_animation_get_width       (GdkPixbufAnimation *animation);
@@ -106,9 +92,12 @@ gboolean            gdk_pixbuf_animation_is_static_image  (GdkPixbufAnimation *a
 GDK_PIXBUF_AVAILABLE_IN_ALL
 GdkPixbuf          *gdk_pixbuf_animation_get_static_image (GdkPixbufAnimation *animation);
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 GDK_PIXBUF_AVAILABLE_IN_ALL
 GdkPixbufAnimationIter *gdk_pixbuf_animation_get_iter                        (GdkPixbufAnimation     *animation,
                                                                               const GTimeVal         *start_time);
+G_GNUC_END_IGNORE_DEPRECATIONS
+
 GDK_PIXBUF_AVAILABLE_IN_ALL
 GType                   gdk_pixbuf_animation_iter_get_type                   (void) G_GNUC_CONST;
 GDK_PIXBUF_AVAILABLE_IN_ALL
@@ -117,9 +106,11 @@ GDK_PIXBUF_AVAILABLE_IN_ALL
 GdkPixbuf              *gdk_pixbuf_animation_iter_get_pixbuf                 (GdkPixbufAnimationIter *iter);
 GDK_PIXBUF_AVAILABLE_IN_ALL
 gboolean                gdk_pixbuf_animation_iter_on_currently_loading_frame (GdkPixbufAnimationIter *iter);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 GDK_PIXBUF_AVAILABLE_IN_ALL
 gboolean                gdk_pixbuf_animation_iter_advance                    (GdkPixbufAnimationIter *iter,
                                                                               const GTimeVal         *current_time);
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 
 #ifdef GDK_PIXBUF_ENABLE_BACKEND
@@ -150,23 +141,24 @@ struct _GdkPixbufAnimation {
 
 };
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 struct _GdkPixbufAnimationClass {
         GObjectClass parent_class;
 
         /*< public >*/
 
-        gboolean                (*is_static_image)  (GdkPixbufAnimation *anim);
+        gboolean                (*is_static_image)  (GdkPixbufAnimation *animation);
 
-        GdkPixbuf*              (*get_static_image) (GdkPixbufAnimation *anim);
-        
-        void                    (*get_size) (GdkPixbufAnimation *anim,
+        GdkPixbuf*              (*get_static_image) (GdkPixbufAnimation *animation);
+
+        void                    (*get_size) (GdkPixbufAnimation *animation,
                                              int                 *width,
                                              int                 *height);
-        
-        GdkPixbufAnimationIter* (*get_iter) (GdkPixbufAnimation *anim,
-                                             const GTimeVal     *start_time);
 
+        GdkPixbufAnimationIter* (*get_iter) (GdkPixbufAnimation *animation,
+                                             const GTimeVal     *start_time);
 };
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 
 
@@ -196,6 +188,7 @@ struct _GdkPixbufAnimationIter {
 
 };
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 struct _GdkPixbufAnimationIterClass {
         GObjectClass parent_class;
 
@@ -210,7 +203,12 @@ struct _GdkPixbufAnimationIterClass {
         gboolean   (*advance)          (GdkPixbufAnimationIter *iter,
                                         const GTimeVal         *current_time);
 };
-      
+G_GNUC_END_IGNORE_DEPRECATIONS
+
+#define GDK_TYPE_PIXBUF_NON_ANIM              (gdk_pixbuf_non_anim_get_type ())
+#define GDK_PIXBUF_NON_ANIM(object)           (G_TYPE_CHECK_INSTANCE_CAST ((object), GDK_TYPE_PIXBUF_NON_ANIM, GdkPixbufNonAnim))
+#define GDK_IS_PIXBUF_NON_ANIM(object)        (G_TYPE_CHECK_INSTANCE_TYPE ((object), GDK_TYPE_PIXBUF_NON_ANIM))
+
 
 GDK_PIXBUF_AVAILABLE_IN_ALL
 GType               gdk_pixbuf_non_anim_get_type (void) G_GNUC_CONST;
@@ -218,6 +216,9 @@ GDK_PIXBUF_AVAILABLE_IN_ALL
 GdkPixbufAnimation* gdk_pixbuf_non_anim_new (GdkPixbuf *pixbuf);
 
 #endif /* GDK_PIXBUF_ENABLE_BACKEND */
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (GdkPixbufAnimation, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (GdkPixbufAnimationIter, g_object_unref)
 
 G_END_DECLS
 
