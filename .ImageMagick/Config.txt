@@ -17,17 +17,18 @@ librsvg -> librsvg
 gdk-pixbuf\gdk-pixbuf -> gdk-pixbuf
 
 [EXCLUDES]
-gdk-pixbuf\contrib\
 gdk-pixbuf\docs\
-gdk-pixbuf\gdk-pixbuf\pixops\timescale.c
+gdk-pixbuf\gdk-pixbuf\fallback-c89.c
+gdk-pixbuf\gdk-pixbuf\io-android-
 gdk-pixbuf\gdk-pixbuf\io-gdip-
-gdk-pixbuf\gdk-pixbuf\io-jasper.c
+gdk-pixbuf\gdk-pixbuf\io-glycin-
 gdk-pixbuf\gdk-pixbuf\gdk-pixbuf-csource.c
+gdk-pixbuf\gdk-pixbuf\make-inline-pixbuf.c
 gdk-pixbuf\gdk-pixbuf\queryloaders.c
 gdk-pixbuf\gdk-pixbuf\test-gdk-pixbuf.c
+gdk-pixbuf\gdk-pixbuf\pixops\timescale.c
 gdk-pixbuf\tests\
 gdk-pixbuf\thumbnailer\
-gdk-pixbuf\win32\
 librsvg\gdk-pixbuf-loader\test.c
 librsvg\rsvg-convert.c
 librsvg\rsvg-file-util.c
