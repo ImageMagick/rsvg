@@ -1,6 +1,7 @@
 [DYNAMIC_LIBRARY]
 
 [LICENSE]
+gdk-pixbuf\COPYING
 librsvg\COPYING.LIB
 
 [DEFINES]
