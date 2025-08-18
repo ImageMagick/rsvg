@@ -695,7 +695,7 @@ gdk_pixbuf_io_init_builtin (void)
 static gboolean
 gdk_pixbuf_io_init (void)
 {
-	char *module_file;
+	char *module_file = NULL;
 	gboolean ret;
 
 	gdk_pixbuf_io_init_builtin ();
