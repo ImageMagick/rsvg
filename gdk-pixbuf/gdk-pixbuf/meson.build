@@ -392,8 +392,6 @@ if native_windows_loaders
 endif
 
 gdkpixbuf_bin = [
-  [ 'gdk-pixbuf-csource' ],
-  [ 'gdk-pixbuf-pixdata' ],
   [ 'gdk-pixbuf-query-loaders', [ 'queryloaders.c' ] ],
 ]
 
