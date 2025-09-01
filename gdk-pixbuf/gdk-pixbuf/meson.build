@@ -333,7 +333,7 @@ endif
 gdkpixbuf_dep = declare_dependency(
   link_with: gdkpixbuf,
   include_directories: root_inc,
-  dependencies: gdk_pixbuf_deps,
+  dependencies: [ gdk_pixbuf_deps, included_loaders_deps ],
   sources: [ gdkpixbuf_enum_h, built_girs ],
 )
 meson.override_dependency('gdk-pixbuf-2.0', gdkpixbuf_dep)
@@ -392,6 +392,8 @@ if native_windows_loaders
 endif
 
 gdkpixbuf_bin = [
+  [ 'gdk-pixbuf-csource' ],
+  [ 'gdk-pixbuf-pixdata' ],
   [ 'gdk-pixbuf-query-loaders', [ 'queryloaders.c' ] ],
 ]
 
@@ -401,7 +403,7 @@ foreach bin: gdkpixbuf_bin
 
   bin = executable(bin_name, bin_source,
                    gdkpixbuf_enum_h,
-                   dependencies: gdk_pixbuf_deps + [ gdkpixbuf_dep ],
+                   dependencies: gdkpixbuf_dep,
                    include_directories: [ root_inc, gdk_pixbuf_inc ],
                    c_args: common_cflags + gdk_pixbuf_cflags,
                    install: true)

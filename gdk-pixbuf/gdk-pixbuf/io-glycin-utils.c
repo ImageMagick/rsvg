@@ -100,77 +100,21 @@ gdk_pixbuf__glycin_image_begin_load (GdkPixbufModuleSizeFunc       size_func,
 }
 
 static GdkPixbuf *
-convert_glycin_frame_to_pixbuf (GlyFrame  *frame,
-                                GError   **error)
+convert_glycin_frame_to_pixbuf (GlyFrame *frame)
 {
-  GdkPixbuf *pixbuf;
   GBytes *bytes;
-  guchar *data;
-  int R, G, B, A;
-  int bpp;
   GlyMemoryFormat format;
 
-  format = gly_frame_get_memory_format (frame);
-  switch ((int) format)
-    {
-    case GLY_MEMORY_B8G8R8A8:
-      B = 0; G = 1; R = 2; A = 3;
-      bpp = 4;
-      break;
-
-    case GLY_MEMORY_A8R8G8B8:
-      A = 0; R = 1; G = 2; B = 3;
-      bpp = 4;
-      break;
-
-    case GLY_MEMORY_R8G8B8A8:
-      R = 0; G = 1; B = 2; A = 3;
-      bpp = 4;
-      break;
-
-    case GLY_MEMORY_A8B8G8R8:
-      A = 0; B = 1; G = 2; R = 3;
-      bpp = 4;
-      break;
-
-    case GLY_MEMORY_R8G8B8:
-      R = 0; G = 1; B = 2; A = -1;
-      bpp = 3;
-      break;
-
-    case GLY_MEMORY_B8G8R8:
-      B = 0; G = 1; R = 2; A = -1;
-      bpp = 3;
-      break;
-
-    default:
-      g_set_error (error,
-                   GDK_PIXBUF_ERROR, GDK_PIXBUF_ERROR_UNSUPPORTED_OPERATION,
-                   "Glycin memory format %u not handled", format);
-      return NULL;
-    }
-
   bytes = gly_frame_get_buf_bytes (frame);
-  data = g_bytes_get_data (bytes, NULL);
-  pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8,
-                           gly_frame_get_width (frame),
-                           gly_frame_get_height (frame));
+  format = gly_frame_get_memory_format (frame);
 
-  for (gsize y = 0; y < gly_frame_get_height (frame); y++)
-    {
-      guchar *src = data + y * gly_frame_get_stride (frame);
-      guchar *dst = gdk_pixbuf_get_pixels (pixbuf) + y * gdk_pixbuf_get_rowstride (pixbuf);
-
-      for (gsize x = 0; x < gly_frame_get_width (frame); x++, src += bpp, dst += 4)
-        {
-          dst[0] = src[R];
-          dst[1] = src[G];
-          dst[2] = src[B];
-          dst[3] = A != -1 ? src[A] : 0xff;
-        }
-    }
-
-  return pixbuf;
+  return gdk_pixbuf_new_from_bytes (bytes,
+                                    GDK_COLORSPACE_RGB,
+                                    gly_memory_format_has_alpha (format),
+                                    8,
+                                    gly_frame_get_width (frame),
+                                    gly_frame_get_height (frame),
+                                    gly_frame_get_stride (frame));
 }
 
 static GdkPixbuf *
@@ -187,18 +131,17 @@ load_pixbuf_with_glycin (GFile                    *file,
   GError *local_error = NULL;
   int width, height;
   char **keys;
+  char value[64];
 
   loader = gly_loader_new (file);
 
   if (should_run_unsandboxed ())
     gly_loader_set_sandbox_selector (loader, GLY_SANDBOX_SELECTOR_NOT_SANDBOXED);
 
-  gly_loader_set_accepted_memory_formats (loader, GLY_MEMORY_SELECTION_B8G8R8A8 |
-                                                  GLY_MEMORY_SELECTION_A8R8G8B8 |
-                                                  GLY_MEMORY_SELECTION_R8G8B8A8 |
-                                                  GLY_MEMORY_SELECTION_A8B8G8R8 |
-                                                  GLY_MEMORY_SELECTION_R8G8B8 |
-                                                  GLY_MEMORY_SELECTION_B8G8R8);
+  gly_loader_set_accepted_memory_formats (loader, GLY_MEMORY_SELECTION_R8G8B8A8 |
+                                                  GLY_MEMORY_SELECTION_R8G8B8);
+
+  gly_loader_set_apply_transformations (loader, FALSE);
 
   image = gly_loader_load (loader, &local_error);
   if (!image)
@@ -217,7 +160,11 @@ load_pixbuf_with_glycin (GFile                    *file,
   if (!frame)
     goto done;
 
-  pixbuf = convert_glycin_frame_to_pixbuf (frame, &local_error);
+  pixbuf = convert_glycin_frame_to_pixbuf (frame);
+
+  g_snprintf (value, sizeof (value), "%u",
+              gly_image_get_transformation_orientation (image));
+  gdk_pixbuf_set_option (pixbuf, "orientation", value);
 
   keys = gly_image_get_metadata_keys (image);
   if (keys)
@@ -410,6 +357,9 @@ glycin_image_save (const char         *mimetype,
   creator = gly_creator_new (mimetype, error);
   if (!creator)
     return FALSE;
+
+  if (should_run_unsandboxed ())
+    gly_creator_set_sandbox_selector (creator, GLY_SANDBOX_SELECTOR_NOT_SANDBOXED);
 
   data = gdk_pixbuf_read_pixel_bytes (pixbuf);
   width = gdk_pixbuf_get_width (pixbuf);

@@ -47,6 +47,8 @@
 #include <mach-o/dyld.h>
 #endif
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+
 /**
  * GdkPixbufModule:
  * @module_name: the name of the module, usually the same as the
@@ -695,16 +697,17 @@ gdk_pixbuf_io_init_builtin (void)
 static gboolean
 gdk_pixbuf_io_init (void)
 {
-	char *module_file = NULL;
-	gboolean ret;
+#ifdef USE_GMODULE
+	char *module_file;
+
+	module_file = gdk_pixbuf_get_module_file ();
+	gdk_pixbuf_io_init_modules (module_file, NULL);
+	g_free (module_file);
+#endif
 
 	gdk_pixbuf_io_init_builtin ();
-#ifdef USE_GMODULE
-	module_file = gdk_pixbuf_get_module_file ();
-#endif
-	ret = gdk_pixbuf_io_init_modules (module_file, NULL);
-	g_free (module_file);
-	return ret;
+
+	return file_formats != NULL;
 }
 
 #define module(type) \
@@ -1848,14 +1851,17 @@ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	 * compressed, and uncompressed on-the-fly.
          */
 	if (g_resources_get_info  (resource_path, 0, &data_size, NULL, NULL) &&
-	    data_size > sizeof(guint32) &&
+	    data_size > sizeof (guint32) &&
 	    (bytes = g_resources_lookup_data (resource_path, 0, NULL)) != NULL) {
-		GdkPixbuf*pixbuf = NULL;
+		GdkPixbuf *pixbuf = NULL;
 		const guint8 *stream = g_bytes_get_data (bytes, NULL);
 		GdkPixdata pixdata;
 		guint32 magic;
 
-		magic = (stream[0] << 24) + (stream[1] << 16) + (stream[2] << 8) + stream[3];
+                magic = ((guint32) stream[0] << 24)
+                      + ((guint32) stream[1] << 16)
+                      + ((guint32) stream[2] << 8)
+                      +  (guint32) stream[3];
 		if (magic == GDK_PIXBUF_MAGIC_NUMBER &&
 		    gdk_pixdata_deserialize (&pixdata, data_size, stream, NULL)) {
 			pixbuf = gdk_pixbuf_from_pixdata (&pixdata, FALSE, NULL);
