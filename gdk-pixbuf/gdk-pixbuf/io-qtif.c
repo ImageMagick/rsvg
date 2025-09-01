@@ -25,7 +25,7 @@
 
 #include "config.h"
 #include <errno.h>
-#include <libintl.h>
+//#include <libintl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -147,9 +147,9 @@ static GdkPixbuf *gdk_pixbuf__qtif_image_load (FILE *f, GError **error)
         {
             g_set_error(error, GDK_PIXBUF_ERROR,
                         GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-                        ngettext (  "QTIF atom size too large (%d byte)",
+                        //ngettext (  "QTIF atom size too large (%d byte)",
                                     "QTIF atom size too large (%d bytes)",
-                                    hdr.length),
+                                    //hdr.length),
                         hdr.length);
             return NULL;
         }
@@ -170,10 +170,10 @@ static GdkPixbuf *gdk_pixbuf__qtif_image_load (FILE *f, GError **error)
                 {
                     g_set_error(error, GDK_PIXBUF_ERROR,
                                 GDK_PIXBUF_ERROR_INSUFFICIENT_MEMORY,
-                                ngettext ( "Failed to allocate %d byte for file read buffer",
+                                //ngettext ( "Failed to allocate %d byte for file read buffer",
                                            "Failed to allocate %d bytes for file read buffer",
-                                           READ_BUFFER_SIZE
-                                ),
+                                           //READ_BUFFER_SIZE
+                                //),
                                 READ_BUFFER_SIZE);
                     return NULL;
                 }
@@ -184,9 +184,9 @@ static GdkPixbuf *gdk_pixbuf__qtif_image_load (FILE *f, GError **error)
                 {
                     g_set_error(error, GDK_PIXBUF_ERROR,
                                 GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-                                ngettext (  "QTIF atom size too large (%d byte)",
+                                //ngettext (  "QTIF atom size too large (%d byte)",
                                             "QTIF atom size too large (%d bytes)",
-                                            hdr.length),
+                                            //hdr.length),
                                 hdr.length);
                     goto clean_up;
                 }
@@ -235,9 +235,9 @@ clean_up:
             {
                 g_set_error(error, GDK_PIXBUF_ERROR,
                             GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-                            ngettext (  "Failed to skip the next %d byte with seek().",
+                            //ngettext (  "Failed to skip the next %d byte with seek().",
                                         "Failed to skip the next %d bytes with seek().",
-                                        hdr.length),
+                                        //hdr.length),
                             hdr.length);
                 return NULL;
             }
@@ -446,9 +446,9 @@ static gboolean gdk_pixbuf__qtif_image_load_increment (gpointer data,
                 {
                     g_set_error(error, GDK_PIXBUF_ERROR,
                                        GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-                                       ngettext (  "QTIF atom size too large (%d byte)",
+                                       //ngettext (  "QTIF atom size too large (%d byte)",
                                                    "QTIF atom size too large (%d bytes)",
-                                                    hdr->length),
+                                                    //hdr->length),
                                        hdr->length);
                     return FALSE;
                 }
