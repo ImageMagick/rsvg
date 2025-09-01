@@ -20,7 +20,7 @@
 #include <math.h>
  
 /* Workaround for round() for non-GCC/non-C99 compilers */
-#ifndef HAVE_ROUND
+#if !defined(_MSC_VER) && !defined(HAVE_ROUND)
 static inline double
 round (double x)
 {
@@ -32,7 +32,7 @@ round (double x)
 #endif
 
 /* Workaround for lrint() for non-GCC/non-C99 compilers */
-#ifndef HAVE_LRINT
+#if !defined(_MSC_VER) && !defined(HAVE_LRINT)
 static inline long
 lrint (double x)
 {
