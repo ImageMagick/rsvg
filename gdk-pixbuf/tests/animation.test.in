@@ -1,3 +1,0 @@
-[Test]
-Exec=@pkglibexecdir@/installed-tests/animation
-Type=session
