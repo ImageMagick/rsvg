@@ -1,51 +1,33 @@
 [DYNAMIC_LIBRARY]
 
 [LICENSE]
-gdk-pixbuf\COPYING
-librsvg\COPYING.LIB
+COPYING.LIB
+
+[INCLUDES]
+.
 
 [DEFINES]
 GDK_PIXBUF_ENABLE_BACKEND
 RSVG_COMPILATION
 
-[INCLUDES]
-gdk-pixbuf
-gdk-pixbuf\gdk-pixbuf
-librsvg
-
 [INCLUDE_ARTIFACTS]
-librsvg -> librsvg
-gdk-pixbuf\gdk-pixbuf -> gdk-pixbuf
+. -> librsvg
 
 [EXCLUDES]
-gdk-pixbuf\docs\
-gdk-pixbuf\gdk-pixbuf\fallback-c89.c
-gdk-pixbuf\gdk-pixbuf\io-android-
-gdk-pixbuf\gdk-pixbuf\io-gdip-
-gdk-pixbuf\gdk-pixbuf\io-glycin-
-gdk-pixbuf\gdk-pixbuf\gdk-pixbuf-csource.c
-gdk-pixbuf\gdk-pixbuf\make-inline-pixbuf.c
-gdk-pixbuf\gdk-pixbuf\queryloaders.c
-gdk-pixbuf\gdk-pixbuf\test-gdk-pixbuf.c
-gdk-pixbuf\gdk-pixbuf\pixops\timescale.c
-gdk-pixbuf\tests\
-gdk-pixbuf\thumbnailer\
-librsvg\gdk-pixbuf-loader\test.c
-librsvg\rsvg-convert.c
-librsvg\rsvg-file-util.c
-librsvg\test-display.c
-librsvg\tests\
-librsvg\tools\
+gdk-pixbuf-loader\test.c
+rsvg-convert.c
+rsvg-file-util.c
+test-display.c
+tests\
+tools\
 
 [REFERENCES]
 cairo
 croco
-harfbuzz
+gdk-pixbuf
 glib
-jpeg-turbo
+harfbuzz
 pango
-png
-tiff
 xml
 
 [MAGICK_BASECONFIG_DEFINE]
