@@ -1,5 +1,23 @@
 [DYNAMIC_LIBRARY]
 
+[VERSION]
+2.40.20
+
+[RELEASE_DATE]
+2017-12-15
+
+[PRODUCT_NAME]
+librsvg
+
+[COMPANY_NAME]
+GNU
+
+[URL]
+https://wiki.gnome.org/LibRsvg
+
+[COPYRIGHT]
+Copyright © 2013
+
 [LICENSE_FILE]
 COPYING.LIB
 
