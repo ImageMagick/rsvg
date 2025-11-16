@@ -839,7 +839,7 @@ rsvg_css_parse_overflow (const char *str, gboolean * inherit)
 }
 
 static void
-rsvg_xml_noerror (void *data, xmlErrorPtr error)
+rsvg_xml_noerror (void *data, const struct _xmlError *error)
 {
 }
 
