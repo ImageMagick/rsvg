@@ -199,6 +199,7 @@ RsvgHandle *rsvg_handle_new_with_flags (RsvgHandleFlags flags);
 void        rsvg_handle_set_base_gfile (RsvgHandle *handle,
                                         GFile      *base_file);
 
+RSVG_EXPORT
 gboolean    rsvg_handle_read_stream_sync (RsvgHandle   *handle,
                                           GInputStream *stream,
                                           GCancellable *cancellable,
